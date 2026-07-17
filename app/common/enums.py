@@ -33,6 +33,7 @@ class DeviceType(str, Enum):
     LED = "LED"
     LCD = "LCD"
     CAMERA = "CAMERA"
+    SERVO = "SERVO"
 
 class ConnectionType(str, Enum):
     GPIO = "GPIO"

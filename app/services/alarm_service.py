@@ -19,7 +19,7 @@ from app.modules.notifications.service import NotificationService
 from app.modules.readings.service import SensorReadingService
 from app.modules.users.service import UserService
 from app.security.hashing import password_hasher
-
+from app.modules.devices.service import DeviceService
 #from app.modules.devices.service import DeviceService
 from app.modules.events.schemas import AlarmEventCreate
 
@@ -44,7 +44,7 @@ class AlarmService:
         self.user_service = user_service
         self.auth_service = auth_service
         self.device_control_service = device_control_service
-        #self.device_service = device_service
+        self.device_service = device_service
     def process_sensor_reading(
         self,
         reading: SensorReading,
@@ -194,35 +194,35 @@ class AlarmService:
         return self.settings_service.get_alarm_status()
     
     def _activate_alarm_devices(self):
-        leds = self.device_service.get_devices_by_type(DeviceType.LED)
+        leds = self.device_service.get_by_type(DeviceType.LED)
         for led in leds:
             self.device_control_service.turn_on_led(led)
-        buzzer = self.device_service.get_devices_by_type(DeviceType.BUZZER)
+        buzzer = self.device_service.get_by_type(DeviceType.BUZZER)
         for buzzer in buzzer:
             self.device_control_service.turn_on_buzzer(buzzer)
-        servos = self.device_service.get_devices_by_type(DeviceType.SERVO)
+        servos = self.device_service.get_by_type(DeviceType.SERVO)
         for servo in servos:
             self.device_control_service.move_servo(servo,180)
-        motors = self.device_service.get_devices_by_type(DeviceType.MOTOR)
+        motors = self.device_service.get_by_type(DeviceType.MOTOR)
         for motor in motors:
             self.device_control_service.move_motor(motor,'LEFT',100)
-        cameras = self.device_service.get_devices_by_type(DeviceType.CAMERA)
+        cameras = self.device_service.get_by_type(DeviceType.CAMERA)
         for camera in cameras:
             self.device_control_service.turn_on_camera(camera)
 
     def _deactivate_alarm_devices(self):
-        leds = self.device_service.get_devices_by_type(DeviceType.LED)
+        leds = self.device_service.get_by_type(DeviceType.LED)
         for led in leds:
             self.device_control_service.turn_off_led(led)
-        buzzer = self.device_service.get_devices_by_type(DeviceType.BUZZER)
+        buzzer = self.device_service.get_by_type(DeviceType.BUZZER)
         for buzzer in buzzer:
             self.device_control_service.turn_off_buzzer(buzzer)
-        servos = self.device_service.get_devices_by_type(DeviceType.SERVO)
+        servos = self.device_service.get_by_type(DeviceType.SERVO)
         for servo in servos:
             self.device_control_service.move_servo(servo,0)
-        motors = self.device_service.get_devices_by_type(DeviceType.MOTOR)
+        motors = self.device_service.get_by_type(DeviceType.MOTOR)
         for motor in motors:
             self.device_control_service.move_motor(motor,'RIGHT',100)
-        cameras = self.device_service.get_devices_by_type(DeviceType.CAMERA)
+        cameras = self.device_service.get_by_type(DeviceType.CAMERA)
         for camera in cameras:
             self.device_control_service.turn_off_camera(camera)
