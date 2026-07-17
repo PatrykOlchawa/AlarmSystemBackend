@@ -12,9 +12,15 @@ from app.modules.notifications.router import router as notification_router
 from app.modules.settings.router import router as settings_router
 from app.modules.alarm.router import router as alarm_router
 from app.modules.devices.router import router as devices_router
+from app.modules.control_devices.router import router as control_devices_router
 
 from app.core.exception_handlers import register_exception_handlers
 from app.security.hashing import password_hasher
+
+import logging
+
+logging.basicConfig(level=logging.INFO)
+
 app = FastAPI(
     title="AlarmAPI",
     description="REST API for RaspberryPi Alarm System",
@@ -31,6 +37,7 @@ app.include_router(notification_router)
 app.include_router(settings_router)
 app.include_router(alarm_router)
 app.include_router(devices_router)
+app.include_router(control_devices_router)
 
 @app.get("/")
 def root():
