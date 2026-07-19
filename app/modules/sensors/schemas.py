@@ -9,7 +9,7 @@ from app.common.enums import (
 
 class SensorBase(BaseModel):
     name: str = Field(
-        min_length=3,
+        min_length=2,
         max_length=100,
     )
 
@@ -51,7 +51,7 @@ class SensorUpdate(BaseModel):
 
     enabled: bool | None = None
 
-class SensorRead(BaseModel):
+class SensorRead(SensorBase):
     id: int
     model_config = ConfigDict(
         from_attributes=True

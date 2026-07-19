@@ -58,3 +58,7 @@ class DeviceAlreadyExistsException(AppException):
 class InvalidPinException(AppException):
     status_code = 403
     detail = "Invalid pin"
+
+class CarPlateNotFoundException(AppException):
+    status_code = 404
+    detail = "Car plate not found"

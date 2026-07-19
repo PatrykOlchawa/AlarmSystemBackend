@@ -69,3 +69,127 @@ def turn_off_led(
     return MessageResponse(
         message="LED turned on",
     )
+
+@router.post(
+    "/buzzer/{device_id}/on",
+    response_model=MessageResponse,
+    )
+def turn_on_buzzer(
+    device_id: int,
+    current_user: User = Depends(get_current_user),
+    device_service: DeviceService = Depends(get_device_service),
+    control_service: DeviceControlService = Depends(get_device_control_service),
+) -> MessageResponse:
+    device = _get_device_or_raise(
+        device_id,
+        DeviceType.BUZZER,
+        device_service,
+    )
+    control_service.turn_on_buzzer(device)
+    return MessageResponse(
+        message="Buzzer turned on",
+    )
+
+@router.post(
+    "/buzzer/{device_id}/off",
+    response_model=MessageResponse,
+    )
+def turn_off_buzzer(
+    device_id: int,
+    current_user: User = Depends(get_current_user),
+    device_service: DeviceService = Depends(get_device_service),
+    control_service: DeviceControlService = Depends(get_device_control_service),
+) -> MessageResponse:
+    device = _get_device_or_raise(
+        device_id,
+        DeviceType.BUZZER,
+        device_service,
+    )
+    control_service.turn_off_buzzer(device)
+    return MessageResponse(
+        message="Buzzer turned off",
+    )
+
+@router.post(
+    "/camera/{device_id}/on",
+    response_model=MessageResponse,
+    )
+def turn_on_camera(
+    device_id: int,
+    current_user: User = Depends(get_current_user),
+    device_service: DeviceService = Depends(get_device_service),
+    control_service: DeviceControlService = Depends(get_device_control_service),
+) -> MessageResponse:
+    device = _get_device_or_raise(
+        device_id,
+        DeviceType.CAMERA,
+        device_service,
+    )
+    control_service.turn_on_camera(device)
+    return MessageResponse(
+        message="Camera turned on",
+    )
+
+@router.post(
+    "/camera/{device_id}/off",
+    response_model=MessageResponse,
+    )
+def turn_off_camera(
+    device_id: int,
+    current_user: User = Depends(get_current_user),
+    device_service: DeviceService = Depends(get_device_service),
+    control_service: DeviceControlService = Depends(get_device_control_service),
+) -> MessageResponse:
+    device = _get_device_or_raise(
+        device_id,
+        DeviceType.CAMERA,
+        device_service,
+    )
+    control_service.turn_off_camera(device)
+    return MessageResponse(
+        message="Camera turned off",
+    )
+
+@router.post(
+    "/servo/{device_id}/move",
+    response_model=MessageResponse,
+    )
+def move_servo(
+    device_id: int,
+    angle: int,
+    current_user: User = Depends(get_current_user),
+    device_service: DeviceService = Depends(get_device_service),
+    control_service: DeviceControlService = Depends(get_device_control_service),
+) -> MessageResponse:
+    device = _get_device_or_raise(
+        device_id,
+        DeviceType.SERVO,
+        device_service,
+    )
+    control_service.move_servo(device, angle)
+    return MessageResponse(
+        message=f"Servo moved by {angle} degrees",
+    )
+
+@router.post(
+    "/motor/{device_id}/move",
+    response_model=MessageResponse,
+    )
+def move_motor(
+    device_id: int,
+    direction: str,
+    steps: int,
+    current_user: User = Depends(get_current_user),
+    device_service: DeviceService = Depends(get_device_service),
+    control_service: DeviceControlService = Depends(get_device_control_service),
+) -> MessageResponse:
+    device = _get_device_or_raise(
+        device_id,
+        DeviceType.MOTOR,
+        device_service,
+    )
+    control_service.move_motor(device, direction, steps)
+    return MessageResponse(
+        message=f"Motor moved to {direction} by {steps} steps",
+    )
+    
