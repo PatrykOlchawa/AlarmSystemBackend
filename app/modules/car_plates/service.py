@@ -28,8 +28,8 @@ class CarPlateService:
         plate_number: str
     ) -> CarPlate:
         car_plate = self.repository.get_by_plate_number(plate_number)
-        if car_plate is None:
-            raise CarPlateNotFoundException
+        #if car_plate is None:
+        #    raise CarPlateNotFoundException
         return car_plate
 
     def get_by_owner(

@@ -3,8 +3,8 @@ from app.modules.alarm.schemas import AlarmMessageResponse
 from app.modules.devices.model import Device
 from app.common.enums import DeviceType
 from fastapi import APIRouter, Depends, HTTPException, status
-from app.modules.devices.service import DeviceService
-from app.services.dependencies import get_device_service, get_device_control_service
+from app.services.dependencies import  get_device_control_service
+from app.modules.devices.dependencies import get_device_service
 from app.services.device_control_service import DeviceControlService
 from app.modules.users.model import User
 from app.security.auth_dependencies import get_current_user
@@ -16,7 +16,7 @@ router = APIRouter(
 def _get_device_or_raise(
     device_id: int,
     expected_type: DeviceType,
-    service: DeviceService,
+    service = Depends(get_device_service),
 ) -> Device:
     device = service.get_by_id(device_id)
     if device is None:
@@ -38,8 +38,8 @@ def _get_device_or_raise(
 def turn_on_led(
     device_id: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> AlarmMessageResponse:
     device = _get_device_or_raise(
         device_id,
@@ -57,8 +57,8 @@ def turn_on_led(
 def turn_off_led(
     device_id: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
     device = _get_device_or_raise(
         device_id,
@@ -77,8 +77,8 @@ def turn_off_led(
 def turn_on_buzzer(
     device_id: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
     device = _get_device_or_raise(
         device_id,
@@ -97,8 +97,8 @@ def turn_on_buzzer(
 def turn_off_buzzer(
     device_id: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
     device = _get_device_or_raise(
         device_id,
@@ -117,8 +117,8 @@ def turn_off_buzzer(
 def turn_on_camera(
     device_id: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
     device = _get_device_or_raise(
         device_id,
@@ -137,8 +137,8 @@ def turn_on_camera(
 def turn_off_camera(
     device_id: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
     device = _get_device_or_raise(
         device_id,
@@ -158,8 +158,8 @@ def move_servo(
     device_id: int,
     angle: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
     device = _get_device_or_raise(
         device_id,
@@ -180,8 +180,8 @@ def move_motor(
     direction: str,
     steps: int,
     current_user: User = Depends(get_current_user),
-    device_service: DeviceService = Depends(get_device_service),
-    control_service: DeviceControlService = Depends(get_device_control_service),
+    device_service = Depends(get_device_service),
+    control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
     device = _get_device_or_raise(
         device_id,

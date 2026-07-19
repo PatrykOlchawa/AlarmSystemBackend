@@ -1,3 +1,5 @@
+from app.services.tollgate_service import TollgateService
+from app.services import tollgate_service
 from app.modules.devices.service import DeviceService
 from app.common.enums import DeviceType
 from app.services.device_control_service import DeviceControlService
@@ -36,6 +38,7 @@ class AlarmService:
         auth_service: AuthService,
         device_service: DeviceService,
         device_control_service: DeviceControlService,
+        tollgate_service: TollgateService,
     ):
         self.settings_service = settings_service
         self.sensor_service = sensor_service
@@ -45,6 +48,8 @@ class AlarmService:
         self.auth_service = auth_service
         self.device_control_service = device_control_service
         self.device_service = device_service
+        self.tollgate_service = tollgate_service
+    
     def process_sensor_reading(
         self,
         reading: SensorReading,
@@ -97,6 +102,7 @@ class AlarmService:
             message="The alarm system has been armed",
             event_id=event.id,
         )
+        self.tollgate_service.process_vehicle()
     
     def disarm_alarm(
         self,

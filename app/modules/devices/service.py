@@ -1,5 +1,3 @@
-
-
 from app.common.enums import ConnectionType
 from app.common.enums import DeviceType
 from app.modules.devices.schemas import DeviceUpdate

@@ -62,3 +62,11 @@ class InvalidPinException(AppException):
 class CarPlateNotFoundException(AppException):
     status_code = 404
     detail = "Car plate not found"
+
+class InvalidDeviceTypeException(AppException):
+    status_code = 400
+    detail = "Invalid device type"
+
+class CarNotAuthorizedException(AppException):
+    status_code = 403
+    detail = "Car not authorized"
