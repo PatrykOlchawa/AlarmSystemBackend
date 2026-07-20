@@ -1,3 +1,5 @@
+from app.security.auth_dependencies import get_current_user
+from app.modules.users.model import User
 from fastapi import APIRouter
 from fastapi import Depends
 
@@ -31,7 +33,8 @@ def get_user(
 @router.post("/", response_model=UserResponse)
 def create_user(
     request: UserCreate,
-    service: UserService = Depends(get_user_service)
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create_user(
         username=request.username,
