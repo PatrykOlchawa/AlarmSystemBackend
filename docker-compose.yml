@@ -1,12 +1,32 @@
 services:
+  postgres:
+    image: postgres:17
+    container_name: alarm-postgres
+
+    environment:
+      POSTGRES_USER: alarm
+      POSTGRES_PASSWORD: alarm_password
+      POSTGRES_DB: alarm_db
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    restart: unless-stopped
+
   backend:
     build: .
     container_name: alarm-backend
 
+    env_file:
+      - .env
+
     ports:
       - "8000:8000"
 
-    volumes:
-      - .:/app
+    depends_on:
+      - postgres
 
-    restart: unless-stopped 
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
