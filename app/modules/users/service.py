@@ -6,7 +6,7 @@ from app.modules.users.repository import UserRepository
 from app.modules.users.model import User
 from app.common.enums import UserRole
 from app.security.hashing import password_hasher
-from app.modules.users.schema import UserUpdate
+
 
 class UserService:
 

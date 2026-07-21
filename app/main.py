@@ -14,7 +14,7 @@ from app.modules.alarm.router import router as alarm_router
 from app.modules.devices.router import router as devices_router
 from app.modules.control_devices.router import router as control_devices_router
 from app.modules.car_plates.router import router as car_plate_router
-
+from app.modules.alarms.router import router as alarms_router
 from app.core.exception_handlers import register_exception_handlers
 from app.security.hashing import password_hasher
 
@@ -40,6 +40,7 @@ app.include_router(alarm_router)
 app.include_router(devices_router)
 app.include_router(control_devices_router)
 app.include_router(car_plate_router)
+app.include_router(alarms_router)
 
 @app.get("/")
 def root():

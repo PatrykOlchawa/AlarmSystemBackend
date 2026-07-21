@@ -6,6 +6,7 @@ from app.modules.devices.schemas import DeviceCreate
 from app.modules.devices.model import Device
 from app.modules.devices.repository import DeviceRepository
 from app.core.exceptions import DeviceNotFoundException
+
 class DeviceService:
     def __init__(
         self,

@@ -1,5 +1,3 @@
-from app.security.auth_dependencies import get_current_user
-from app.modules.users.model import User
 from fastapi import Depends
 from sqlalchemy.orm import Session
 

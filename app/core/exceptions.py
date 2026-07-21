@@ -70,3 +70,11 @@ class InvalidDeviceTypeException(AppException):
 class CarNotAuthorizedException(AppException):
     status_code = 403
     detail = "Car not authorized"
+
+class AlarmNotFoundException(AppException):
+    status_code = 404
+    detail = "Alarm not found"
+    
+class AlarmAlreadyExistsException(AppException):
+    status_code = 404
+    detail = "Alarm already exists"

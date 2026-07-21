@@ -1,9 +1,10 @@
+from typing import TYPE_CHECKING
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
-from sqlalchemy import Enum as SqlEnum
+from sqlalchemy import Enum
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
@@ -12,7 +13,8 @@ from app.db.base import Base
 from app.common.enums import UserRole
 from app.modules.events.model import AlarmEvent
 from app.modules.notifications.model import Notification
-
+if TYPE_CHECKING:
+    from app.modules.user_alarm.model import UserAlarm
 class User(Base):
 
     __tablename__ = "users"
@@ -37,7 +39,7 @@ class User(Base):
     )
     
     role: Mapped[UserRole] = mapped_column(
-        SqlEnum(UserRole),
+        Enum(UserRole),
         default=UserRole.USER,
         nullable=False
     )
@@ -59,6 +61,11 @@ class User(Base):
         cascade="all, delete-orphan"
     )
     notifications: Mapped[list["Notification"]] = relationship(
+        back_populates="user",
+        cascade="all, delete-orphan"
+    )
+
+    user_alarms: Mapped[list["UserAlarm"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan"
     )

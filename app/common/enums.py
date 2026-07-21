@@ -1,5 +1,10 @@
 from enum import Enum
 
+class AlarmRole(str, Enum):
+    OWNER = "OWNER"
+    ADMIN = "ADMIN"
+    USER = "USER"
+    SERVICE = "SERVICE"
 class UserRole(str, Enum):
     ADMIN = "ADMIN"
     USER = "USER"

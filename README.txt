@@ -21,3 +21,6 @@ sudo docker compose exec postgres psql -U alarm -d alarm_db
 #Alembic
 sudo docker compose exec backend alembic revision --autogenerate -m "Note"
 sudo docker compose exec backend alembic upgrade head
+
+#renew certbot
+sudo docker compose run --rm certbot renew
