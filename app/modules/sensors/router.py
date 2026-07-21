@@ -1,3 +1,5 @@
+from app.security.auth_dependencies import get_current_user
+from app.modules.users.model import User
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import status
@@ -20,7 +22,8 @@ router = APIRouter(
     response_model=list[SensorRead]
 )
 def get_all_sensors(
-    service: SensorService = Depends(get_sensor_service)
+    service: SensorService = Depends(get_sensor_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_all_sensors()
 
@@ -30,7 +33,8 @@ def get_all_sensors(
 )
 def get_sensor(
     sensor_id: int,
-    service: SensorService = Depends(get_sensor_service)
+    service: SensorService = Depends(get_sensor_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_sensor_by_id(sensor_id)
 
@@ -41,7 +45,8 @@ def get_sensor(
 )
 def create_sensor(
     request: SensorCreate,
-    service: SensorService = Depends(get_sensor_service)
+    service: SensorService = Depends(get_sensor_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create_sensor(request)
 
@@ -54,6 +59,7 @@ def update_sensor(
     sensor_id: int,
     request: SensorUpdate,
     service: SensorService = Depends(get_sensor_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.update_sensor(sensor_id, request)
 
@@ -64,6 +70,7 @@ def update_sensor(
 def delete_sensor(
     sensor_id: int,
     service: SensorService = Depends(get_sensor_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.delete_sensor(sensor_id)
     

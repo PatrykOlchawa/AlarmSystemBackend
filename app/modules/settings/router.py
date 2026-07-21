@@ -26,9 +26,8 @@ router = APIRouter(
 
 )
 def get_all_settings(
-    service: SettingService = Depends(
-        get_settings_service,
-    ),
+    service: SettingService = Depends(get_settings_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_all()
 
@@ -39,6 +38,7 @@ def get_all_settings(
 def get_setting(
     key: str,
     service: SettingService = Depends(get_settings_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_by_key(key)
 
@@ -50,6 +50,7 @@ def get_setting(
 def create_setting(
     request: SettingCreate,
     service: SettingService = Depends(get_settings_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create(request)
 
@@ -61,6 +62,7 @@ def update_setting(
     key: str,
     request: SettingUpdate,
     service: SettingService = Depends(get_settings_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.update(key, request)
 
@@ -71,5 +73,6 @@ def update_setting(
 def delete_setting(
     key: str,
     service: SettingService = Depends(get_settings_service),
+    current_user: User = Depends(get_current_user),
 ):
     service.delete(key)    

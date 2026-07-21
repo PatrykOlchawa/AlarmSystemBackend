@@ -1,3 +1,5 @@
+from app.security.auth_dependencies import get_current_user
+from app.modules.users.model import User
 from fastapi import APIRouter, Depends, status
 
 from app.modules.notifications.dependencies import (
@@ -24,9 +26,8 @@ router = APIRouter(
     response_model= list[NotificationRead]
 )
 def get_all_notifications(
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_all()
 
@@ -36,9 +37,8 @@ def get_all_notifications(
 )
 def get_notification(
     user_id: int,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_by_user(user_id)
 
@@ -48,9 +48,8 @@ def get_notification(
 )
 def get_unread_notification(
     user_id: int,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_unread_by_user(user_id)
 
@@ -60,9 +59,8 @@ def get_unread_notification(
 )
 def get_last_notification(
     user_id: int,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_latest_by_user(user_id)
 
@@ -72,9 +70,8 @@ def get_last_notification(
 )
 def get_unread_count(
     user_id: int,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_unread_count(user_id)
 
@@ -84,9 +81,8 @@ def get_unread_count(
 )
 def get_notification_by_id(
     notification_id: int,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_by_id(notification_id)
 
@@ -97,9 +93,8 @@ def get_notification_by_id(
 )
 def create_notification(
     request: NotificationCreate,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create(request)
 
@@ -110,9 +105,8 @@ def create_notification(
 def mark_as_read(
     notification_id: int,
     request: NotificationUpdate,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.update(notification_id, request)
 
@@ -122,8 +116,7 @@ def mark_as_read(
 )
 def delete_notification(
     notification_id: int,
-    service: NotificationService = Depends(
-        get_notification_service
-    ),
+    service: NotificationService = Depends(get_notification_service),
+    current_user: User = Depends(get_current_user),
 ):
     service.delete(notification_id)

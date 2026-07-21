@@ -21,6 +21,7 @@ router = APIRouter(
 )
 def get_devices(
     service: DeviceService = Depends(get_device_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_all()
 
@@ -31,6 +32,7 @@ def get_devices(
 def get_device(
     device_id: int,
     service: DeviceService = Depends(get_device_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_by_id(device_id)
 
@@ -42,6 +44,7 @@ def get_device(
 def create_device(
     request: DeviceCreate,
     service: DeviceService = Depends(get_device_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create(request)
 
@@ -53,6 +56,7 @@ def update_device(
     device_id: int,
     request: DeviceUpdate,
     service: DeviceService = Depends(get_device_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.update(device_id, request)
 
@@ -63,5 +67,6 @@ def update_device(
 def delete_device(
     device_id: int,
     service: DeviceService = Depends(get_device_service),
+    current_user: User = Depends(get_current_user),
 ):
     service.delete(device_id)

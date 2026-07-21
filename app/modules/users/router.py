@@ -17,7 +17,8 @@ router = APIRouter(
 
 @router.get("/", response_model=list[UserResponse])
 def get_users(
-    service: UserService = Depends(get_user_service)
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_all_users()
 
@@ -25,7 +26,8 @@ def get_users(
 @router.get("/{user_id}", response_model=UserResponse)
 def get_user(
     user_id: int,
-    service: UserService = Depends(get_user_service)
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_user_by_id(user_id)
 

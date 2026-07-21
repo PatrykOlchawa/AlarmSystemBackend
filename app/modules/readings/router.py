@@ -1,3 +1,5 @@
+from app.security.auth_dependencies import get_current_user
+from app.modules.users.model import User
 import math as m
 from app.modules.readings import service
 from fastapi import APIRouter
@@ -28,9 +30,8 @@ router = APIRouter(
     response_model = list[SensorReadingRead],
 )
 def get_all_readings(
-    serivce: SensorReadingRead = Depends(
-        get_sensor_reading_service
-    ),
+    serivce: SensorReadingRead = Depends(get_sensor_reading_service),
+    current_user: User = Depends(get_current_user),
 ):
     return serivce.get_all()
 
@@ -40,9 +41,8 @@ def get_all_readings(
 )
 def get_sensor_hisory(
     sensor_id: int,
-    service: SensorReadingService = Depends(
-        get_sensor_reading_service
-    ),
+    service: SensorReadingService = Depends(get_sensor_reading_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_by_sensor(sensor_id)
 
@@ -52,9 +52,8 @@ def get_sensor_hisory(
 )
 def get_last_reading(
     sensor_id: int,
-    service: SensorReadingService = Depends(
-        get_sensor_reading_service
-    ),
+    service: SensorReadingService = Depends(get_sensor_reading_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_latest_by_sensor(sensor_id)
 
@@ -65,9 +64,8 @@ def get_last_reading(
 )
 def create_reading(
     request: SensorReadingCreate,
-    service: SensorReadingService = Depends(
-        get_sensor_reading_service
-    ),
+    service: SensorReadingService = Depends(get_sensor_reading_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create(request)
 
@@ -77,8 +75,7 @@ def create_reading(
 )
 def delete_reading(
     reading_id: int,
-    service: SensorReadingService = Depends(
-        get_sensor_reading_service
-    ),
+    service: SensorReadingService = Depends(get_sensor_reading_service),
+    current_user: User = Depends(get_current_user),
 ):
     service.delete(reading_id)
