@@ -17,7 +17,7 @@ from app.modules.car_plates.router import router as car_plate_router
 from app.modules.alarms.router import router as alarms_router
 from app.core.exception_handlers import register_exception_handlers
 from app.security.hashing import password_hasher
-
+from fastapi.middleware.cors import CORSMiddleware
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -27,6 +27,28 @@ app = FastAPI(
     description="REST API for RaspberryPi Alarm System",
     version="1.0.0"
 )
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+    ],
+    allow_credentials=True,
+    allow_methods=[
+        "GET",
+        "POST",
+        "PUT",
+        "PATCH",
+        "DELETE",
+        "OPTIONS",
+    ],
+    allow_headers=[
+        "Authorization",
+        "Content-Type",
+        "Accept",
+    ],
+)
+
 register_exception_handlers(app)
 
 app.include_router(users_router)
