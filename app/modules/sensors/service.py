@@ -3,7 +3,7 @@ from app.core.exceptions import SensorNotFoundException
 from app.modules.sensors.model import Sensor
 from app.modules.sensors.repository import SensorRepository
 from app.modules.sensors.schemas import SensorCreate
-
+from app.modules.alarms.model import Alarm
 class SensorService:
     def __init__(
         self,
@@ -11,37 +11,38 @@ class SensorService:
     ):
         self.repository = repository
     
-    def get_all_sensors(self):
-        return self.repository.get_all()
+    def get_all_sensors(
+        self,
+        alarm: Alarm,
+    ):
+        return self.repository.get_all(alarm)
     
     def get_sensor_by_id(
         self,
+        alarm: Alarm,
         sensor_id: int
     ):
-        sensor = self.repository.get_by_id(sensor_id)
+        sensor = self.repository.get_by_id(alarm, sensor_id)
         if sensor is None:
             raise SensorNotFoundException
 
-        return self.repository.get_by_id(sensor_id)
+        return self.repository.get_by_id(alarm, sensor_id)
     
     def create_sensor(
         self,
+        alarm: Alarm,
         request: SensorCreate,
     ):
-        sensor = Sensor(
-            name = request.name,
-            type = request.type,
-            gpio_pin = request.gpio_pin,
-            enabled = request.enabled
-        )
+        sensor = Sensor(**request.model_dump())
         return self.repository.create_sensor(sensor)
     
     def update_sensor(
         self,
+        alarm: Alarm,
         sensor_int: int,
         request: SensorUpdate
     ):
-        sensor = self.get_sensor_by_id(sensor_int)
+        sensor = self.get_sensor_by_id(alarm, sensor_int)
         if sensor is None:
             raise SensorNotFoundException
         update_data = request.model_dump(exclude_unset=True)
@@ -51,9 +52,10 @@ class SensorService:
     
     def delete_sensor(
         self,
+        alarm: Alarm,
         sensor_id: int,
     ):
-        sensor = self.get_sensor_by_id(sensor_id)
+        sensor = self.get_sensor_by_id(alarm, sensor_id)
         if sensor is None:
             raise SensorNotFoundException
         self.repository.delete_sensor(sensor)

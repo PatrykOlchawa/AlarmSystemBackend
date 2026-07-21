@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from app.common.enums import ConnectionType
 from app.common.enums import DeviceType
 from sqlalchemy import select
@@ -10,35 +11,41 @@ class DeviceRepository:
     def __init__(self, session: Session):
         self.session = session
         
-    def get_all(self) -> list[Device]:
+    def get_all(self, alarm:Alarm) -> list[Device]:
         stmt = (
             select(Device)
+            .where(Device.alarm_id == alarm.id)
             .order_by(Device.name)
         )
         return list(self.session.scalars(stmt))
     
     def get_by_id(
         self,
+        alarm:Alarm,
         device_id: int
     ) -> Device | None:
         stmt = (
             select(Device)
             .where(Device.id == device_id)
+            .where(Device.alarm_id == alarm.id)
         )
         return self.session.scalar(stmt)
     
     def get_by_name(
         self,
+        alarm:Alarm,
         name: str
     ) -> Device | None:
         stmt = (
             select(Device)
             .where(Device.name == name)
+            .where(Device.alarm_id == alarm.id)
         )
         return self.session.scalar(stmt)
     
     def create(
         self,
+        alarm:Alarm,
         device: Device
     ) -> Device:
         self.session.add(device)
@@ -48,6 +55,7 @@ class DeviceRepository:
     
     def update(
         self,
+        alarm:Alarm,
         device: Device
     ) -> Device:        
         self.session.commit()
@@ -56,6 +64,7 @@ class DeviceRepository:
 
     def delete(
         self,
+        alarm:Alarm,
         device: Device
     ) -> None:
         self.session.delete(device)
@@ -63,28 +72,36 @@ class DeviceRepository:
 
     def get_by_type(
         self,
+        alarm:Alarm,
         device_type: DeviceType
     ) -> list[Device]:
         stmt = (
             select(Device)
             .where(Device.type == device_type)
+            .where(Device.alarm_id == alarm.id)
         )
         return list(self.session.scalars(stmt))
 
     def get_by_connection_type(
         self,
+        alarm:Alarm,
         connection_type: ConnectionType
     ) -> list[Device]:
         stmt = (
             select(Device)
             .where(Device.connection_type == connection_type)
+            .where(Device.alarm_id == alarm.id)
         )
         return list(self.session.scalars(stmt))
 
-    def get_enabled_devices(self) -> list[Device]:
+    def get_enabled_devices(
+        self,
+        alarm:Alarm
+    ) -> list[Device]:
         stmt = (
             select(Device)
             .where(Device.enabled == True)
+            .where(Device.alarm_id == alarm.id)
         )
         return list(self.session.scalars(stmt))
         

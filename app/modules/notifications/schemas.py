@@ -18,10 +18,12 @@ class NotificationBase(BaseModel):
     user_id: int | None = Field(
         gt=-1
     )
-    
+
     is_read: bool = False
 
     notification_type: NotificationType
+
+    alarm_id: int
 
 class NotificationCreate(NotificationBase):
     pass

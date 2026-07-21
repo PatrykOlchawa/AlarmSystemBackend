@@ -10,8 +10,11 @@ from app.modules.devices.service import DeviceService
 from app.modules.devices.dependencies import get_device_service
 from app.modules.devices.schemas import DeviceResponse
 from fastapi import APIRouter
+from app.modules.alarms.model import Alarm
+from app.security.authorization_dependencies import require_alarm_admin
+
 router = APIRouter(
-    prefix="/devices",
+    prefix="/alarms/{alarm_id}/devices",
     tags=["Devices"],
 )
 
@@ -21,9 +24,9 @@ router = APIRouter(
 )
 def get_devices(
     service: DeviceService = Depends(get_device_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_all()
+    return service.get_all(alarm)
 
 @router.get(
     "/{device_id}",
@@ -32,9 +35,9 @@ def get_devices(
 def get_device(
     device_id: int,
     service: DeviceService = Depends(get_device_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_by_id(device_id)
+    return service.get_by_id(alarm,device_id)
 
 @router.post(
     "",
@@ -44,9 +47,9 @@ def get_device(
 def create_device(
     request: DeviceCreate,
     service: DeviceService = Depends(get_device_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.create(request)
+    return service.create(alarm,request)
 
 @router.put(
     "/{device_id}",
@@ -56,9 +59,9 @@ def update_device(
     device_id: int,
     request: DeviceUpdate,
     service: DeviceService = Depends(get_device_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.update(device_id, request)
+    return service.update(alarm,device_id, request)
 
 @router.delete(
     "/{device_id}",
@@ -67,6 +70,6 @@ def update_device(
 def delete_device(
     device_id: int,
     service: DeviceService = Depends(get_device_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    service.delete(device_id)
+    service.delete(alarm,device_id)

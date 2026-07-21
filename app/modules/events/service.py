@@ -3,48 +3,52 @@ from app.modules.events.schemas import AlarmEventCreate
 from app.modules.events.repository import AlarmEventRepository
 from app.core.exceptions import AlarmEventNotFoundException
 from app.common.enums import AlarmEventType
-
+from app.modules.alarms.model import Alarm
 class AlarmEventService:
     def __init__(
         self,
         repository: AlarmEventRepository,
     ):
         self.repository = repository
-    def get_all(self):
-        return self.repository.get_all()
+    def get_all(
+        self,
+        alarm:Alarm
+    ):
+        return self.repository.get_all(alarm)
     def get_by_id(
         self,
+        alarm:Alarm,
         event_id: int
     ):
-        event = self.repository.get_by_id(event_id)
+        event = self.repository.get_by_id(alarm,event_id)
         if event is None:
             raise AlarmEventNotFoundException()
         return event
-    def get_latest(self):
-        return self.repository.get_latest()
+    def get_latest(
+        self, 
+        alarm:Alarm
+    ):
+        return self.repository.get_latest(alarm)
 
     def get_by_type(
         self,
+        alarm:Alarm,
         event_type: AlarmEventType,
     ):
-        return self.repository.get_by_type(event_type)
+        return self.repository.get_by_type(alarm,event_type)
 
     def create(
         self,
+        alarm:Alarm,
         request: AlarmEventCreate,
     ):
-        event = AlarmEvent(
-            event_type=request.event_type,
-            user_id=request.user_id,
-            device_id=request.device_id,
-            location=request.location,
-            message=request.message,
-        )
-        return self.repository.create(event)
+        event = AlarmEvent(**request.model_dump())
+        return self.repository.create(alarm,event)
         
     def delete(
         self,
+        alarm:Alarm,
         event_id: int,
     ):
-        event = self.get_by_id(event_id)
-        self.repository.delete(event)
+        event = self.get_by_id(alarm,event_id)
+        self.repository.delete(alarm,event)

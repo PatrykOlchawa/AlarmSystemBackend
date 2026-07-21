@@ -17,6 +17,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.modules.users.model import User
+    from app.modules.alarms.model import Alarm
 
 class Notification(Base):
 
@@ -25,7 +26,11 @@ class Notification(Base):
     id: Mapped[int] = mapped_column(
         primary_key=True
     )
-
+    alarm_id: Mapped[int] = mapped_column(
+        ForeignKey("alarms.id"),
+        nullable=False,
+        index=True
+    )
     title: Mapped[str] = mapped_column(
         String(100),
         nullable=False
@@ -59,4 +64,8 @@ class Notification(Base):
     )
     user: Mapped["User | None"] = relationship(
         back_populates="notifications"
+    )
+
+    alarm: Mapped["Alarm"] = relationship(
+        back_populates="notifications",
     )

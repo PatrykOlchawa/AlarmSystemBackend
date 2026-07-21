@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from app.modules.notifications.repository import NotificationRepository
 from app.core.exceptions import (
     NotificationNotFoundException,
@@ -12,14 +13,18 @@ class NotificationService:
     ):
         self.repository = repository
     
-    def get_all(self):
-        return self.repository.get_all()
+    def get_all(
+        self,
+        alarm: Alarm,
+    ):
+        return self.repository.get_all(alarm)
 
     def get_by_id(
         self,
-        notification_id: int
+        alarm: Alarm,
+        notification_id: int,
     ):
-        notification = self.repository.get_by_id(notification_id)
+        notification = self.repository.get_by_id(alarm, notification_id)
 
         if notification is None:
             raise NotificationNotFoundException()
@@ -28,43 +33,43 @@ class NotificationService:
     
     def get_by_user(
         self,
+        alarm: Alarm,
         user_id: int
     ):
-        return self.repository.get_by_user_id(user_id)
+        return self.repository.get_by_user_id(alarm, user_id)
 
     def get_unread_by_user(
         self,
+        alarm: Alarm,
         user_id: int
     ):
-        return self.repository.get_unread_by_user(user_id)
+        return self.repository.get_unread_by_user(alarm, user_id)
     
     def get_latest_by_user(
         self,
+        alarm: Alarm,
         user_id: int
     ):
-        return self.repository.get_latest_by_user(user_id)
+        return self.repository.get_latest_by_user(alarm, user_id)
     
     def get_unread_count(
         self,
+        alarm: Alarm,
         user_id: int
     ):
-        return self.repository.get_unread_count(user_id)
+        return self.repository.get_unread_count(alarm, user_id)
     
     def create(
         self,
+        alarm: Alarm,
         request: NotificationCreate,
     ):
-        notification = Notification(
-            title=request.title,
-            message=request.message,
-            user_id=request.user_id,
-            is_read=request.is_read,
-            notification_type=request.notification_type,
-        )
+        notification = Notification(**request.model_dump())
         return self.repository.create(notification)
     
     def update(
         self,
+        alarm: Alarm,
         notification_id: int,
         request: NotificationUpdate,
     ):
@@ -75,6 +80,7 @@ class NotificationService:
     
     def delete(
         self,
+        alarm: Alarm,
         notification_id: int,
     ):
         notification = self.get_by_id(notification_id)

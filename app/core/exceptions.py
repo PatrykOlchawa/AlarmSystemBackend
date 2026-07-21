@@ -74,7 +74,11 @@ class CarNotAuthorizedException(AppException):
 class AlarmNotFoundException(AppException):
     status_code = 404
     detail = "Alarm not found"
-    
+
 class AlarmAlreadyExistsException(AppException):
     status_code = 404
     detail = "Alarm already exists"
+    
+class AlarmAccessDeniedException(AppException):
+    status_code = 403
+    detail = "Alarm access denied"

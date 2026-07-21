@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from app.common.enums import AlarmStatus
 from app.modules.settings.schemas import SettingUpdate
 from app.modules.settings.repository import SettingRepository
@@ -12,17 +13,22 @@ class SettingService:
     def __init__(
         self,
         repository:SettingRepository,
+        
     ):
         self.repository = repository
 
-    def get_all(self):
-        return self.repository.get_all()
+    def get_all(
+        self,
+        alarm: Alarm
+    ):
+        return self.repository.get_all(alarm)
 
     def get_by_id(
         self,
+        alarm: Alarm,
         setting_id: int,
     ):
-        setting = self.repository.get_by_id(setting_id)
+        setting = self.repository.get_by_id(alarm, setting_id)
         if setting is None:
             raise SettingNotFoundException()
         
@@ -30,45 +36,43 @@ class SettingService:
     
     def get_by_key(
         self,
+        alarm: Alarm,
         key: str,
     ):
-        setting = self.repository.get_by_key(key)
-        if setting is None:
-            raise SettingNotFoundException()
-        
+        setting = self.repository.get_by_key(alarm, key)        
         return setting
 
     def create(
         self,
+        alarm: Alarm,
         request: SettingCreate,
     ):
-        exist = self.repository.get_by_key(request.key)
+        exist = self.get_by_key(alarm, request.key)
 
         if exist is not None:
             raise SettingAlreadyExistsException()
         
-        setting = Setting(
-            key = request.key,
-            value = request.value
-        )
+        setting = Setting(**request.model_dump())
 
         return self.repository.create(setting)
 
     def update(
         self,
+        alarm: Alarm,
         key: str,
         request: SettingUpdate,
     ):
-        setting = self.get_by_key(key)
+        setting = self.get_by_key(alarm, key)
         setting.value = request.value
 
         return self.repository.update(setting)
     
     def delete(
         self,
+        alarm: Alarm,
         key: str,
     ):
-        setting = self.get_by_key(key)
+        setting = self.get_by_key(alarm, key)
         self.repository.delete(setting)
 
     def get_string(
@@ -81,9 +85,10 @@ class SettingService:
         
     def get_bool(
         self,
+        alarm: Alarm,
         key: str,
     ) -> bool:
-        value = self.get_string(key)
+        value = self.get_string(alarm, key)
         return value.lower() in (
             "1",
             "true",
@@ -94,26 +99,32 @@ class SettingService:
         )
     def get_int(
         self,
+        alarm: Alarm,
         key: str,
     ) -> int:
-        value = self.get_string(key)
+        value = self.get_string(alarm, key)
         return int(value)
 
     def get_float(
         self,
+        alarm: Alarm,
         key: str,
     ) -> float:
-        value = self.get_string(key)
+        value = self.get_string(alarm, key)
         return float(value)
 
-    def get_alarm_status(self) -> AlarmStatus:
-        setting = self.get_by_key("alarm_status")
+    def get_alarm_status(
+        self,
+        alarm: Alarm
+    ) -> AlarmStatus:
+        setting = self.get_by_key(alarm, "alarm_status")
         return AlarmStatus(setting.value)
     
     def set_alarm_status(
         self,
+        alarm: Alarm,
         status: AlarmStatus,
     ):
-        setting = self.get_by_key("alarm_status")
+        setting = self.get_by_key(alarm, "alarm_status")
         setting.value = status.value
         return self.repository.update(setting)

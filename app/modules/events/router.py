@@ -1,3 +1,5 @@
+from app.security.authorization_dependencies import require_alarm_admin
+from app.modules.alarms.model import Alarm
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
 from fastapi import APIRouter, Depends, status
@@ -18,7 +20,7 @@ from app.modules.events.service import (
 )
 
 router = APIRouter(
-    prefix="/alarm-events",
+    prefix="/alarms/{alarm_id}/alarm-events",
     tags=["Alarm Events"],
 )
 
@@ -27,22 +29,20 @@ router = APIRouter(
     response_model= list[AlarmEventRead],
 )
 def get_all_events(
-    service: AlarmEventService = Depends(
-        get_alarm_event_service,
-    ),
+    service: AlarmEventService = Depends(get_alarm_event_service),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_all()
+    return service.get_all(alarm)
 
 @router.get(
     "/last",
     response_model=AlarmEventRead,
 )
 def get_last_event(
-    service: AlarmEventService = Depends(
-        get_alarm_event_service,
-    ),
+    service: AlarmEventService = Depends(get_alarm_event_service),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_latest()
+    return service.get_latest(alarm)
 
 @router.get(
     "/{event_id}",
@@ -51,9 +51,9 @@ def get_last_event(
 def get_event(
     event_id: int,
     service: AlarmEventService = Depends(get_alarm_event_service),
-    current_user: User = Depends(get_current_user), 
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_by_id(event_id)
+    return service.get_by_id(alarm,event_id)
 
 
 
@@ -64,9 +64,9 @@ def get_event(
 def get_events_by_type(
     event_type: AlarmEventType,
     service: AlarmEventService = Depends(get_alarm_event_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin)
 ):
-    return service.get_by_type(event_type)
+    return service.get_by_type(alarm,event_type)
 
 @router.post(
     "",
@@ -77,9 +77,9 @@ def get_events_by_type(
 def create_event(
     request: AlarmEventCreate,
     service: AlarmEventService = Depends(get_alarm_event_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.create(request)
+    return service.create(alarm,request)
 
 
 @router.delete(
@@ -89,6 +89,6 @@ def create_event(
 def delete_event(
     event_id: int,
     service: AlarmEventService = Depends(get_alarm_event_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    service.delete(event_id)
+    service.delete(alarm,event_id)

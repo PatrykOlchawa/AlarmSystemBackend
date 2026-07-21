@@ -5,12 +5,10 @@ from datetime import datetime
 from pydantic import BaseModel, Field
 
 class SensorReadingBase(BaseModel):
-    sensor_id: int = Field(
-        gt=-1
-    )
     value: float = Field(
         gt=-1
     )
+
 class SensorReadingCreate(SensorReadingBase):
     pass
 

@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -22,6 +23,12 @@ class AlarmEvent(Base):
     __tablename__ = "alarm_events"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    alarm_id: Mapped[int] = mapped_column(
+        ForeignKey("alarms.id"),
+        nullable=False,
+        index=True
+    )
 
     event_type: Mapped[AlarmEventType] = mapped_column(
         Enum(AlarmEventType),
@@ -61,4 +68,8 @@ class AlarmEvent(Base):
 
     device: Mapped["Device | None"] = relationship(
         back_populates="alarm_events"
+    )
+
+    alarm: Mapped["Alarm"] = relationship(
+        back_populates="events",
     )

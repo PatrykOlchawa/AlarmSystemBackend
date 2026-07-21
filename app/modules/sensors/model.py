@@ -13,11 +13,24 @@ from sqlalchemy.orm import relationship
 from app.common.enums import SensorType
 from app.db.base import Base
 from app.modules.readings.model import SensorReading
+import typing
+from sqlalchemy import ForeignKey
+
+if typing.TYPE_CHECKING:
+    from app.modules.alarms.model import Alarm
+
 
 class Sensor(Base):
     __tablename__ = "sensors"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    alarm_id: Mapped[int] = mapped_column(
+        ForeignKey("alarms.id"),
+        nullable=False,
+        index=True
+    )
+    
     name: Mapped[str] = mapped_column(
         String(100),
         unique=True,
@@ -44,4 +57,8 @@ class Sensor(Base):
     readings: Mapped[list["SensorReading"]] = relationship(
         back_populates="sensor",
         cascade="all, delete-orphan"
+    )
+    
+    alarm: Mapped["Alarm"] = relationship(
+        back_populates="sensors",
     )

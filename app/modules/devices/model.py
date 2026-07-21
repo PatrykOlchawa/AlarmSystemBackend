@@ -1,3 +1,5 @@
+from sqlalchemy import ForeignKey
+from app.modules.alarms.model import Alarm
 from sqlalchemy.orm import relationship
 from datetime import datetime
 
@@ -22,11 +24,21 @@ class Device(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
 
+    alarm_id: Mapped[int] = mapped_column(
+        ForeignKey("alarms.id"),
+        nullable=False
+    )
+
     name: Mapped[str] = mapped_column(
         String(128),
         unique=True,
         nullable=False,
         index=True
+    )
+
+    alarm_id: Mapped[int] = mapped_column(
+        ForeignKey("alarms.id"),
+        nullable=False
     )
 
     connection_type: Mapped[ConnectionType] = mapped_column(
@@ -55,3 +67,8 @@ class Device(Base):
     alarm_events: Mapped[list["AlarmEvent"]] = relationship(
         back_populates="device"
     )
+
+    alarm: Mapped["Alarm"] = relationship(
+        back_populates="devices"
+    )
+    

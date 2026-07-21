@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from app.modules.readings.model import SensorReading
 from app.core.exceptions import SensorReadingNotFoundException
 from app.modules.readings.repository import (
@@ -23,53 +24,45 @@ class SensorReadingService:
         self.sensor_service = sensor_service
         self.alarm_service = alarm_service
 
-    def get_all(self):
-        return self.repository.get_all()
+    def get_all(
+        self,
+        alarm: Alarm,
+        sensor_id: int,
+    ):
+        return self.repository.get_all(alarm, sensor_id)
     
     def get_by_id(
         self,
-        reading_id: int
-    ):
-        reading = self.repository.get_by_id(reading_id)
-        if reading is None:
-            raise SensorReadingNotFoundException()
-        return reading
-    def get_by_sensor(
-        self,
+        alarm: Alarm,
         sensor_id: int,
+        reading_id: int,
     ):
-        self.sensor_service.get_sensor_by_id(sensor_id)
-        
-        return self.repository.get_by_sensor(sensor_id)
+        return self.repository.get_by_id(alarm, sensor_id, reading_id)
     
-    def get_latest_by_sensor(
+    def get_latest(
         self,
+        alarm: Alarm,
         sensor_id: int,
     ):
-        self.sensor_service.get_sensor_by_id(sensor_id)
-        
-        return self.repository.get_latest_by_sensor(sensor_id)
+        return self.repository.get_latest_by_sensor(alarm, sensor_id)
     
     def create(
         self,
+        alarm: Alarm,
+        sensor_id: int, 
         request: SensorReadingCreate,
     ):
-        sensor = self.sensor_service.get_sensor_by_id(request.sensor_id)
-
-        reading = SensorReading(
-            sensor_id=sensor.id,
-            value=request.value,
-        )
+        reading = SensorReading(**request.model_dump(),sensor_id=sensor_id)
         reading = self.repository.create(reading)
-        
-        self.alarm_service.process_reading(reading)
-
+        #self.alarm_service.process_reading(alarm, sensor_id, reading)
         return reading
     
     def delete(
         self,
-        reading_id: int
+        alarm: Alarm,
+        sensor_id: int,
+        reading_id: int,
     ):
-        reading = self.get_by_id(reading_id)
+        reading = self.get_by_id(alarm, sensor_id, reading_id)
         self.repository.delete(reading)
         

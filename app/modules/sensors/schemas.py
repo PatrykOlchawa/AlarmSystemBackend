@@ -20,6 +20,11 @@ class SensorBase(BaseModel):
         ge=0,
         le=40,
     )
+
+    alarm_id: int | None = Field(
+        default=None,
+        gt=-1
+    )
     #polling_interval: int = Field(
     #    default=1000,
     #    ge=100,

@@ -1,3 +1,4 @@
+from app.core.exceptions import AlarmAccessDeniedException
 from app.common.enums import AlarmRole
 from app.common.enums import UserRole
 from app.modules.users.model import User
@@ -91,3 +92,25 @@ class AlarmService:
     ) -> None:
         alarm = self.get_by_id(alarm_id)
         self.repository.delete(alarm)
+
+    def verify_alarm_access(
+        self,
+        alarm_id: int,
+        current_user: User,
+        required_role: set[AlarmRole] | None = None,
+    ) -> None:
+        alarm = self.get_by_id(alarm_id)
+        if alarm is None:
+            raise AlarmNotFoundException()
+
+        membership = self.user_alarm_repository.get(
+            user_id=current_user.id,
+            alarm_id=alarm_id,
+        )
+
+        if membership is None: 
+            raise AlarmAccessDeniedException()
+        if required_role is not None and membership.role not in required_role:
+            raise AlarmAccessDeniedException()
+        
+        return alarm

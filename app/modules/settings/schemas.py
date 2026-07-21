@@ -13,6 +13,12 @@ class SettingBase(BaseModel):
         min_length=1,
         max_length=255,
     )
+
+    alarm_id: int = Field(
+        default=None,
+        gt=-1
+    )
+    
 class SettingCreate(SettingBase):
     pass
 

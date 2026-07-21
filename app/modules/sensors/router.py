@@ -1,3 +1,5 @@
+from app.security.authorization_dependencies import require_alarm_admin
+from app.modules.alarms.model import Alarm
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
 from fastapi import APIRouter
@@ -13,7 +15,7 @@ from app.modules.sensors.schemas import (
 from app.modules.sensors.service import SensorService
 
 router = APIRouter(
-    prefix="/sensors",
+    prefix="/alarms/{alarm_id}/sensors",
     tags=["Sensors"],
 )
 
@@ -23,9 +25,9 @@ router = APIRouter(
 )
 def get_all_sensors(
     service: SensorService = Depends(get_sensor_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_all_sensors()
+    return service.get_all_sensors(alarm)
 
 @router.get(
     "/{sensor_id}",
@@ -34,9 +36,9 @@ def get_all_sensors(
 def get_sensor(
     sensor_id: int,
     service: SensorService = Depends(get_sensor_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_sensor_by_id(sensor_id)
+    return service.get_sensor_by_id(alarm, sensor_id)
 
 @router.post(
     "",
@@ -46,9 +48,9 @@ def get_sensor(
 def create_sensor(
     request: SensorCreate,
     service: SensorService = Depends(get_sensor_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.create_sensor(request)
+    return service.create_sensor(alarm, request)
 
 @router.patch(
     "/{sesor_id}",
@@ -59,9 +61,9 @@ def update_sensor(
     sensor_id: int,
     request: SensorUpdate,
     service: SensorService = Depends(get_sensor_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.update_sensor(sensor_id, request)
+    return service.update_sensor(alarm, sensor_id, request)
 
 @router.delete(
     "/{sensor_id}",
@@ -70,7 +72,7 @@ def update_sensor(
 def delete_sensor(
     sensor_id: int,
     service: SensorService = Depends(get_sensor_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.delete_sensor(sensor_id)
+    return service.delete_sensor(alarm, sensor_id)
     

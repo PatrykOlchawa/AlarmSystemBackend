@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -7,17 +8,25 @@ class SensorRepository:
     def __init__(self, session:Session):
         self.session = session
     
-    def get_all(self) -> list[Sensor]:
-        stmt = select(Sensor)
+    def get_all(
+        self,
+        alarm: Alarm,
+    ) -> list[Sensor]:
+        stmt = (
+            select(Sensor)
+            .where(Sensor.alarm_id == alarm.id)
+        )
         return list(
             self.session.scalars(stmt).all()
         ) 
     def get_by_id(
         self,
+        alarm: Alarm,   
         sensor_id: int
     ) -> Sensor | None:
         stmt = (
             select(Sensor)
+            .where(Sensor.alarm_id == alarm.id)
             .where(Sensor.id == sensor_id)
         )
         return self.session.scalar(stmt)

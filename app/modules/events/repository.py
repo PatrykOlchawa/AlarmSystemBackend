@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from sqlalchemy.orm import Session
 from sqlalchemy import select
 
@@ -8,45 +9,56 @@ class AlarmEventRepository:
     def __init__(self, session: Session):
         self.session = session
     
-    def get_all(self) -> list[AlarmEvent]:
+    def get_all(
+        self,
+        alarm:Alarm
+    ) -> list[AlarmEvent]:
         stmt = (
             select(AlarmEvent)
+            .where(AlarmEvent.alarm_id == alarm.id)
             .order_by(AlarmEvent.timestamp.desc())
         )
         return list(self.session.scalars(stmt).all())
          
     def get_by_id(
         self,
+        alarm:Alarm,
         event_id:int,
     ) -> AlarmEvent | None:
         stmt = (
-            select(AlarmEvent).where(
-                AlarmEvent.id == event_id,
-            )
+            select(AlarmEvent)
+            .where(AlarmEvent.alarm_id == alarm.id)
+            .where(AlarmEvent.id == event_id)
         )
         return self.session.scalar(stmt)
     
-    def get_latest(self) -> AlarmEvent | None:
+    def get_latest(
+        self,
+        alarm:Alarm
+    ) -> AlarmEvent | None:
         stmt = (
             select(AlarmEvent)
+            .where(AlarmEvent.alarm_id == alarm.id)
             .order_by(AlarmEvent.timestamp.desc()).limit(1)
         )
         return self.session.scalar(stmt)
     
     def get_by_type(
         self,
+        alarm:Alarm,
         event_type: AlarmEventType,
     ) -> list[AlarmEvent]:
         stmt = (
             select(AlarmEvent)
-            .where(
-                AlarmEvent.event_type == event_type
-            ).order_by(AlarmEvent.timestamp.desc())
+            .where(AlarmEvent.alarm_id == alarm.id)
+            .where(AlarmEvent.event_type == event_type)
+            .order_by(AlarmEvent.timestamp.desc())
         )
         return list(self.session.scalars(stmt).all())
 
     def create(
         self,
+        alarm:Alarm,
         event: AlarmEvent,
     ) -> AlarmEvent:
         self.session.add(event)
@@ -56,6 +68,7 @@ class AlarmEventRepository:
     
     def delete(
         self,
+        alarm:Alarm,
         event: AlarmEvent,
     ) -> None:
         self.session.delete(event)

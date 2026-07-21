@@ -1,3 +1,5 @@
+from app.security.authorization_dependencies import require_alarm_admin
+from app.modules.alarms.model import Alarm
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
 from urllib import response
@@ -18,20 +20,20 @@ from app.modules.settings.service import (
 )
 
 router = APIRouter(
-    prefix="/settings",
+    prefix="/alarms/{alarm_id}/settings",
     tags=["Settings"],
 )
 
 @router.get(
-    "",
+    "/",
     response_model=list[SettingRead],
 
 )
 def get_all_settings(
     service: SettingService = Depends(get_settings_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_all()
+    return service.get_all(alarm)
 
 @router.get(
     "/{key}",
@@ -40,9 +42,9 @@ def get_all_settings(
 def get_setting(
     key: str,
     service: SettingService = Depends(get_settings_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_by_key(key)
+    return service.get_by_key(alarm, key)
 
 @router.post(
     "",
@@ -52,9 +54,9 @@ def get_setting(
 def create_setting(
     request: SettingCreate,
     service: SettingService = Depends(get_settings_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):  
-    return service.create(request)
+    return service.create(alarm, request)
 
 @router.patch(
     "/{key}",
@@ -64,9 +66,9 @@ def update_setting(
     key: str,
     request: SettingUpdate,
     service: SettingService = Depends(get_settings_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.update(key, request)
+    return service.update(alarm, key, request)
 
 @router.delete(
     "/{key}",
@@ -75,6 +77,6 @@ def update_setting(
 def delete_setting(
     key: str,
     service: SettingService = Depends(get_settings_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    service.delete(key)    
+    service.delete(alarm, key)    

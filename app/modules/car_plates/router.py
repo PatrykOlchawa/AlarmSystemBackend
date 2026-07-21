@@ -11,9 +11,11 @@ from app.modules.car_plates.schemas import (
     CarPlateRead,
 )
 from app.modules.car_plates.service import CarPlateService
+from app.security.authorization_dependencies import require_alarm_admin
+from app.modules.alarms.model import Alarm
 
 router = APIRouter(
-    prefix="/car-plates",
+    prefix="/alarms/{alarm_id}/car-plates",
     tags=["Car Plates"],
 )
 
@@ -21,11 +23,11 @@ router = APIRouter(
     "",
     response_model=list[CarPlateRead]
 )
-def get_all_car_plates(
+def get_all(    
     service: CarPlateService = Depends(get_car_plate_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_all()
+    return service.get_all(alarm)
 
 
 
@@ -34,23 +36,14 @@ def get_all_car_plates(
     status_code=status.HTTP_201_CREATED,
     response_model=CarPlateRead,
 )
-def create_car_plate(
+def create(
     request: CarPlateCreate,
     service: CarPlateService = Depends(get_car_plate_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
+
 ):
-    return service.create_car_plate(request)
+    return service.create(alarm,request)
     
-@router.get(
-    "/is-authorized/{plate_number}",
-    response_model=bool
-)
-def is_authorized(
-    plate_number: str,
-    service: CarPlateService = Depends(get_car_plate_service),
-    current_user: User = Depends(get_current_user),
-):
-    return service.is_authorized(plate_number)
 
 
 @router.get(
@@ -58,43 +51,54 @@ def is_authorized(
     response_model=list[CarPlateRead],
 
 )
-def get_authorized_plates(
+def get_authorized(
     service: CarPlateService = Depends(get_car_plate_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_authorized_plates()
-    
+    return service.get_authorized(alarm)
+
+@router.get(
+    "/check/{plate_number}",
+    response_model=bool
+)
+def is_authorized(
+    plate_number: str,
+    service: CarPlateService = Depends(get_car_plate_service),
+    alarm : Alarm = Depends(require_alarm_admin),
+):
+    return service.is_authorized(alarm, plate_number)
+   
 @router.get(
     "/{car_plate_id}",
     response_model=CarPlateRead
 )
-def get_car_plate(
+def get_by_id(
     car_plate_id: int,
     service: CarPlateService = Depends(get_car_plate_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.get_by_id(car_plate_id)
+    return service.get_by_id(alarm,car_plate_id)
 
 @router.patch(
     "/{car_plate_id}",
     response_model=CarPlateRead,
 )
-def update_car_plate(
+def update(
     car_plate_id: int,
     request: CarPlateUpdate,
     service: CarPlateService = Depends(get_car_plate_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.update_car_plate(car_plate_id, request)
+    return service.update(alarm,car_plate_id, request)
 
 @router.delete(
     "/{car_plate_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def delete_car_plate(
+def delete(
     car_plate_id: int,
     service: CarPlateService = Depends(get_car_plate_service),
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ):
-    return service.delete_car_plate(car_plate_id)
+    return service.delete(alarm,car_plate_id)
 
