@@ -1,3 +1,5 @@
+from app.security.auth_dependencies import get_current_user
+from app.modules.users.model import User
 from urllib import response
 from fastapi import APIRouter, Depends, status
 
@@ -51,7 +53,7 @@ def create_setting(
     request: SettingCreate,
     service: SettingService = Depends(get_settings_service),
     current_user: User = Depends(get_current_user),
-):
+):  
     return service.create(request)
 
 @router.patch(

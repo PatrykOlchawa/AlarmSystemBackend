@@ -18,6 +18,7 @@ class UserCreate(BaseModel):
     username: str
     password: str
     pin: str
+    role: UserRole
 
 
 class UserLogin(BaseModel):
@@ -36,3 +37,9 @@ class UserResponse(BaseModel):
         "from_attributes": True
     }
     
+class UserUpdate(BaseModel):
+    username: str
+    password: str
+    pin: str
+    role: UserRole
+    is_active: bool

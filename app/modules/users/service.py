@@ -1,9 +1,12 @@
+from app.modules.users.schema import UserUpdate
+from app.core.exceptions import UserNotFoundException
 from app.security.hashing import PasswordHasher
 from app.core.exceptions import UserAlreadyExistsException
 from app.modules.users.repository import UserRepository
 from app.modules.users.model import User
 from app.common.enums import UserRole
 from app.security.hashing import password_hasher
+from app.modules.users.schema import UserUpdate
 
 class UserService:
 
@@ -38,3 +41,26 @@ class UserService:
     
     def get_all_users(self):
         return self.repository.get_all()
+
+    def delete_user(
+        self,
+        user_id: int
+    ) -> None:
+        user = self.repository.get_by_id(user_id)
+        if not user:
+            raise UserNotFoundException
+        self.repository.delete(user)
+    
+    def update_user(
+        self,
+        user_id: int,
+        request: UserUpdate
+    ) -> User:
+        user = self.repository.get_by_id(user_id)
+        if not user:
+            raise UserNotFoundException
+        update_data = request.model_dump(exclude_unset=True)
+        for field, value in update_data.items():
+            setattr(user, field, value)
+    
+        return self.repository.update(user)

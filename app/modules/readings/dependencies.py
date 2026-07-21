@@ -30,9 +30,13 @@ def get_sensor_reading_service(
     alarm_service: AlarmService = Depends(
         get_alarm_service
     ),
+    sensor_service: SensorService = Depends(
+        get_sensor_service
+    ),
 ) -> SensorReadingService:
 
     return SensorReadingService(
         repository,
+        sensor_service,
         alarm_service,
     )

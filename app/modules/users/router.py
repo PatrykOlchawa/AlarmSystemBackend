@@ -1,3 +1,5 @@
+from app.modules.users.schema import UserUpdate
+from fastapi import status
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
 from fastapi import APIRouter
@@ -43,3 +45,26 @@ def create_user(
         password=request.password,
         pin=request.pin,
     )
+
+@router.delete(
+    "/{user_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+)
+def delete_user(
+    user_id: int,
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(get_current_user),
+):
+    service.delete_user(user_id)
+
+@router.patch(
+    "/{user_id}",
+    response_model=UserResponse,
+)
+def update_user(
+    user_id: int,
+    request: UserUpdate,
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(get_current_user),
+):
+    return service.update_user(user_id, request)

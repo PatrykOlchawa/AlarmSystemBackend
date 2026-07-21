@@ -26,3 +26,13 @@ class UserRepository:
     def get_all(self) -> list[User]:
         stmt = select(User)
         return list(self.db.scalars(stmt).all())
+    
+    def delete(self, user: User) -> None:
+        self.db.delete(user)
+        self.db.commit()
+    
+    def update(self, user: User) -> User:
+        self.db.add(user)
+        self.db.commit()
+        self.db.refresh(user)
+        return user

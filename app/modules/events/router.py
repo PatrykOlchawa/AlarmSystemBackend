@@ -1,3 +1,5 @@
+from app.security.auth_dependencies import get_current_user
+from app.modules.users.model import User
 from fastapi import APIRouter, Depends, status
 
 from app.common.enums import AlarmEventType
@@ -48,9 +50,8 @@ def get_last_event(
 )
 def get_event(
     event_id: int,
-    service: AlarmEventService = Depends(
-        get_alarm_event_service,
-    ),
+    service: AlarmEventService = Depends(get_alarm_event_service),
+    current_user: User = Depends(get_current_user), 
 ):
     return service.get_by_id(event_id)
 
@@ -62,9 +63,8 @@ def get_event(
 )
 def get_events_by_type(
     event_type: AlarmEventType,
-    service: AlarmEventService = Depends(
-        get_alarm_event_service,
-    ),
+    service: AlarmEventService = Depends(get_alarm_event_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.get_by_type(event_type)
 
@@ -76,9 +76,8 @@ def get_events_by_type(
 
 def create_event(
     request: AlarmEventCreate,
-    service: AlarmEventService = Depends(
-        get_alarm_event_service,
-    ),
+    service: AlarmEventService = Depends(get_alarm_event_service),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create(request)
 
@@ -89,8 +88,7 @@ def create_event(
 )
 def delete_event(
     event_id: int,
-    service: AlarmEventService = Depends(
-        get_alarm_event_service,
-    ),
+    service: AlarmEventService = Depends(get_alarm_event_service),
+    current_user: User = Depends(get_current_user),
 ):
     service.delete(event_id)
