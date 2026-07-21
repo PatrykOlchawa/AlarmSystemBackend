@@ -4,32 +4,24 @@ from pydantic import BaseModel, Field
 
 from app.common.enums import UserRole
 
+class UserBase(BaseModel):
+    username: str = Field(
+        min_length=3,
+        max_length=30
+    )
 
-username: str = Field(
-    min_length=3,
-    max_length=30
-)
-
-password: str = Field(
-    min_length=8,
-    max_length=64
-)
-class UserCreate(BaseModel):
-    username: str
+    role: UserRole
+class UserCreate(UserBase):
     password: str
     pin: str
-    role: UserRole
-
 
 class UserLogin(BaseModel):
     username: str
     password: str
 
 
-class UserResponse(BaseModel):
+class UserResponse(UserBase):
     id: int
-    username: str
-    role: UserRole
     is_active: bool
     creation_date: datetime
 

@@ -1,4 +1,3 @@
-from app.modules.users.schema import password
 from passlib.context import CryptContext
 
 class PasswordHasher:

@@ -1,3 +1,6 @@
+from app.modules.devices.service import DeviceService
+from app.security.authorization_dependencies import require_alarm_admin
+from app.modules.alarms.model import Alarm
 from app.common.schemas import MessageResponse
 from app.modules.alarm.schemas import AlarmMessageResponse
 from app.modules.devices.model import Device
@@ -9,16 +12,17 @@ from app.services.device_control_service import DeviceControlService
 from app.modules.users.model import User
 from app.security.auth_dependencies import get_current_user
 router = APIRouter(
-    prefix="/control-devices",
+    prefix="/alarms/{alarm_id}/control-devices",
     tags=["Control Devices"],
 )
 
 def _get_device_or_raise(
     device_id: int,
     expected_type: DeviceType,
-    service = Depends(get_device_service),
+    service : DeviceService = Depends(get_device_service),
+    alarm : Alarm = Depends(require_alarm_admin),   
 ) -> Device:
-    device = service.get_by_id(device_id)
+    device = service.get_by_id(alarm, device_id)
     if device is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -37,7 +41,7 @@ def _get_device_or_raise(
     )
 def turn_on_led(
     device_id: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> AlarmMessageResponse:
@@ -45,6 +49,7 @@ def turn_on_led(
         device_id,
         DeviceType.LED,
         device_service,
+        alarm,
     )
     control_service.turn_on_led(device)
     return MessageResponse(
@@ -56,7 +61,7 @@ def turn_on_led(
     )
 def turn_off_led(
     device_id: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -64,6 +69,7 @@ def turn_off_led(
         device_id,
         DeviceType.LED,
         device_service,
+        alarm,
     )
     control_service.turn_off_led(device)
     return MessageResponse(
@@ -76,7 +82,7 @@ def turn_off_led(
     )
 def turn_on_buzzer(
     device_id: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -84,6 +90,7 @@ def turn_on_buzzer(
         device_id,
         DeviceType.BUZZER,
         device_service,
+        alarm,
     )
     control_service.turn_on_buzzer(device)
     return MessageResponse(
@@ -96,7 +103,7 @@ def turn_on_buzzer(
     )
 def turn_off_buzzer(
     device_id: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -104,6 +111,7 @@ def turn_off_buzzer(
         device_id,
         DeviceType.BUZZER,
         device_service,
+        alarm,
     )
     control_service.turn_off_buzzer(device)
     return MessageResponse(
@@ -116,7 +124,7 @@ def turn_off_buzzer(
     )
 def turn_on_camera(
     device_id: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),   
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -124,6 +132,7 @@ def turn_on_camera(
         device_id,
         DeviceType.CAMERA,
         device_service,
+        alarm,
     )
     control_service.turn_on_camera(device)
     return MessageResponse(
@@ -136,7 +145,7 @@ def turn_on_camera(
     )
 def turn_off_camera(
     device_id: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -144,6 +153,7 @@ def turn_off_camera(
         device_id,
         DeviceType.CAMERA,
         device_service,
+        alarm,
     )
     control_service.turn_off_camera(device)
     return MessageResponse(
@@ -157,7 +167,7 @@ def turn_off_camera(
 def move_servo(
     device_id: int,
     angle: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),   
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -165,6 +175,7 @@ def move_servo(
         device_id,
         DeviceType.SERVO,
         device_service,
+        alarm,
     )
     control_service.move_servo(device, angle)
     return MessageResponse(
@@ -179,7 +190,7 @@ def move_motor(
     device_id: int,
     direction: str,
     steps: int,
-    current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),   
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -187,6 +198,7 @@ def move_motor(
         device_id,
         DeviceType.MOTOR,
         device_service,
+        alarm,
     )
     control_service.move_motor(device, direction, steps)
     return MessageResponse(

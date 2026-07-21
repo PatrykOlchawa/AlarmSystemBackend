@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from app.core.exceptions import (
     InvalidCredentialsException,
 )

@@ -1,3 +1,4 @@
+from fastapi import requests
 from app.modules.users.schema import UserUpdate
 from app.core.exceptions import UserNotFoundException
 from app.security.hashing import PasswordHasher
@@ -6,8 +7,8 @@ from app.modules.users.repository import UserRepository
 from app.modules.users.model import User
 from app.common.enums import UserRole
 from app.security.hashing import password_hasher
-
-
+from app.modules.alarms.model import Alarm
+from app.modules.users.schema import UserCreate
 class UserService:
 
     def __init__(self, repository: UserRepository, password_hasher: PasswordHasher):
@@ -16,30 +17,29 @@ class UserService:
     
     def create_user(
         self,
-        username: str,
-        password: str,
-        pin: str,
-        role: UserRole = UserRole.USER,  
+        request: UserCreate,
     ) -> User:
 
-        existing = self.repository.get_by_username(username)
+        existing = self.repository.get_by_username(request.username)
 
         if existing:
             raise UserAlreadyExistsException
-        hashed_password = password_hasher.hash_password(password)
-        hashed_pin = password_hasher.hash_pin(pin)
-        user = User(
-            username=username,
-            password_hash=hashed_password,
-            role=role,
-            pin_hash=hashed_pin,
-        )
+        hashed_password = password_hasher.hash_password(request.password)
+        hashed_pin = password_hasher.hash_pin(request.pin)
+        user = User(**request.model_dump())
         return self.repository.create(user)
     
-    def get_user_by_id(self, user_id: int) -> User | None:
+    def get_user_by_id(
+        self,
+        user_id: int,
+
+    ) -> User | None:
+
         return self.repository.get_by_id(user_id)
     
-    def get_all_users(self):
+    def get_all_users(
+        self,
+    ):
         return self.repository.get_all()
 
     def delete_user(
@@ -64,3 +64,9 @@ class UserService:
             setattr(user, field, value)
     
         return self.repository.update(user)
+
+    def get_users_by_alarm(
+        self,
+        alarm_id:int,
+    ) -> list[User] | None:
+        return self.repository.get_users_by_alarm(alarm_id)

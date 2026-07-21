@@ -1,3 +1,4 @@
+from app.modules.alarms.model import Alarm
 from app.services.tollgate_service import TollgateService
 from app.services import tollgate_service
 from app.modules.devices.service import DeviceService
@@ -54,12 +55,14 @@ class AlarmService:
         self,
         reading: SensorReading,
     ) -> None:
-        status = self.settings_service.get_alarm_status()
-        if status != AlarmStatus.ARMED:
-            return
         
-        sensor = self.sensor_service.get_by_id(reading.sensor_id)
+
+        sensor = self.sensor_service.get_sensor_by_id(reading.sensor_id)
         if sensor is None:
+            return
+        alarm = sensor.alarm
+        status = self.settings_service.get_alarm_status(alarm)
+        if status != AlarmStatus.ARMED:
             return
         
         match sensor.sensor_type:
@@ -77,6 +80,7 @@ class AlarmService:
 
     def arm_alarm(
         self,
+        alarm: Alarm,
         user_id:int,
         pin:str,
     ) -> None:
@@ -84,13 +88,13 @@ class AlarmService:
         if not password_hasher.verify_pin(pin,user.pin_hash):
             raise InvalidPinException()
 
-        status = self.settings_service.get_alarm_status()
+        status = self.settings_service.get_alarm_status(alarm)
         if status != AlarmStatus.DISARMED:
             raise InvalidAlarmStateException(status.value)
         
         self.settings_service.set_alarm_status(AlarmStatus.ARMED)
    
-        event =self._create_event(
+        event = self._create_event(
             event_type=AlarmEventType.ALARM_ARMED,
             message="Alarm armed",
             user_id=user_id,
@@ -106,6 +110,7 @@ class AlarmService:
     
     def disarm_alarm(
         self,
+        alarm: Alarm,
         user_id:int,
         pin:str,
     ) -> None:
@@ -113,12 +118,12 @@ class AlarmService:
         if not password_hasher.verify_pin(pin,user.pin_hash):
             raise InvalidPinException()
             
-        status = self.settings_service.get_alarm_status()
+        status = self.settings_service.get_alarm_status(alarm)
         if status == AlarmStatus.DISARMED:
             raise AlarmAlreadyDisarmedException()
         
         self._deactivate_alarm_devices()
-        self.settings_service.set_alarm_status(AlarmStatus.DISARMED)
+        self.settings_service.set_alarm_status(alarm, AlarmStatus.DISARMED)
 
         event = self._create_event(
             event_type=AlarmEventType.ALARM_DISARMED,
@@ -141,19 +146,21 @@ class AlarmService:
         user_id: int | None,
         device_id: int | None,
         location: str | None,
+        alarm: Alarm
 
     ) -> None:
-        status = self.settings_service.get_alarm_status()
+        status = self.settings_service.get_alarm_status(alarm)
         if status == AlarmStatus.TRIGGERED:
             return
         
-        self.settings_service.set_alarm_status(AlarmStatus.TRIGGERED)
+        self.settings_service.set_alarm_status(alarm, AlarmStatus.TRIGGERED)
         event = self._create_event(
             event_type=event_type,
             message=message,
             user_id=user_id,
             device_id=device_id,
             location=location,
+            alarm=alarm
         )
         self._notify_users(
             title=title,
@@ -168,6 +175,7 @@ class AlarmService:
         user_id: int | None,
         device_id: int | None,
         location: str | None,
+        alarm:Alarm
     ) -> AlarmEvent:
         request = AlarmEventCreate(
             event_type=event_type,
@@ -176,7 +184,7 @@ class AlarmService:
             device_id=device_id,
             location=location,
         )
-        event = self.alarm_event_service.create(request)
+        event = self.alarm_event_service.create(alarm, request)
         return event
     
     def _notify_users(
@@ -184,8 +192,9 @@ class AlarmService:
         title: str,
         message: str,
         event_id: int,
+        alarm:Alarm,
     ) -> None:
-        users = self.user_service.get_all_users()
+        users = self.user_service.get_all_users(alarm)
         for user in users:
             request = NotificationCreate(
                 user_id=user.id,
@@ -196,39 +205,39 @@ class AlarmService:
             )
             self.notification_service.create(request)
     
-    def get_alarm_status(self) -> AlarmStatus:
-        return self.settings_service.get_alarm_status()
+    def get_alarm_status(self, alarm) -> AlarmStatus:
+        return self.settings_service.get_alarm_status(alarm)
     
-    def _activate_alarm_devices(self):
-        leds = self.device_service.get_by_type(DeviceType.LED)
+    def _activate_alarm_devices(self, alarm):
+        leds = self.device_service.get_by_type(alarm, DeviceType.LED)
         for led in leds:
             self.device_control_service.turn_on_led(led)
-        buzzer = self.device_service.get_by_type(DeviceType.BUZZER)
+        buzzer = self.device_service.get_by_type(alarm, DeviceType.BUZZER)
         for buzzer in buzzer:
             self.device_control_service.turn_on_buzzer(buzzer)
-        servos = self.device_service.get_by_type(DeviceType.SERVO)
+        servos = self.device_service.get_by_type(alarm, DeviceType.SERVO)
         for servo in servos:
             self.device_control_service.move_servo(servo,180)
-        motors = self.device_service.get_by_type(DeviceType.MOTOR)
+        motors = self.device_service.get_by_type(alarm, DeviceType.MOTOR)
         for motor in motors:
             self.device_control_service.move_motor(motor,'LEFT',100)
-        cameras = self.device_service.get_by_type(DeviceType.CAMERA)
+        cameras = self.device_service.get_by_type(alarm, DeviceType.CAMERA)
         for camera in cameras:
             self.device_control_service.turn_on_camera(camera)
 
-    def _deactivate_alarm_devices(self):
-        leds = self.device_service.get_by_type(DeviceType.LED)
+    def _deactivate_alarm_devices(self, alarm):
+        leds = self.device_service.get_by_type(alarm, DeviceType.LED)
         for led in leds:
             self.device_control_service.turn_off_led(led)
-        buzzer = self.device_service.get_by_type(DeviceType.BUZZER)
+        buzzer = self.device_service.get_by_type(alarm, DeviceType.BUZZER)
         for buzzer in buzzer:
             self.device_control_service.turn_off_buzzer(buzzer)
-        servos = self.device_service.get_by_type(DeviceType.SERVO)
+        servos = self.device_service.get_by_type(alarm, DeviceType.SERVO)
         for servo in servos:
             self.device_control_service.move_servo(servo,0)
-        motors = self.device_service.get_by_type(DeviceType.MOTOR)
+        motors = self.device_service.get_by_type(alarm, DeviceType.MOTOR)
         for motor in motors:
             self.device_control_service.move_motor(motor,'RIGHT',100)
-        cameras = self.device_service.get_by_type(DeviceType.CAMERA)
+        cameras = self.device_service.get_by_type(alarm, DeviceType.CAMERA)
         for camera in cameras:
             self.device_control_service.turn_off_camera(camera)
