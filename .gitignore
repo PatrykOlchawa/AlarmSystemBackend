@@ -53,3 +53,6 @@ dist/
 
 # Docker
 docker-compose.override.yml
+.docker-ignore
+
+main.py
