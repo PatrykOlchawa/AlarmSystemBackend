@@ -89,9 +89,9 @@ class AlarmControlService:
         if not password_hasher.verify_pin(pin,user.pin_hash):
             raise InvalidPinException()
         alarm_status = alarm.status
-        if alarm_status!= AlarmStatus.DISARMED:
+        if alarm_status!= AlarmStatus:DISARMED
             raise InvalidAlarmStateException(alarm_status)
-            
+
         self.alarm_service.set_alarm_status(alarm, AlarmStatus.ARMED)
 
         event = self._create_event(

@@ -49,7 +49,7 @@ class DeviceControlService:
         logger.info(f"Opening tollgate")
     
     def close_tollgate(self, devices: list[Device]): 
-        for device in devices:    
+        for device in devices:
             if device.type != DeviceType.SERVO:
                 raise InvalidDeviceTypeException()
             self.move_servo(device, 0)

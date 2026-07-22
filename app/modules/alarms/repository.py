@@ -10,7 +10,6 @@ class AlarmRepository:
     def get_all(self) -> list[Alarm]:
         stmt = (
             select(Alarm)
-            .order_by(Alarm.name)
         )
         return list(self.session.scalars(stmt))
     
