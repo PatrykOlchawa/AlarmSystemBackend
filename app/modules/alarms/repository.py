@@ -39,10 +39,9 @@ class AlarmRepository:
     ) -> Alarm | None:
         stmt = (
             select(Alarm)
-            .options(
-                selectinload(Alarm.users)
-            )
-            .where(Alarm.id == alarm_id)
+            .join(Alarm.users)
+            .where(User.id == user_id)
+            .distinct()
         )
         return self.session.scalar(stmt)
 
