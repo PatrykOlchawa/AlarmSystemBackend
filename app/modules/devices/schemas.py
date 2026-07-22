@@ -13,7 +13,6 @@ class DeviceBase(BaseModel):
     location: str | None = Field(default=None, max_length=256)
     enabled: bool = True
     model_config = ConfigDict(from_attributes=True)
-    alarm_id: int
 
 
 class DeviceCreate(DeviceBase):

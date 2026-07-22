@@ -33,7 +33,7 @@ class SensorService:
         alarm: Alarm,
         request: SensorCreate,
     ):
-        sensor = Sensor(**request.model_dump())
+        sensor = Sensor(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
         return self.repository.create_sensor(sensor)
     
     def update_sensor(

@@ -49,7 +49,7 @@ class DeviceService:
         if exist:
             raise DeviceAlreadyExistsException()
         
-        device = Device(**request.model_dump())
+        device = Device(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
         return self.repository.create(alarm,device)
 
     def update(
