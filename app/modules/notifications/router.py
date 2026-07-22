@@ -67,7 +67,7 @@ def get_last_notification(
     return service.get_latest_by_user(alarm, user_id)
 
 @router.get(
-    "u/ser/{user_id}/unread-count",
+    "/user/{user_id}/unread-count",
     response_model=int,
 )
 def get_unread_count(
