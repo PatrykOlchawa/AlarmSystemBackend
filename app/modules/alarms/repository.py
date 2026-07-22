@@ -10,6 +10,7 @@ class AlarmRepository:
     def get_all(self) -> list[Alarm]:
         stmt = (
             select(Alarm)
+            .order_by(Alarm.name)
         )
         return list(self.session.scalars(stmt))
     
@@ -39,9 +40,10 @@ class AlarmRepository:
     ) -> Alarm | None:
         stmt = (
             select(Alarm)
-            .join(Alarm.users)
-            .where(User.id == user_id)
-            .distinct()
+            .options(
+                selectinload(Alarm.users)
+            )
+            .where(Alarm.id == alarm_id)
         )
         return self.session.scalar(stmt)
 
@@ -51,8 +53,9 @@ class AlarmRepository:
     ) -> list[Alarm]:
         stmt = (
             select(Alarm)
-            .where(UserAlarm.user_id == user_id)
-            .where(Alarm.is_active == True)
+            .join(Alarm.users)
+            .where(User.id == user_id)
+            .distinct()
         )
         return list(self.session.scalars(stmt))
 
