@@ -42,8 +42,8 @@ class AlarmEventService:
         alarm:Alarm,
         request: AlarmEventCreate,
     ):
-        event = AlarmEvent(**request.model_dump())
-        return self.repository.create(alarm,event)
+        event = AlarmEvent(**request.model_dump(exclude={"alarm_id"}), alarm_id = alarm.id)
+        return self.repository.create(event)
         
     def delete(
         self,
@@ -51,4 +51,4 @@ class AlarmEventService:
         event_id: int,
     ):
         event = self.get_by_id(alarm,event_id)
-        self.repository.delete(alarm,event)
+        self.repository.delete(event)

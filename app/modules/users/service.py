@@ -46,6 +46,7 @@ class UserService:
         self,
     ):
         return self.repository.get_all()
+    
 
     def delete_user(
         self,

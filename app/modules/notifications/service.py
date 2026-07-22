@@ -64,7 +64,7 @@ class NotificationService:
         alarm: Alarm,
         request: NotificationCreate,
     ):
-        notification = Notification(**request.model_dump())
+        notification = Notification(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
         return self.repository.create(notification)
     
     def update(

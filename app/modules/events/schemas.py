@@ -25,10 +25,7 @@ class AlarmEventBase(BaseModel):
         max_length=100,
 
     )
-    alarm_id: int | None = Field(
-        default=None,
-        gt=-1,
-    )
+
 
 class AlarmEventCreate(AlarmEventBase):
     pass

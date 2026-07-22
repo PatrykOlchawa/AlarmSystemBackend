@@ -23,7 +23,6 @@ class NotificationBase(BaseModel):
 
     notification_type: NotificationType
 
-    alarm_id: int
 
 class NotificationCreate(NotificationBase):
     pass

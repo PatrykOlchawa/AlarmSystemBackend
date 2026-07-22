@@ -105,8 +105,10 @@ class AlarmControlService:
             title="Alarm armed",
             message="The alarm system has been armed",
             event_id=event.id,
+            alarm=alarm,
         )
-        self.tollgate_service.process_vehicle()
+        
+        #self.tollgate_service.process_vehicle()
     
     def disarm_alarm(
         self,
@@ -136,6 +138,7 @@ class AlarmControlService:
             title="Alarm disarmed",
             message="The alarm system has been disarmed",
             event_id=event.id,
+            alarm=alarm,
         )
     
     def _trigger_alarm(
@@ -166,6 +169,7 @@ class AlarmControlService:
             title=title,
             message=message,
             event_id=event.id,
+            alarm=alarm,
         )
     
     def _create_event(
@@ -194,16 +198,16 @@ class AlarmControlService:
         event_id: int,
         alarm:Alarm,
     ) -> None:
-        users = self.user_service.get_all_users(alarm)
+        users = self.user_service.get_users_by_alarm(alarm.id)
         for user in users:
             request = NotificationCreate(
                 user_id=user.id,
                 title=title,
                 message=message,
                 event_id=event_id,
-                notification_type=NotificationType.SYSTEM,
+                notification_type=NotificationType.INFO,
             )
-            self.notification_service.create(request)
+            self.notification_service.create(alarm, request)
     
     def get_alarm_status(self, alarm) -> AlarmStatus:
         return alarm.status

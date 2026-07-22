@@ -120,7 +120,7 @@ class SettingService:
     ) -> AlarmStatus:
         setting = self.get_by_key(alarm, "alarm_status")
         if setting is None:
-            return AlarmNotFoundException()
+            return SettingNotFoundException()
         return AlarmStatus(setting.value)
     
     def set_alarm_status(

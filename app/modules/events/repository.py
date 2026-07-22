@@ -58,7 +58,6 @@ class AlarmEventRepository:
 
     def create(
         self,
-        alarm:Alarm,
         event: AlarmEvent,
     ) -> AlarmEvent:
         self.session.add(event)
@@ -68,7 +67,6 @@ class AlarmEventRepository:
     
     def delete(
         self,
-        alarm:Alarm,
         event: AlarmEvent,
     ) -> None:
         self.session.delete(event)
