@@ -53,7 +53,7 @@ def create_sensor(
     return service.create_sensor(alarm, request)
 
 @router.patch(
-    "/{sesor_id}",
+    "/{sensor_id}",
     response_model=SensorRead,
 
 )
