@@ -26,7 +26,7 @@ from app.modules.devices.service import DeviceService
 #from app.modules.devices.service import DeviceService
 from app.modules.events.schemas import AlarmEventCreate
 from app.modules.alarms.service import AlarmService
-
+import time
 
 class AlarmControlService:
     def __init__(
@@ -92,7 +92,10 @@ class AlarmControlService:
         if alarm_status!= AlarmStatus.DISARMED:
             raise InvalidAlarmStateException(alarm_status)
 
-        self.alarm_service.set_alarm_status(alarm, AlarmStatus.ARMING)
+        self.alarm_service.set_alarm_status(alarm, AlarmStatus.ARMED)
+        time.sleep(10)
+        self.alarm_service.set_alarm_status(alarm, AlarmStatus.ARMED)
+
         event = self._create_event(
             event_type=AlarmEventType.ALARM_ARMED,
             message="Alarm armed",
