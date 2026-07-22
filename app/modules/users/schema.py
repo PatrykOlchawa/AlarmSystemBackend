@@ -11,6 +11,7 @@ class UserBase(BaseModel):
     )
 
     role: UserRole
+    
 class UserCreate(UserBase):
     password: str
     pin: str

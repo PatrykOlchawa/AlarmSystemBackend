@@ -26,7 +26,7 @@ def upgrade() -> None:
     sa.Column('name', sa.String(length=128), nullable=False),
     sa.Column('connection_type', sa.Enum('GPIO', 'I2C', 'SPI', 'USB', 'ETHERNET', 'WIFI', 'CSI', name='connectiontype'), nullable=False),
     sa.Column('connection_identifier', sa.String(length=50), nullable=False),
-    sa.Column('type', sa.Enum('SENSOR', 'MOTOR', 'RGB_LED', 'BUZZER', 'LED', 'LCD', 'CAMERA', name='devicetype'), nullable=False),
+    sa.Column('type', sa.Enum('SENSOR', 'MOTOR', 'RGB_LED', 'BUZZER', 'LED', 'LCD', 'CAMERA', 'SERVO', name='devicetype'), nullable=False),
     sa.Column('location', sa.String(length=256), nullable=True),
     sa.Column('enabled', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
@@ -34,7 +34,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_devices_name'), 'devices', ['name'], unique=True)
     op.create_table('alarm_events',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('event_type', sa.Enum('ARM', 'DISARM', 'ACTIVATE', 'DEACTIVATE', 'MOTION', 'TEMPERATURE', 'HUMIDITY', 'CAMERA', 'SYSTEM', name='alarmeventtype'), nullable=False),
+    sa.Column('event_type', sa.Enum('ALARM_ARMED', 'ALARM_DISARMED', 'ALARM_TRIGGERED', 'ALARM_ARMING', 'MOTION_DETECTED', 'TEMPERATURE_TRESHOLD', 'HUMIDITY_TRESHOLD', 'CAMERA_MOTION', 'SYSTEM_ERROR', 'DOOR_OPENED', 'DOOR_CLOSED', 'GATE_OPENED', 'GATE_CLOSED', name='alarmeventtype'), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('device_id', sa.Integer(), nullable=False),
     sa.Column('location', sa.String(length=100), nullable=True),

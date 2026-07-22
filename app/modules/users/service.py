@@ -26,7 +26,12 @@ class UserService:
             raise UserAlreadyExistsException
         hashed_password = password_hasher.hash_password(request.password)
         hashed_pin = password_hasher.hash_pin(request.pin)
-        user = User(**request.model_dump())
+        user = User(
+            username = request.username,
+            role = request.role,
+            password_hash = hashed_password,
+            pin_hash = hashed_pin,
+        )
         return self.repository.create(user)
     
     def get_user_by_id(
