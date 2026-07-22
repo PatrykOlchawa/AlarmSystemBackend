@@ -36,7 +36,7 @@ def _get_device_or_raise(
     return device
 
 @router.post(
-    "led/{device_id}/on",
+    "/led/{device_id}/on",
     response_model=MessageResponse,
     )
 def turn_on_led(
