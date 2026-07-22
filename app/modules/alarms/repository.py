@@ -53,9 +53,8 @@ class AlarmRepository:
     ) -> list[Alarm]:
         stmt = (
             select(Alarm)
-            .join(Alarm.user)
-            .where(User.id == user_id)
-            .distinct()
+            .join(UserAlarm)
+            .where(UserAlarm.user_id == user_id)
         )
         return list(self.session.scalars(stmt))
 
