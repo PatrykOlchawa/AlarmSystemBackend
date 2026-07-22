@@ -53,7 +53,7 @@ class AlarmRepository:
     ) -> list[Alarm]:
         stmt = (
             select(Alarm)
-            .join(Alarm.users)
+            .join(Alarm.user)
             .where(User.id == user_id)
             .distinct()
         )
