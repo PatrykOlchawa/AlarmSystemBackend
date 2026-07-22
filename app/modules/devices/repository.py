@@ -77,8 +77,9 @@ class DeviceRepository:
     ) -> list[Device]:
         stmt = (
             select(Device)
-            .where(Device.type == device_type)
             .where(Device.alarm_id == alarm.id)
+            .where(Device.type == device_type)
+
         )
         return list(self.session.scalars(stmt))
 

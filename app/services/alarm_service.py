@@ -25,10 +25,10 @@ from app.security.hashing import password_hasher
 from app.modules.devices.service import DeviceService
 #from app.modules.devices.service import DeviceService
 from app.modules.events.schemas import AlarmEventCreate
+from app.modules.alarms.service import AlarmService
 
 
-
-class AlarmService:
+class AlarmControlService:
     def __init__(
         self,
         settings_service: SettingService,
@@ -40,6 +40,7 @@ class AlarmService:
         device_service: DeviceService,
         device_control_service: DeviceControlService,
         tollgate_service: TollgateService,
+        alarm_service: AlarmService,
     ):
         self.settings_service = settings_service
         self.sensor_service = sensor_service
@@ -50,6 +51,7 @@ class AlarmService:
         self.device_control_service = device_control_service
         self.device_service = device_service
         self.tollgate_service = tollgate_service
+        self.alarm_service = alarm_service
     
     def process_sensor_reading(
         self,
@@ -61,8 +63,7 @@ class AlarmService:
         if sensor is None:
             return
         alarm = sensor.alarm
-        status = self.settings_service.get_alarm_status(alarm)
-        if status != AlarmStatus.ARMED:
+        if alarm.status != AlarmStatus.ARMED:
             return
         
         match sensor.sensor_type:
@@ -87,19 +88,18 @@ class AlarmService:
         user = self.user_service.get_user_by_id(user_id)
         if not password_hasher.verify_pin(pin,user.pin_hash):
             raise InvalidPinException()
+        alarm_status = alarm.status
+        if alarm_status!= AlarmStatus.DISARMED:
+            raise InvalidAlarmStateException(alarm_status)
 
-        status = self.settings_service.get_alarm_status(alarm)
-        if status != AlarmStatus.DISARMED:
-            raise InvalidAlarmStateException(status.value)
-        
-        self.settings_service.set_alarm_status(AlarmStatus.ARMED)
-   
+        self.alarm_service.set_alarm_status(alarm, AlarmStatus.ARMING)
         event = self._create_event(
             event_type=AlarmEventType.ALARM_ARMED,
             message="Alarm armed",
             user_id=user_id,
             device_id=None,
             location=None,
+            alarm=alarm,
         )
         self._notify_users(
             title="Alarm armed",
@@ -118,12 +118,11 @@ class AlarmService:
         if not password_hasher.verify_pin(pin,user.pin_hash):
             raise InvalidPinException()
             
-        status = self.settings_service.get_alarm_status(alarm)
-        if status == AlarmStatus.DISARMED:
+        if alarm.status == AlarmStatus.DISARMED:
             raise AlarmAlreadyDisarmedException()
         
-        self._deactivate_alarm_devices()
-        self.settings_service.set_alarm_status(alarm, AlarmStatus.DISARMED)
+        self._deactivate_alarm_devices(alarm)
+        self.alarm_service.set_alarm_status(alarm, AlarmStatus.DISARMED)
 
         event = self._create_event(
             event_type=AlarmEventType.ALARM_DISARMED,
@@ -131,6 +130,7 @@ class AlarmService:
             user_id=user_id,
             device_id=None,
             location=None,
+            alarm=alarm,
         )
         self._notify_users(
             title="Alarm disarmed",
@@ -149,8 +149,8 @@ class AlarmService:
         alarm: Alarm
 
     ) -> None:
-        status = self.settings_service.get_alarm_status(alarm)
-        if status == AlarmStatus.TRIGGERED:
+
+        if alarm.status == AlarmStatus.TRIGGERED:
             return
         
         self.settings_service.set_alarm_status(alarm, AlarmStatus.TRIGGERED)
@@ -206,7 +206,7 @@ class AlarmService:
             self.notification_service.create(request)
     
     def get_alarm_status(self, alarm) -> AlarmStatus:
-        return self.settings_service.get_alarm_status(alarm)
+        return alarm.status
     
     def _activate_alarm_devices(self, alarm):
         leds = self.device_service.get_by_type(alarm, DeviceType.LED)

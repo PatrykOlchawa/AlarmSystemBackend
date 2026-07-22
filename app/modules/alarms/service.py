@@ -1,6 +1,9 @@
 from app.core.exceptions import AlarmAccessDeniedException
-from app.common.enums import AlarmRole
-from app.common.enums import UserRole
+from app.common.enums import (
+    AlarmRole,
+    AlarmStatus,
+    UserRole
+)
 from app.modules.users.model import User
 from app.modules.alarms.repository import AlarmRepository
 from app.modules.alarms.schemas import AlarmCreate
@@ -10,6 +13,7 @@ from app.core.exceptions import AlarmAlreadyExistsException
 from app.core.exceptions import AlarmNotFoundException
 from app.modules.user_alarm.repository import UserAlarmRepository
 from app.modules.user_alarm.model import UserAlarm
+
 class AlarmService:
     def __init__(
         self,
@@ -48,7 +52,12 @@ class AlarmService:
         if alarm is None:
             raise AlarmNotFoundException()
         return alarm
-    
+    def set_alarm_status(
+        self,
+        alarm: Alarm,
+        alarm_status: AlarmStatus,
+    ):
+        self.repository.set_alarm_status(alarm, alarm_status)
     def create(
         self,
         request: AlarmCreate,

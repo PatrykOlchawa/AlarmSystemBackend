@@ -5,6 +5,7 @@ from app.modules.settings.repository import SettingRepository
 from app.core.exceptions import (
     SettingNotFoundException,
     SettingAlreadyExistsException,
+    AlarmNotFoundException,
 )
 from app.modules.settings.model import Setting
 from app.modules.settings.schemas import SettingCreate
@@ -118,6 +119,8 @@ class SettingService:
         alarm: Alarm
     ) -> AlarmStatus:
         setting = self.get_by_key(alarm, "alarm_status")
+        if setting is None:
+            return AlarmNotFoundException()
         return AlarmStatus(setting.value)
     
     def set_alarm_status(

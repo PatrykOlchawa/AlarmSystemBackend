@@ -2,7 +2,7 @@ from app.modules.car_plates.dependencies import get_car_plate_service
 from app.services.tollgate_service import TollgateService
 from app.services.ocr_service import OCRService
 from app.modules.auth.dependencies import get_auth_service
-from app.services.alarm_service import AlarmService
+from app.services.alarm_service import AlarmControlService
 from typing import TYPE_CHECKING
 from fastapi import Depends
 from app.modules.settings.dependencies import get_settings_service
@@ -13,7 +13,7 @@ from app.modules.notifications.dependencies import get_notification_service
 from app.services.device_control_service import DeviceControlService
 from app.modules.devices.service import DeviceService
 from app.modules.devices.dependencies import get_device_service
-
+from app.modules.alarms.dependencies import get_alarm_service
 
 #if TYPE_CHECKING:
  #   from app.modules.readings.dependencies import get_sensor_reading_service
@@ -54,9 +54,10 @@ def get_alarm_service(
     auth_service = Depends(get_auth_service),
     device_control_service = Depends(get_device_control_service),
     tollgate_service = Depends(get_tollgate_service),
-) -> AlarmService:
+    alarm_service = Depends(get_alarm_service),
+) -> AlarmControlService:
 
-    return AlarmService(
+    return AlarmControlService(
         settings_service=settings_service,
         sensor_service=sensor_service,
         alarm_event_service=alarm_event_service,
@@ -66,5 +67,6 @@ def get_alarm_service(
         auth_service=auth_service,
         device_control_service=device_control_service,
         tollgate_service=tollgate_service,
+        alarm_service=alarm_service,
     )
 

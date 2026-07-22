@@ -2,6 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 from app.modules.alarms.model import Alarm
 from app.modules.user_alarm.model import UserAlarm
+from app.common.enums import AlarmStatus
 class AlarmRepository:
     def __init__(self, session: Session):
         self.session = session
@@ -80,3 +81,11 @@ class AlarmRepository:
     ) -> None:
         self.session.delete(alarm)
         self.session.commit()
+
+    def set_alarm_status(
+        self,
+        alarm: Alarm,
+        status: AlarmStatus,
+    ) -> None:
+        alarm.status = status
+        self.update(alarm)
