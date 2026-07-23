@@ -34,7 +34,7 @@ def upgrade() -> None:
     op.create_index(op.f('ix_devices_name'), 'devices', ['name'], unique=True)
     op.create_table('alarm_events',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('event_type', sa.Enum('ALARM_ARMED', 'ALARM_DISARMED', 'ALARM_TRIGGERED', 'ALARM_ARMING', 'MOTION_DETECTED', 'TEMPERATURE_TRESHOLD', 'HUMIDITY_TRESHOLD', 'CAMERA_MOTION', 'SYSTEM_ERROR', 'DOOR_OPENED', 'DOOR_CLOSED', 'GATE_OPENED', 'GATE_CLOSED', name='alarmeventtype'), nullable=False),
+    sa.Column('event_type', sa.Enum('ALARM_ARMED', 'ALARM_DISARMED', 'ALARM_TRIGGERED', 'ALARM_ACTIVATED','ALARM_ARMING', 'MOTION_DETECTED', 'TEMPERATURE_THRESHOLD', 'HUMIDITY_THRESHOLD', 'LIGHT_DETECTED', 'TOLLGATE_OPENED', 'TOLLGATE_CLOSED', 'SYSTEM', 'SYSTEM_ERROR', 'DOOR_OPENED', 'DOOR_CLOSED', 'GATE_OPENED', 'GATE_CLOSED', name='alarmeventtype'), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('device_id', sa.Integer(), nullable=False),
     sa.Column('location', sa.String(length=100), nullable=True),
