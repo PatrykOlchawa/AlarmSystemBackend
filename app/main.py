@@ -20,53 +20,15 @@ from app.core.exception_handlers import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
 import logging
 logging.basicConfig(level=logging.INFO)
-
-
-#slowapi for rate limiting
-from app.core.limiter import limiter
-from slowapi.errors import RateLimitExceeded
-from slowapi.middleware import SlowAPIMiddleware
-from slowapi import _rate_limit_exceeded_handler
-
+from fastapicap import Cap
 
 app = FastAPI(
     title="AlarmAPI",
     description="REST API for RaspberryPi Alarm System",
     version="1.0.0"
 )
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:8081",
-        "http://127.0.0.1:8081",
-    ],
-    allow_credentials=True,
-    allow_methods=[
-        "GET",
-        "POST",
-        "PUT",
-        "PATCH",
-        "DELETE",
-        "OPTIONS",
-    ],
-    allow_headers=[
-        "Authorization",
-        "Content-Type",
-        "Accept",
-    ],
-)
 
 register_exception_handlers(app)
-
-app.state.limiter = limiter
-
-app.add_exception_handler(
-    RateLimitExceeded,
-    _rate_limit_exceeded_handler,
-)
-
-app.add_middleware(SlowAPIMiddleware)
-
 
 app.include_router(users_router)
 app.include_router(auth_router)

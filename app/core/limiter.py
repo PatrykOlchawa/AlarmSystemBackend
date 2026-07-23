@@ -1,4 +1,11 @@
-from slowapi import Limiter
-from slowapi.util import get_remote_address
+from fastapicap import RateLimiter
 
-limiter = Limiter(key_func=get_remote_address)
+login_rate_limiter = RateLimiter(
+    limit=5,
+    minutes=1,
+)
+
+pin_rate_limiter = RateLimiter(
+    limit =10,
+    minutes=1,
+)

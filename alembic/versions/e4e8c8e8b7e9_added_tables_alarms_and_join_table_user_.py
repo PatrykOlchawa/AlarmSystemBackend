@@ -24,7 +24,7 @@ def upgrade() -> None:
     op.create_table('alarms',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=128), nullable=False),
-    sa.Column('status', sa.Enum('ARMED', 'DISARMED', 'TRIGGERED', 'ARMING', 'DISARMING', 'UNKNOWN', name='alarmstatus'), nullable=False),
+    sa.Column('status', sa.Enum('ARMED', 'DISARMED', 'TRIGGERED', 'ARMING', 'ACTIVATED', 'UNKNOWN', name='alarmstatus'), nullable=False),
     sa.Column('created_at', sa.DateTime(), nullable=False),
     sa.Column('is_active', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
