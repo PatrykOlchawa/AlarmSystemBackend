@@ -3,7 +3,7 @@ from app.modules.users.schema import UserResponse
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi.security import OAuth2PasswordRequestForm
-
+from fastapi import Request
 from app.modules.auth.dependencies import (
     get_auth_service,    
 )
@@ -29,19 +29,21 @@ def me(
     current_user: User = Depends(get_current_user),
 ):
     return current_user
+
 @router.post(
     "/login",
     response_model=TokenResponse,
 )
-@limiter.limit("5/minute")
+#@limiter.limit("5/minute")
 def login(
-    request: LoginRequest,
+    request: Request,
+    login_request: LoginRequest,
     service: AuthService = Depends(get_auth_service),
 ):
 
     token = service.login(
-        request.username,
-        request.password,
+        login_request.username,
+        login_request.password,
     )
 
     return TokenResponse(

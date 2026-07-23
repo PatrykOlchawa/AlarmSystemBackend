@@ -31,7 +31,7 @@ def get_alarm_status(
     "/arm",
     status_code=status.HTTP_200_OK,
 )
-@limiter.limit("20/minute")
+#@limiter.limit("20/minute")
 def arm_alarm(
     request: AlarmPinRequest,
     current_user: User = Depends(get_current_user),
