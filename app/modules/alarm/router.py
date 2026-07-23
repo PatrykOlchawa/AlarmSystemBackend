@@ -8,6 +8,7 @@ from app.services.dependencies import get_alarm_service
 from app.services.alarm_service import AlarmService
 from app.modules.users.model import User
 from app.security.auth_dependencies import get_current_user
+from app.core.limiter import limiter
 
 router = APIRouter(
     prefix="/alarms/{alarm_id}",
@@ -30,6 +31,7 @@ def get_alarm_status(
     "/arm",
     status_code=status.HTTP_200_OK,
 )
+@limiter.limit("20/minute")
 def arm_alarm(
     request: AlarmPinRequest,
     current_user: User = Depends(get_current_user),
@@ -49,6 +51,7 @@ def arm_alarm(
     "/disarm",
     status_code=status.HTTP_200_OK,
 )
+@limiter.limit("20/minute")
 def disarm_alarm(
     request: AlarmPinRequest,
     current_user: User = Depends(get_current_user),

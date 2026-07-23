@@ -15,6 +15,8 @@ from app.modules.auth.schemas import (
     TokenResponse,
 )
 from app.modules.auth.service import AuthService
+from app.core.limiter import limiter
+
 
 
 router = APIRouter(
@@ -22,9 +24,6 @@ router = APIRouter(
     tags=["Authentication"],
 )
 
-
-
-#test endpoint
 @router.get("/me", response_model=UserResponse)
 def me(
     current_user: User = Depends(get_current_user),
@@ -34,6 +33,7 @@ def me(
     "/login",
     response_model=TokenResponse,
 )
+@limiter.limit("5/minute")
 def login(
     request: LoginRequest,
     service: AuthService = Depends(get_auth_service),
