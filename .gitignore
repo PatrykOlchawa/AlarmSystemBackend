@@ -53,6 +53,8 @@ dist/
 
 # Docker
 docker-compose.override.yml
+docker-compose.yml
 .docker-ignore
 
-main.py
+cerbot/
+nginx/

@@ -50,7 +50,6 @@ def arm_alarm(
     "/disarm",
     status_code=status.HTTP_200_OK,
 )
-@limiter.limit("20/minute")
 def disarm_alarm(
     request: AlarmPinRequest,
     current_user: User = Depends(get_current_user),
