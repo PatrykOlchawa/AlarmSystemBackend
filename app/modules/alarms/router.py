@@ -39,7 +39,20 @@ def get_my_alarms(
     service: AlarmService = Depends(get_alarm_service),
 ) -> list[AlarmResponse]:
     return service.get_all_by_user_id(current_user.id)
-    
+
+@router.post(
+    "/{alarm_id}/user",
+    response_model=AlarmResponse,
+)
+def add_user_to_alarm(
+    alarm_id: int,
+    request: AddUser,
+    service: AlarmService = Depends(get_alarm_service),
+    current_user: User = Depends(get_current_user),
+) -> AlarmResponse:
+    return service.add_user_to_alarm(alarm_id, request)
+
+        
 @router.get(
     "/{alarm_id}",
     response_model=AlarmResponse,
@@ -88,15 +101,4 @@ def delete_alarm(
     service.delete(alarm_id)
     return MessageResponse(message="Alarm deleted successfully")
 
-@router.post(
-    "/{alarm_id}/user",
-    response_model=AlarmResponse,
-)
-def add_user_to_alarm(
-    alarm_id: int,
-    request: AddUser,
-    service: AlarmService = Depends(get_alarm_service),
-    current_user: User = Depends(get_current_user),
-) -> AlarmResponse:
-    return service.add_user_to_alarm(alarm_id, request)
-    
+
