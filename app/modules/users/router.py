@@ -58,7 +58,7 @@ def get_user(
 def create_user(
     request: UserCreate,
     service: UserService = Depends(get_user_service),
-    #current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     return service.create_user(request)
 
