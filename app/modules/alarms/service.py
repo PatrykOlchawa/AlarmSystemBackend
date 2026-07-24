@@ -47,6 +47,13 @@ class AlarmService:
         user_id: int,
     ) -> list[Alarm]:
         return self.repository.get_all_by_user_id(user_id)
+
+    def get_user_alarm_role(
+        self,
+        alarm_id,
+        user_id,
+    ) -> AlarmRole:
+        return self.repository.get_alarm_role(alarm_id, user_id)
     
     def get_by_name(
         self,

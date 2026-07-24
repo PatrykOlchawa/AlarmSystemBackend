@@ -28,3 +28,8 @@ class AddUser(BaseModel):
 
 class DeleteUser(BaseModel):
     user_id: int
+
+class AlarmRoleResponse(BaseModel):
+    user_alarm_role: AlarmRole
+
+    model_config = ConfigDict(from_attributes=True)

@@ -10,7 +10,9 @@ from app.modules.alarms.schemas import(
     AlarmCreate,
     AddUser,
     DeleteUser,
+    AlarmRoleResponse,
 ) 
+from app.common.enums import AlarmRole
 from app.modules.alarms.service import AlarmService
 from app.modules.alarms.dependencies import get_alarm_service
 from app.modules.user_alarm.model import UserAlarm
@@ -40,6 +42,22 @@ def get_my_alarms(
     service: AlarmService = Depends(get_alarm_service),
 ) -> list[AlarmResponse]:
     return service.get_all_by_user_id(current_user.id)
+
+@router.post(
+    "/{alarm_id}/user_role",
+    response_model=AlarmRoleResponse,
+)
+def get_user_alarm_role(
+    alarm_id: int,
+    request: DeleteUser,
+    service: AlarmService = Depends(get_alarm_service),
+    current_user: User = Depends(get_current_user),
+) -> AlarmRoleResponse:
+    role = service.get_user_alarm_role(alarm_id, request.user_id)
+
+    return AlarmRoleResponse(
+        user_alarm_role=role
+    )
 
 @router.post(
     "/{alarm_id}/user",

@@ -2,7 +2,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session, selectinload
 from app.modules.alarms.model import Alarm
 from app.modules.user_alarm.model import UserAlarm
-from app.common.enums import AlarmStatus
+from app.common.enums import AlarmStatus, AlarmRole
 class AlarmRepository:
     def __init__(self, session: Session):
         self.session = session
@@ -44,6 +44,20 @@ class AlarmRepository:
                 selectinload(Alarm.users)
             )
             .where(Alarm.id == alarm_id)
+        )
+        return self.session.scalar(stmt)
+
+    def get_alarm_role(
+        self,
+        alarm_id: int,
+        user_id: int,
+    ) -> AlarmRole:
+        stmt = (
+            select(UserAlarm.role)
+            .where(
+                UserAlarm.alarm_id == alarm_id,
+                UserAlarm.user_id == user_id,
+            )
         )
         return self.session.scalar(stmt)
 
