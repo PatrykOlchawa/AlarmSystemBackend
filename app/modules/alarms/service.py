@@ -74,6 +74,7 @@ class AlarmService:
         if exist:
             raise AlarmAlreadyExistsException() 
         alarm = Alarm(**request.model_dump())
+        self.repository.create(alarm)
         return alarm
     
     def update(
