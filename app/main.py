@@ -28,6 +28,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
+Cap.init_app("redis://redis:6379/0")
 register_exception_handlers(app)
 
 app.include_router(users_router)
