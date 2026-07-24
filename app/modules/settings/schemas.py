@@ -14,16 +14,13 @@ class SettingBase(BaseModel):
         max_length=255,
     )
 
-    alarm_id: int = Field(
-        default=None,
-        gt=-1
-    )
     
 class SettingCreate(SettingBase):
     pass
 
 class SettingRead(SettingBase):
     id: int
+    alarm_id: int
     model_config = ConfigDict(
         from_attributes=True,
     )

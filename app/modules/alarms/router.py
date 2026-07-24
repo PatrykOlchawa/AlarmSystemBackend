@@ -11,6 +11,8 @@ from app.modules.alarms.schemas import(
     AddUser,
     DeleteUser,
     AlarmRoleResponse,
+    UpdateAlarmRole,
+
 ) 
 from app.common.enums import AlarmRole
 from app.modules.alarms.service import AlarmService
@@ -43,47 +45,62 @@ def get_my_alarms(
 ) -> list[AlarmResponse]:
     return service.get_all_by_user_id(current_user.id)
 
-@router.post(
-    "/{alarm_id}/user_role",
+@router.get(
+    "/{alarm_id}/users/{user_id}/alarm_role",
     response_model=AlarmRoleResponse,
 )
 def get_user_alarm_role(
     alarm_id: int,
-    request: DeleteUser,
+    user_id:int,
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
 ) -> AlarmRoleResponse:
-    role = service.get_user_alarm_role(alarm_id, request.user_id)
+    role = service.get_user_alarm_role(alarm_id, user_id)
 
     return AlarmRoleResponse(
         user_alarm_role=role
     )
 
 @router.post(
-    "/{alarm_id}/user",
+    "/{alarm_id}/users/{user_id}",
     response_model=MessageResponse,
 )
 def add_user_to_alarm(
     alarm_id: int,
+    user_id:int,
     request: AddUser,
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
 ) -> MessageResponse:
-    service.add_user_to_alarm(alarm_id, request)
+    service.add_user_to_alarm(alarm_id, user_id, request.alarm_role)
     return MessageResponse(message="User added to alarm")
 
 @router.delete(
     "/{alarm_id}/user",
-    response_model=MessageResponse,
+    response_model=MessageResponse,    
 )
 def delete_user_from_alarm(
     alarm_id: int,
     request: DeleteUser,
     service: AlarmService = Depends(get_alarm_service),
+    current_user: User = Depends(get_current_user),
 ) -> MessageResponse:
     service.delete_user_from_alarm(alarm_id, request.user_id)
     return MessageResponse(message="User deleted from alarm")
-        
+@router.patch(
+    "/{alarm_id}/users/{user_id}",
+    response_model=MessageResponse,
+)        
+def update_alarm_role(
+    alarm_id: int,
+    user_id: int,
+    request: UpdateAlarmRole,
+    service: AlarmService = Depends(get_alarm_service),
+    current_user: User = Depends(get_current_user),
+) -> MessageResponse:
+    service.update_alarm_role(alarm_id, user_id, request.user_alarm_role)
+    return MessageResponse(message="User alarm role updated")
+
 @router.get(
     "/{alarm_id}",
     response_model=AlarmResponse,

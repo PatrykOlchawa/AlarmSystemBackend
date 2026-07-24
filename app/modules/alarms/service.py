@@ -75,6 +75,14 @@ class AlarmService:
         alarm_status: AlarmStatus,
     ):
         self.repository.set_alarm_status(alarm, alarm_status)
+
+    def update_alarm_role(
+        self,
+        alarm_id: int,
+        user_id: int,
+        user_alarm_role: AlarmRole,
+    ):
+        self.repository.update_alarm_role(alarm_id, user_id, user_alarm_role)
     def create(
         self,
         request: AlarmCreate,
@@ -115,15 +123,17 @@ class AlarmService:
     def add_user_to_alarm(
         self,
         alarm_id: int,
-        request: AddUser,
+        user_id: int,
+        alarm_role: AlarmRole,
     ) -> None:
-        membership = self.user_alarm_repository.get(request.user_id, alarm_id)
+        membership = self.user_alarm_repository.get(user_id, alarm_id)
         if membership:
             raise UserAlreadyAddedToAlarm()
         
         membership = UserAlarm(
             alarm_id=alarm_id,
-            user_id=request.user_id,
+            user_id=user_id,
+            role=alarm_role,
         )
         self.user_alarm_repository.create(membership)
 

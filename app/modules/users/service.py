@@ -1,5 +1,5 @@
 from fastapi import requests
-from app.modules.users.schema import UserUpdate
+from app.modules.users.schema import UserUpdate, AlarmMemberResponse
 from app.core.exceptions import UserNotFoundException
 from app.security.hashing import PasswordHasher
 from app.core.exceptions import UserAlreadyExistsException
@@ -74,5 +74,5 @@ class UserService:
     def get_users_by_alarm(
         self,
         alarm_id:int,
-    ) -> list[User] | None:
+    ) -> list[AlarmMemberResponse] | None:
         return self.repository.get_users_by_alarm(alarm_id)

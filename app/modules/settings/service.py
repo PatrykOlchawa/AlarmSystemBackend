@@ -53,7 +53,7 @@ class SettingService:
         if exist is not None:
             raise SettingAlreadyExistsException()
         
-        setting = Setting(**request.model_dump())
+        setting = Setting(**request.model_dump(), alarm_id=alarm.id)
 
         return self.repository.create(setting)
 

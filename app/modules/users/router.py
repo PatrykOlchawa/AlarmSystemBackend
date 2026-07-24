@@ -6,7 +6,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 
 from app.modules.users.schema import UserCreate
-from app.modules.users.schema import UserResponse
+from app.modules.users.schema import UserResponse, AlarmMemberResponse
 
 from app.modules.users.service import UserService
 from app.modules.users.dependencies import get_user_service
@@ -30,7 +30,7 @@ def get_users(
 
 @router.get(
     "/alarm/{alarm_id}",
-    response_model=list[UserResponse]
+    response_model=list[AlarmMemberResponse]
 )
 def get_users_by_alarm(
     alarm_id: int,

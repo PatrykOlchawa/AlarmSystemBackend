@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session, selectinload
 from app.modules.alarms.model import Alarm
 from app.modules.user_alarm.model import UserAlarm
 from app.common.enums import AlarmStatus, AlarmRole
+from sqlalchemy import update
 class AlarmRepository:
     def __init__(self, session: Session):
         self.session = session
@@ -103,3 +104,21 @@ class AlarmRepository:
     ) -> None:
         alarm.status = status
         self.update(alarm)
+
+    def update_alarm_role(
+        self,
+        alarm_id: int,
+        user_id: int,
+        user_alarm_role,
+    ) -> None:
+        stmt = (
+        update(UserAlarm)
+            .where(
+                UserAlarm.alarm_id == alarm_id,
+                UserAlarm.user_id == user_id,
+            )
+            .values(role=user_alarm_role)
+        )
+
+        self.session.execute(stmt)
+        self.session.commit()
