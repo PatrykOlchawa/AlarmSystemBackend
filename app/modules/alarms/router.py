@@ -49,9 +49,9 @@ def add_user_to_alarm(
     request: AddUser,
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
-) -> AlarmResponse:
-    return service.add_user_to_alarm(alarm_id, request)
-
+) -> MessageResponse:
+    service.add_user_to_alarm(alarm_id, request)
+    return MessageResponse("User added to alarm")
         
 @router.get(
     "/{alarm_id}",
