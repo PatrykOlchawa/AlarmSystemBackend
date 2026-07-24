@@ -29,6 +29,20 @@ app = FastAPI(
 )
 
 Cap.init_app("redis://redis:6379/0")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:8081",
+        "http://127.0.0.1:8081",
+        "https://app.wsb-alarm.pl",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["Retry-After"],
+)
+
 register_exception_handlers(app)
 
 app.include_router(users_router)
