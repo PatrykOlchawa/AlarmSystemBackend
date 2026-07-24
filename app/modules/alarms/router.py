@@ -42,7 +42,7 @@ def get_my_alarms(
 
 @router.post(
     "/{alarm_id}/user",
-    response_model=AlarmResponse,
+    response_model=MessageResponse,
 )
 def add_user_to_alarm(
     alarm_id: int,
