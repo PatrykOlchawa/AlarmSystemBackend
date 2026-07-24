@@ -27,11 +27,9 @@ class AlarmService:
         self,
         repository: AlarmRepository,
         user_alarm_repository: UserAlarmRepository,
-        user_service: UserService,
     ):
         self.repository = repository
         self.user_alarm_repository = user_alarm_repository
-        self.user_service = user_service
 
     def get_all(self) -> list[Alarm]:
         return self.repository.get_all()
