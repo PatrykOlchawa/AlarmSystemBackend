@@ -2,10 +2,13 @@
 
 - FastAPI
 - Python
-- SQLite
+- Postgresql
 - MQTT
 - OpenCV
 - React Native
+- Docker
+- Nginx
+- Redis
 
 #To run:
 #sudo docker compose up --build
