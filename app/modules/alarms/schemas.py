@@ -22,6 +22,6 @@ class AlarmResponse(AlarmBase):
 
     model_config = ConfigDict(from_attributes=True)
     
-class AddUser(AlarmBase):
+class AddUser(BaseModel):
     user_id: int
     alarm_role: AlarmRole
