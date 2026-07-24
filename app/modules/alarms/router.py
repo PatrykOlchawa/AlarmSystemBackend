@@ -2,13 +2,18 @@ from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
 from fastapi import status
 from app.common.schemas import MessageResponse
-from app.modules.alarms.schemas import AlarmCreate
 from fastapi import Depends
-from app.modules.alarms.schemas import AlarmUpdate
 from fastapi import APIRouter
-from app.modules.alarms.schemas import AlarmResponse
+from app.modules.alarms.schemas import(
+    AlarmResponse,
+    AlarmUpdate,
+    AlarmCreate,
+    AddUser,
+) 
 from app.modules.alarms.service import AlarmService
 from app.modules.alarms.dependencies import get_alarm_service
+from app.modules.user_alarm.model import UserAlarm
+from app.modules.user_alarm.repository import UserAlarmRepository 
 
 router = APIRouter(
     prefix="/alarms",
@@ -56,7 +61,7 @@ def create_alarm(
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
 ) -> AlarmResponse:
-    return service.create(request, current_user)
+    return service.create(request)
 
 
 @router.patch(
@@ -82,3 +87,16 @@ def delete_alarm(
 ) -> MessageResponse:
     service.delete(alarm_id)
     return MessageResponse(message="Alarm deleted successfully")
+
+@router.post(
+    "/{alarm_id}/user",
+    response_model=AlarmResponse,
+)
+def add_user_to_alarm(
+    alarm_id: int,
+    request: AddUser,
+    service: AlarmService = Depends(get_alarm_service),
+    current_user: User = Depends(get_current_user),
+) -> AlarmResponse:
+    return service.add_user_to_alarm(alarm_id, request)
+    

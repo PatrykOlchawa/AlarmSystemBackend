@@ -7,8 +7,8 @@ class UserAlreadyExistsException(AppException):
     """Exception raised when a user already exists"""
     pass
 class UserNotFoundException(AppException):
-    """Exception raised when a user is not found"""
-    pass
+    status_code = 404
+    detail = "User not found"
 
 class InvalidCredentialsException(AppException):
     """Exception raised when credentials are invalid"""
@@ -82,3 +82,7 @@ class AlarmAlreadyExistsException(AppException):
 class AlarmAccessDeniedException(AppException):
     status_code = 403
     detail = "Alarm access denied"
+
+class UserAlreadyAddedToAlarm(AppException):
+    status_code = 403
+    detail = "User already is added to alarm"

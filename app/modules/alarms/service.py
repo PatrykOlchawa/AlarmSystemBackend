@@ -6,22 +6,32 @@ from app.common.enums import (
 )
 from app.modules.users.model import User
 from app.modules.alarms.repository import AlarmRepository
-from app.modules.alarms.schemas import AlarmCreate
-from app.modules.alarms.schemas import AlarmUpdate
+from app.modules.alarms.schemas import (
+    AlarmCreate,
+    AlarmUpdate,
+    AddUser,
+) 
 from app.modules.alarms.model import Alarm
-from app.core.exceptions import AlarmAlreadyExistsException
-from app.core.exceptions import AlarmNotFoundException
+from app.core.exceptions import (
+    AlarmAlreadyExistsException,
+    AlarmNotFoundException,
+    UserNotFoundException,
+    UserAlreadyAddedToAlarm,
+)
 from app.modules.user_alarm.repository import UserAlarmRepository
 from app.modules.user_alarm.model import UserAlarm
+from app.modules.users.service import UserService
 
 class AlarmService:
     def __init__(
         self,
         repository: AlarmRepository,
         user_alarm_repository: UserAlarmRepository,
+        user_service: UserService,
     ):
         self.repository = repository
         self.user_alarm_repository = user_alarm_repository
+        self.user_service = user_service
 
     def get_all(self) -> list[Alarm]:
         return self.repository.get_all()
@@ -61,19 +71,11 @@ class AlarmService:
     def create(
         self,
         request: AlarmCreate,
-        current_user: User,
     ) -> Alarm:
         exist = self.get_by_name(request.name)
         if exist:
-            raise AlarmAlreadyExistsException()
+            raise AlarmAlreadyExistsException() 
         alarm = Alarm(**request.model_dump())
-        alarm =self.repository.create(alarm)
-        membership = UserAlarm(
-            alarm_id=alarm.id,
-            user_id=current_user.id,
-            role=AlarmRole.OWNER,
-        )
-        self.user_alarm_repository.create(membership)
         return alarm
     
     def update(
@@ -101,6 +103,22 @@ class AlarmService:
     ) -> None:
         alarm = self.get_by_id(alarm_id)
         self.repository.delete(alarm)
+
+    def add_user_to_alarm(
+        self,
+        alarm_id: int,
+        request: AddUser,
+    ) -> None:
+        membership = self.user_alarm_repository.get(request.user_id, alarm_id)
+        if membership:
+            raise UserAlreadyAddedToAlarm()
+        
+        membership = UserAlarm(
+            alarm_id=alarm_id,
+            user_id=request.user_id,
+            role=request.alarm_role,
+        )
+        self.user_alarm_repository.create(membership)
 
     def verify_alarm_access(
         self,
