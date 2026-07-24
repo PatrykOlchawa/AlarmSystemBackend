@@ -86,3 +86,7 @@ class AlarmAccessDeniedException(AppException):
 class UserAlreadyAddedToAlarm(AppException):
     status_code = 403
     detail = "User already is added to alarm"
+
+class UserNotAddedToAlarm(AppException):
+    status_code = 403
+    detail = "User already is added to alarm"

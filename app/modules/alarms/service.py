@@ -10,6 +10,7 @@ from app.modules.alarms.schemas import (
     AlarmCreate,
     AlarmUpdate,
     AddUser,
+    DeleteUser,
 ) 
 from app.modules.alarms.model import Alarm
 from app.core.exceptions import (
@@ -17,6 +18,7 @@ from app.core.exceptions import (
     AlarmNotFoundException,
     UserNotFoundException,
     UserAlreadyAddedToAlarm,
+    UserNotAddedToAlarm,
 )
 from app.modules.user_alarm.repository import UserAlarmRepository
 from app.modules.user_alarm.model import UserAlarm
@@ -115,9 +117,18 @@ class AlarmService:
         membership = UserAlarm(
             alarm_id=alarm_id,
             user_id=request.user_id,
-            role=request.alarm_role,
         )
         self.user_alarm_repository.create(membership)
+
+    def delete_user_from_alarm(
+        self,
+        alarm_id: int,
+        user_id: int,
+    ) -> None:
+        membership = self.user_alarm_repository.get(user_id, alarm_id)
+        if not membership:
+            raise UserNotAddedToAlarm()
+        self.user_alarm_repository.delete(membership)
 
     def verify_alarm_access(
         self,

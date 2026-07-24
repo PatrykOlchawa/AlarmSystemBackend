@@ -25,3 +25,6 @@ class AlarmResponse(AlarmBase):
 class AddUser(BaseModel):
     user_id: int
     alarm_role: AlarmRole
+
+class DeleteUser(BaseModel):
+    user_id: int

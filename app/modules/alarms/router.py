@@ -9,6 +9,7 @@ from app.modules.alarms.schemas import(
     AlarmUpdate,
     AlarmCreate,
     AddUser,
+    DeleteUser,
 ) 
 from app.modules.alarms.service import AlarmService
 from app.modules.alarms.dependencies import get_alarm_service
@@ -52,6 +53,18 @@ def add_user_to_alarm(
 ) -> MessageResponse:
     service.add_user_to_alarm(alarm_id, request)
     return MessageResponse(message="User added to alarm")
+
+@router.delete(
+    "/{alarm_id}/user",
+    response_model=MessageResponse,
+)
+def delete_user_from_alarm(
+    alarm_id: int,
+    request: DeleteUser,
+    service: AlarmService = Depends(get_alarm_service),
+) -> MessageResponse:
+    service.delete_user_from_alarm(alarm_id, request.user_id)
+    return MessageResponse(message="User deleted from alarm")
         
 @router.get(
     "/{alarm_id}",
