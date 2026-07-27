@@ -39,6 +39,16 @@ class UserAlarmRepository:
         )
         return list(self.session.scalars(stmt))
 
+    def get_alarm_user_ids(
+        self,
+        alarm_id: int,
+    ) -> list[int]:
+        stmt = (
+            select(UserAlarm.user_id)
+            .where(UserAlarm.alarm_id == alarm_id)
+        )
+        return list(self.session.scalars(stmt).all())
+    
     def create(
         self,
         membership: UserAlarm,

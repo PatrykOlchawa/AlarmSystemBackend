@@ -3,7 +3,7 @@ from datetime import UTC, datetime, timedelta
 from jose import JWTError, jwt
 
 from app.core.config import settings
-
+from app.core.exceptions import InvalidTokenException
 
 class JWTHandler:
 
@@ -20,7 +20,8 @@ class JWTHandler:
 
         to_encode.update(
             {
-                "exp": expire
+                "exp": expire,
+                "type":"access"
             }
         )
 
@@ -40,6 +41,36 @@ class JWTHandler:
             settings.secret_key,
             algorithms=[settings.algorithm]
         )
+    def verify_access_token(
+        self,
+        token: str,
+    ) -> dict:
 
+        try:
+            payload = self.decode_access_token(token)
+
+        except JWTError:
+            raise InvalidTokenException()
+
+        if "sub" not in payload:
+            raise InvalidTokenException()
+
+        if payload.get("type") != "access":
+            raise InvalidTokenException()
+        return payload
+
+    def get_user_id(
+        self,
+        token: str,
+    ) -> int:
+        payload = self.verify_access_token(token)
+
+        return int(payload["sub"])
+
+    def get_payload(
+        self,
+        token: str,
+    ) -> dict:
+        return self.verify_access_token(token)
 
 jwt_handler = JWTHandler()

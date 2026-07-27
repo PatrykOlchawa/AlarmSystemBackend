@@ -90,3 +90,7 @@ class UserAlreadyAddedToAlarm(AppException):
 class UserNotAddedToAlarm(AppException):
     status_code = 403
     detail = "User already is added to alarm"
+
+class InvalidTokenException(AppException):
+    status_code = 1008
+    detail = "Invalid token"

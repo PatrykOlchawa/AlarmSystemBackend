@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-
+from app.common.enums import UserRole 
 
 class LoginRequest(BaseModel):
     username: str = Field(
@@ -19,5 +19,5 @@ class TokenResponse(BaseModel):
 
 class TokenPayload(BaseModel):
     sub: str
-    user_id: int
-    role: str
+    username: str
+    role: UserRole

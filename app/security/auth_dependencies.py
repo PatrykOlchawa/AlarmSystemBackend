@@ -31,7 +31,7 @@ def get_current_user(
     payload: TokenPayload = Depends(get_token_payload),
     repository: UserRepository = Depends(get_user_service),
 ):
-    user = repository.get_user_by_id(payload.user_id)
+    user = repository.get_user_by_id(int(payload.sub))
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

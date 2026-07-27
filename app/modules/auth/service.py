@@ -38,8 +38,8 @@ class AuthService:
 
         return self.jwt_handler.create_access_token(
             {
-                "sub": user.username,
-                "user_id": user.id,
+                "sub": str(user.id),
+                "username": user.username,
                 "role": user.role.value,
             }
         )

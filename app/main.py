@@ -16,6 +16,7 @@ from app.modules.devices.router import router as devices_router
 from app.modules.control_devices.router import router as control_devices_router
 from app.modules.car_plates.router import router as car_plate_router
 from app.modules.alarms.router import router as alarms_router
+from app.core.websocket.router import router as websocket_router
 from app.core.exception_handlers import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
 import logging
@@ -57,6 +58,7 @@ app.include_router(devices_router)
 app.include_router(control_devices_router)
 app.include_router(car_plate_router)
 app.include_router(alarms_router)
+app.include_router(websocket_router)
 
 @app.get("/")
 def root():

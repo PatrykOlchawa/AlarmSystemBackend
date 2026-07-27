@@ -14,7 +14,7 @@ class DeviceControlService:
 
     def turn_on_led(self, device):
         logger.info(f"Turning on LED for device {device.name}")
-    
+
     def turn_off_led(self, device):
         logger.info(f"Turning off LED for device {device.name}")
         

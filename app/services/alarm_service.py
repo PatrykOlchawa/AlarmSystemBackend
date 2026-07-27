@@ -2,18 +2,22 @@ from app.modules.alarms.model import Alarm
 from app.services.tollgate_service import TollgateService
 from app.services import tollgate_service
 from app.modules.devices.service import DeviceService
-from app.common.enums import DeviceType
 from app.services.device_control_service import DeviceControlService
 from app.core.exceptions import InvalidPinException
 from app.modules.auth.service import AuthService
 from app.core.exceptions import AlarmAlreadyDisarmedException
 from app.core.exceptions import InvalidAlarmStateException
 from app.modules.notifications.schemas import NotificationCreate
-from app.common.enums import NotificationType
+from app.common.enums import (
+    NotificationType,
+    MessageEventType,
+    AlarmEventType,
+    SensorType,
+    AlarmStatus,
+    DeviceType,
+)
 from app.modules.events.model import AlarmEvent
-from app.common.enums import AlarmStatus
 from app.modules.sensors.model import Sensor
-from app.common.enums import AlarmEventType,SensorType
 from app.modules.readings.model import SensorReading
 from app.modules.settings.service import SettingService
 from app.modules.sensors.service import SensorService
@@ -26,8 +30,9 @@ from app.modules.devices.service import DeviceService
 #from app.modules.devices.service import DeviceService
 from app.modules.events.schemas import AlarmEventCreate
 from app.modules.alarms.service import AlarmService
-import time
-
+from app.modules.user_alarm.repository import UserAlarmRepository
+from app.core.websocket.manager import connection_manager
+from app.services.websocket_service import WebSocketMessageService
 class AlarmControlService:
     def __init__(
         self,
@@ -41,6 +46,8 @@ class AlarmControlService:
         device_control_service: DeviceControlService,
         tollgate_service: TollgateService,
         alarm_service: AlarmService,
+        websocket_service: WebSocketMessageService,
+        user_alarm_repository: UserAlarmRepository,
     ):
         self.settings_service = settings_service
         self.sensor_service = sensor_service
@@ -52,6 +59,8 @@ class AlarmControlService:
         self.device_service = device_service
         self.tollgate_service = tollgate_service
         self.alarm_service = alarm_service
+        self.user_alarm_repository = user_alarm_repository
+        self.websocket_service = websocket_service
     
     def process_sensor_reading(
         self,
@@ -79,7 +88,7 @@ class AlarmControlService:
                 self._process_dht11(sensor, reading)
         
 
-    def arm_alarm(
+    async def arm_alarm(
         self,
         alarm: Alarm,
         user_id:int,
@@ -94,6 +103,13 @@ class AlarmControlService:
 
         self.alarm_service.set_alarm_status(alarm, AlarmStatus.ARMED)
 
+        await self.websocket_service.send_message(
+            alarm_id=alarm.id,
+            event_type=MessageEventType.ALARM_STATUS_CHANGED,
+            data={
+                "status": alarm.status.value,
+            }
+        )
         event = self._create_event(
             event_type=AlarmEventType.ALARM_ARMED,
             message="Alarm armed",
@@ -111,7 +127,7 @@ class AlarmControlService:
         
         #self.tollgate_service.process_vehicle()
     
-    def disarm_alarm(
+    async def disarm_alarm(
         self,
         alarm: Alarm,
         user_id:int,
@@ -127,6 +143,13 @@ class AlarmControlService:
         self._deactivate_alarm_devices(alarm)
         self.alarm_service.set_alarm_status(alarm, AlarmStatus.DISARMED)
 
+        await self.websocket_service.send_message(
+            alarm_id=alarm.id,
+            event_type=MessageEventType.ALARM_STATUS_CHANGED,
+            data={
+                "status": alarm.status.value,
+            }
+        )
         event = self._create_event(
             event_type=AlarmEventType.ALARM_DISARMED,
             message="Alarm disarmed",
@@ -142,7 +165,7 @@ class AlarmControlService:
             alarm=alarm,
         )
     
-    def _trigger_alarm(
+    async def _trigger_alarm(
         self,
         title: str,
         event_type: AlarmEventType,
@@ -158,6 +181,14 @@ class AlarmControlService:
             return
         
         self.settings_service.set_alarm_status(alarm, AlarmStatus.TRIGGERED)
+
+        await self.websocket_service.send_message(
+            alarm_id=alarm.id,
+            event_type=MessageEventType.ALARM_STATUS_CHANGED,
+            data={
+                "status": alarm.status.value,
+            }
+        )
         event = self._create_event(
             event_type=event_type,
             message=message,
@@ -202,7 +233,7 @@ class AlarmControlService:
         users = self.user_service.get_users_by_alarm(alarm.id)
         for user in users:
             request = NotificationCreate(
-                user_id=user.id,
+                user_id=user.user_id,
                 title=title,
                 message=message,
                 event_id=event_id,
@@ -246,3 +277,4 @@ class AlarmControlService:
         cameras = self.device_service.get_by_type(alarm, DeviceType.CAMERA)
         for camera in cameras:
             self.device_control_service.turn_off_camera(camera)
+

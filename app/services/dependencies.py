@@ -14,7 +14,8 @@ from app.services.device_control_service import DeviceControlService
 from app.modules.devices.service import DeviceService
 from app.modules.devices.dependencies import get_device_service
 from app.modules.alarms.dependencies import get_alarm_service
-
+from app.services.websocket_service import WebSocketMessageService
+from app.modules.user_alarm.dependencies import get_user_alarm_repository
 #if TYPE_CHECKING:
  #   from app.modules.readings.dependencies import get_sensor_reading_service
 
@@ -29,6 +30,10 @@ def get_ocr_service(
 ) -> OCRService:
     return OCRService()
 
+def get_websocket_service(
+    user_alarm_repository = Depends(get_user_alarm_repository)
+) -> WebSocketMessageService:
+    return WebSocketMessageService(user_alarm_repository)
 
 def get_tollgate_service(
     device_control_service = Depends(get_device_control_service),
@@ -55,6 +60,8 @@ def get_alarm_service(
     device_control_service = Depends(get_device_control_service),
     tollgate_service = Depends(get_tollgate_service),
     alarm_service = Depends(get_alarm_service),
+    websocket_service = Depends(get_websocket_service),
+    user_alarm_repository = Depends(get_user_alarm_repository),
 ) -> AlarmControlService:
 
     return AlarmControlService(
@@ -68,5 +75,7 @@ def get_alarm_service(
         device_control_service=device_control_service,
         tollgate_service=tollgate_service,
         alarm_service=alarm_service,
+        websocket_service=websocket_service,
+        user_alarm_repository=user_alarm_repository
     )
 
