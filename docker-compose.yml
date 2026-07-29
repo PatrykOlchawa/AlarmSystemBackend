@@ -39,6 +39,23 @@ services:
     container_name: alarm-redis
     ports:
       - "6379:6379"
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: alarm-mosquitto
+    restart: unless-stopped
 
+    ports:
+      - "1883:1883"
+
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+    healthcheck:
+      test: ["CMD", "mosquitto_sub", "-h", "localhost", "-t", "$SYS/broker/version", "-C", "1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 volumes:
   postgres_data:
