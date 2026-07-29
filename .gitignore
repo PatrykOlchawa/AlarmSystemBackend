@@ -58,4 +58,3 @@ docker-compose.yml
 
 cerbot/
 nginx/
-mosquitto/

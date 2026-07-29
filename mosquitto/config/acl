@@ -1,0 +1,9 @@
+user backend
+topic readwrite alarm/+/#
+
+user raspberry
+topic read alarm/1/command/#
+topic write alarm/1/state/#
+topic write alarm/1/sensor/#
+topic write alarm/1/event
+topic write alarm/1/heartbeat
