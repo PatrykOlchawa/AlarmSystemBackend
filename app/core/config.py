@@ -11,9 +11,16 @@ class Settings(BaseSettings):
     algorithm: str
     access_token_expire_minutes: int
 
+    mqtt_host: str
+    mqtt_port: int
+    mqtt_username: str
+    mqtt_password: str
+    mqtt_client_id: str
+    
     model_config = SettingsConfigDict(
         env_file=".env"
     )
+
 
 
 settings = Settings()

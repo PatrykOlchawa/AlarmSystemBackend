@@ -97,3 +97,9 @@ class MessageEventType(str, Enum):
     NOTIFICATION_CREATED = "NOTIFICATION_CREATED"
 
     ERROR = "ERROR"
+
+class MQTTMessageType(str, Enum):
+    SENSOR = "sensor"
+    STATE = "state"
+    EVENT = "event"
+    HEARTBEAT = "heartbeat"

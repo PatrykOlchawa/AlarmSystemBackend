@@ -1,28 +1,20 @@
 from app.modules.alarms.model import Alarm
 from app.modules.readings.model import SensorReading
 from app.core.exceptions import SensorReadingNotFoundException
-from app.modules.readings.repository import (
-    SensorReadingRepository,
-)
-
+from app.modules.readings.repository import SensorReadingRepository
 from app.modules.sensors.service import SensorService
 from app.modules.readings.schemas import SensorReadingCreate
-from typing import TYPE_CHECKING
+from app.modules.sensors.model import Sensor
 
-
-if TYPE_CHECKING:
-    from app.services.alarm_service import AlarmService
 
 class SensorReadingService:
     def __init__(
         self,
         repository: SensorReadingRepository,
         sensor_service: SensorService,
-        alarm_service: "AlarmService",
     ):
         self.repository = repository
         self.sensor_service = sensor_service
-        self.alarm_service = alarm_service
 
     def get_all(
         self,
@@ -54,9 +46,19 @@ class SensorReadingService:
     ):
         reading = SensorReading(**request.model_dump(),sensor_id=sensor_id)
         reading = self.repository.create(reading)
-        #self.alarm_service.process_reading(alarm, sensor_id, reading)
         return reading
-    
+
+    def create_for_sensor(
+        self,
+        sensor: Sensor,
+        request: SensorReadingCreate,        
+    ) -> SensorReading:
+        reading = SensorReading(
+            sensor_id=sensor.id,
+            **request.model_dump(),
+        )
+        reading = self.repository.create(reading)
+        return reading
     def delete(
         self,
         alarm: Alarm,

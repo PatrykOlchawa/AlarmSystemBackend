@@ -30,6 +30,18 @@ class SensorRepository:
             .where(Sensor.id == sensor_id)
         )
         return self.session.scalar(stmt)
+
+    def get_by_alarm_and_name(
+        self,
+        alarm_id: int,
+        sensor_name: str,
+    ) -> Sensor | None:
+        stmt = (
+            select(Sensor)
+            .where(Sensor.alarm_id == alarm_id)
+            .where(Sensor.name == sensor_name)
+        )
+        return self.session.scalar(stmt)
     def create_sensor(
         self,
         sensor: Sensor,

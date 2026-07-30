@@ -19,6 +19,7 @@ MarkupSafe==3.0.3
 numpy==2.5.1
 opencv-python==5.0.0.93
 packaging==26.2
+paho-mqtt==2.1.0
 passlib==1.7.4
 pillow==12.3.0
 pyasn1==0.6.4
@@ -40,4 +41,3 @@ typing_extensions==4.16.0
 uvicorn==0.51.0
 wrapt==2.2.2
 psycopg[binary]
-websockets>=15.0

@@ -16,6 +16,7 @@ from app.modules.devices.dependencies import get_device_service
 from app.modules.alarms.dependencies import get_alarm_service
 from app.services.websocket_service import WebSocketMessageService
 from app.modules.user_alarm.dependencies import get_user_alarm_repository
+from app.mqtt.dependencies import get_mqtt_service
 #if TYPE_CHECKING:
  #   from app.modules.readings.dependencies import get_sensor_reading_service
 
@@ -62,6 +63,7 @@ def get_alarm_service(
     alarm_service = Depends(get_alarm_service),
     websocket_service = Depends(get_websocket_service),
     user_alarm_repository = Depends(get_user_alarm_repository),
+    mqtt_service = Depends(get_mqtt_service)
 ) -> AlarmControlService:
 
     return AlarmControlService(
@@ -76,6 +78,7 @@ def get_alarm_service(
         tollgate_service=tollgate_service,
         alarm_service=alarm_service,
         websocket_service=websocket_service,
-        user_alarm_repository=user_alarm_repository
+        user_alarm_repository=user_alarm_repository,
+        mqtt_service=mqtt_service,
     )
 

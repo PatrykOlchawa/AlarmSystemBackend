@@ -33,6 +33,7 @@ from app.modules.alarms.service import AlarmService
 from app.modules.user_alarm.repository import UserAlarmRepository
 from app.core.websocket.manager import connection_manager
 from app.services.websocket_service import WebSocketMessageService
+from app.mqtt.service import MQTTService
 class AlarmControlService:
     def __init__(
         self,
@@ -48,6 +49,7 @@ class AlarmControlService:
         alarm_service: AlarmService,
         websocket_service: WebSocketMessageService,
         user_alarm_repository: UserAlarmRepository,
+        mqtt_service: MQTTService,
     ):
         self.settings_service = settings_service
         self.sensor_service = sensor_service
@@ -61,6 +63,7 @@ class AlarmControlService:
         self.alarm_service = alarm_service
         self.user_alarm_repository = user_alarm_repository
         self.websocket_service = websocket_service
+        self.mqtt_service = mqtt_service
     
     def process_sensor_reading(
         self,
@@ -124,7 +127,10 @@ class AlarmControlService:
             event_id=event.id,
             alarm=alarm,
         )
-        
+        self.mqtt_service.publish_alarm_command(
+            alarm_id=alarm.id,
+            armed=True,
+        )
         #self.tollgate_service.process_vehicle()
     
     async def disarm_alarm(

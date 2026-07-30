@@ -19,6 +19,7 @@ from app.modules.alarms.router import router as alarms_router
 from app.core.websocket.router import router as websocket_router
 from app.core.exception_handlers import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
+from app.mqtt.client import mqtt_client
 import logging
 logging.basicConfig(level=logging.INFO)
 from fastapicap import Cap
@@ -60,6 +61,7 @@ app.include_router(car_plate_router)
 app.include_router(alarms_router)
 app.include_router(websocket_router)
 
+mqtt_client.start()
 @app.get("/")
 def root():
     return {"message": "Alarm systen API is running"}
