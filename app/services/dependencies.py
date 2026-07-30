@@ -16,10 +16,14 @@ from app.modules.devices.dependencies import get_device_service
 from app.modules.alarms.dependencies import get_alarm_service
 from app.services.websocket_service import WebSocketMessageService
 from app.modules.user_alarm.dependencies import get_user_alarm_repository
-from app.mqtt.dependencies import get_mqtt_service
+from app.mqtt.service import MQTTService
 #if TYPE_CHECKING:
  #   from app.modules.readings.dependencies import get_sensor_reading_service
 
+mqtt_service = MQTTService()
+
+def get_mqtt_service() -> MQTTService:
+    return mqtt_service
 
 def get_device_control_service(
     device_service: DeviceService = Depends(get_device_service),

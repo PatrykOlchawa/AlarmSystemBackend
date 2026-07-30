@@ -23,11 +23,26 @@ from app.mqtt.client import mqtt_client
 import logging
 logging.basicConfig(level=logging.INFO)
 from fastapicap import Cap
+import asyncio
+from app.core.event_loop import set_event_loop 
+from contextlib import asynccontextmanager
+import logging
+logger = logging.getLogger(__name__)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    loop = asyncio.get_running_loop()
+    logger.info(f"FastAPI loop id = {id(loop)}")
+    set_event_loop(loop)
+
+    mqtt_client.start()
+
+    yield
+
+    mqtt_client.stop()
+
 
 app = FastAPI(
-    title="AlarmAPI",
-    description="REST API for RaspberryPi Alarm System",
-    version="1.0.0"
+    lifespan=lifespan,
 )
 
 Cap.init_app("redis://redis:6379/0")
@@ -61,7 +76,7 @@ app.include_router(car_plate_router)
 app.include_router(alarms_router)
 app.include_router(websocket_router)
 
-mqtt_client.start()
+
 @app.get("/")
 def root():
     return {"message": "Alarm systen API is running"}

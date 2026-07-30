@@ -7,19 +7,11 @@ from app.mqtt.handlers.sensor_handler import SensorHandler
 #from app.mqtt.handlers.event_handler import EventHandler
 #from app.mqtt.handlers.heartbeat_handler import HeartbeatHandler
 from app.common.enums import MQTTMessageType
-from app.mqtt.dependencies import get_sensor_handler
-    
+
+from app.mqtt.container import mqtt_container
 
 logger = logging.getLogger(__name__)
 class MQTTDispatcher:
-    def __init__(self):
-        self.handlers = {
-            MQTTMessageType.SENSOR: get_sensor_handler(),
-#            MQTTMessageType.STATE: StateHandler(),
- #           MQTTMessageType.EVENT: EventHandler(),
-  #          MQTTMessageType.HEARTBEAT: HeartbeatHandler(),
-        }
-
 
     def dispatch(
         self,
@@ -53,10 +45,21 @@ class MQTTDispatcher:
         )
         logger.info(f"Received MQTT message {message.model_dump()}")
 
-        handler = self.handlers.get(message_type)
+        with mqtt_container.create_session() as db:
 
-        if handler is None:
-            logger.warning(f"Unknown message type")
-            return
-        handler.handle(message)
+            match message.message_type:
+
+                case MQTTMessageType.SENSOR:
+                    handler = mqtt_container.create_sensor_handler(db)
+
+                case _:
+                    logger.warning(
+                        "No handler for %s",
+                        message.message_type,
+                    )
+                    return
+            logger.info("Sending sensor websocket notification")
+            handler.handle(message)
+            logger.info("Sensor websocket notification scheduled")
         
+dispatcher = MQTTDispatcher()

@@ -16,5 +16,5 @@ class MQTTMessage(BaseModel):
 
 class SensorPayload(BaseModel):
     value: bool | int | float | str
-    timestamp: datetime
+
 

@@ -1,5 +1,4 @@
 from app.services.dependencies import get_alarm_service
-from app.services.alarm_service import AlarmService
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
@@ -27,9 +26,6 @@ def get_sensor_reading_service(
     repository: SensorReadingRepository = Depends(
         get_sensor_reading_repository
     ),
-    alarm_service: AlarmService = Depends(
-        get_alarm_service
-    ),
     sensor_service: SensorService = Depends(
         get_sensor_service
     ),
@@ -38,5 +34,4 @@ def get_sensor_reading_service(
     return SensorReadingService(
         repository,
         sensor_service,
-        alarm_service,
     )
