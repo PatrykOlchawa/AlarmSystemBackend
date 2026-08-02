@@ -83,6 +83,6 @@ class NotificationService:
         alarm: Alarm,
         notification_id: int,
     ):
-        notification = self.get_by_id(notification_id)
+        notification = self.get_by_id(alarm, notification_id)
         
         self.repository.delete(notification)
