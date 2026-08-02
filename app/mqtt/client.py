@@ -1,7 +1,7 @@
 import paho.mqtt.client as mqtt
 from app.core.config import settings
 from app.mqtt.topics import Topics
-from app.mqtt.dispatcher import dispatcher
+
 import logging
 logger = logging.getLogger(__name__)
 class MQTTClient:
@@ -17,7 +17,7 @@ class MQTTClient:
         self.client.on_connect = self.on_connect
         self.client.on_disconnect = self.on_disconnect
         self.client.on_message = self.on_message
-
+        self.dispatcher = None
     def start(self):
         self.client.connect(
             settings.mqtt_host,
@@ -82,7 +82,16 @@ class MQTTClient:
         userdata,
         msg,
     ):
-        dispatcher.dispatch(
+        logger.info(
+            "MQTT RX topic=%s payload=%s",
+            msg.topic,
+            msg.payload.decode(),
+        )
+
+        if self.dispatcher is None:
+            return
+        
+        self.dispatcher.dispatch(
             topic=msg.topic,
             payload=msg.payload,
         )
@@ -92,4 +101,8 @@ class MQTTClient:
         self.client.subscribe(Topics.STATE)
         self.client.subscribe(Topics.EVENT)
         self.client.subscribe(Topics.HEARTBEAT)
+
+    def set_dispatcher(self, dispatcher):
+        self.dispatcher = dispatcher
+
 mqtt_client = MQTTClient()

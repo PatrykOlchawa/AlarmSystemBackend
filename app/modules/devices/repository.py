@@ -55,7 +55,6 @@ class DeviceRepository:
     
     def update(
         self,
-        alarm:Alarm,
         device: Device
     ) -> Device:        
         self.session.commit()

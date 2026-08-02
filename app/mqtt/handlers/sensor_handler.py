@@ -9,6 +9,10 @@ from pydantic import ValidationError
 from app.services.websocket_service import WebSocketMessageService
 from app.common.enums import MessageEventType
 import logging
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from app.services.alarm_service import AlarmControlService
 logger = logging.getLogger(__name__)
 class SensorHandler(BaseHandler):
     def __init__(
@@ -16,10 +20,12 @@ class SensorHandler(BaseHandler):
         sensor_service: SensorService,
         reading_service: SensorReadingService,
         websocket_service: WebSocketMessageService,
+        alarm_control_service: "AlarmControlService",
     ):
         self.sensor_service = sensor_service
         self.reading_service = reading_service
         self.websocket_service = websocket_service
+        self.alarm_control_service = alarm_control_service
 
     def handle(
         self,
@@ -50,6 +56,8 @@ class SensorHandler(BaseHandler):
                 )
             except Exception:
                 logger.exception("Failed to send websocket notification")
+
+            self.alarm_control_service.process_sensor_reading(message.alarm_id, reading)
         except ValidationError as exc:
             logger.warning(f"Invalid sensor payload {exc}")
 

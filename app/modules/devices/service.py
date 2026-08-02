@@ -70,7 +70,7 @@ class DeviceService:
         for field, value in update_data.items():
             setattr(device, field, value)
             
-        return self.repository.update(alarm,device)
+        return self.repository.update(device)
 
     def delete(
         self,

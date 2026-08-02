@@ -27,8 +27,9 @@ def get_mqtt_service() -> MQTTService:
 
 def get_device_control_service(
     device_service: DeviceService = Depends(get_device_service),
+    mqtt_service: MQTTService = Depends(get_mqtt_service),
 ) -> DeviceControlService:
-    return DeviceControlService(device_service)
+    return DeviceControlService(device_service, mqtt_service)
     
 def get_ocr_service(
     

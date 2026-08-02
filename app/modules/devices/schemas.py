@@ -4,7 +4,7 @@ from pydantic import BaseModel, ConfigDict, Field
 # pyrefly: ignore [missing-import]
 from app.common.enums import ConnectionType
 from app.common.enums import DeviceType
-
+from typing import Any
 class DeviceBase(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     connection_type: ConnectionType
@@ -25,6 +25,7 @@ class DeviceUpdate(BaseModel):
     type: DeviceType | None = None
     location: str | None = Field(default=None, max_length=256)
     enabled: bool | None = None
+    status: dict[str, Any] | None = None
 
 class DeviceResponse(BaseModel):
     id: int
@@ -34,7 +35,7 @@ class DeviceResponse(BaseModel):
     type: DeviceType
     location: str | None = None
     enabled: bool
-
+    status: dict[str, Any] | None = None
     model_config = ConfigDict(from_attributes=True)
 
 

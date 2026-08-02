@@ -10,7 +10,7 @@ from sqlalchemy import Integer
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped
 from sqlalchemy.orm import mapped_column
-
+from sqlalchemy.dialects.postgresql import JSONB
 from app.common.enums import DeviceType
 from app.common.enums import ConnectionType
 from app.db.base import Base
@@ -64,6 +64,11 @@ class Device(Base):
         nullable=False
     )
 
+    status: Mapped[dict | None] = mapped_column(
+        JSONB,
+        nullable=True,
+    )
+    
     alarm_events: Mapped[list["AlarmEvent"]] = relationship(
         back_populates="device"
     )

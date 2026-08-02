@@ -16,7 +16,8 @@ class AlarmStatus(str, Enum):
     TRIGGERED = "TRIGGERED"
     ARMING = "ARMING"
     DISARMING = "DISARMING"
-    UNKNOWN = "UNKNOWN"    
+    UNKNOWN = "UNKNOWN"   
+    ACTIVATED = "ACTIVATED" 
 
 class SensorStatus(str, Enum):
     ACTIVE = "ACTIVE"
@@ -63,7 +64,7 @@ class AlarmEventType(str, Enum):
     DOOR_CLOSED = "DOOR_CLOSED"
     GATE_OPENED = "GATE_OPENED"
     GATE_CLOSED = "GATE_CLOSED"
-
+    ALARM_ACTIVATED = "ALARM_ACTIVATED"
 
 class NotificationType(str, Enum):
     INFO = "INFO"

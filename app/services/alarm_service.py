@@ -34,6 +34,10 @@ from app.modules.user_alarm.repository import UserAlarmRepository
 from app.core.websocket.manager import connection_manager
 from app.services.websocket_service import WebSocketMessageService
 from app.mqtt.service import MQTTService
+from app.core.event_loop import get_event_loop
+import asyncio
+import logging
+logger = logging.getLogger(__name__)
 class AlarmControlService:
     def __init__(
         self,
@@ -67,30 +71,63 @@ class AlarmControlService:
     
     def process_sensor_reading(
         self,
+        alarm_id: int,
         reading: SensorReading,
     ) -> None:
         
-
-        sensor = self.sensor_service.get_sensor_by_id(reading.sensor_id)
+        alarm = self.alarm_service.get_by_id(alarm_id)
+        sensor = self.sensor_service.get_sensor_by_id(alarm, reading.sensor_id)
         if sensor is None:
             return
-        alarm = sensor.alarm
+        logger.info(
+            "Alarm status=%s expected=%s",
+            alarm.status,
+            AlarmStatus.ARMED,
+        )
         if alarm.status != AlarmStatus.ARMED:
             return
         
-        match sensor.sensor_type:
+        match sensor.type:
             case SensorType.PIR:
-                self._process_motion(sensor, reading)
-            case SensorType.HUMIDITY:
-                self._process_door(sensor, reading)
-            case SensorType.TEMPERATURE:
-                self._process_temperature(sensor, reading)
+                triggered = self._process_motion(reading)
             case SensorType.LDR:
-                self._process_ldr(sensor, reading)
+                triggered = self._process_ldr(reading)
             case SensorType.DHT11:
-                self._process_dht11(sensor, reading)
-        
+                triggered = self._process_dht11(reading)
+            case _:
+                return
+        logger.info(
+            "Sensor type=%s value=%s",
+            sensor.type,
+            reading.value,
+        )    
+        logger.info(
+            "triggered=%s",
+            triggered,
+        )
+        if not triggered:
+            return
+        self._trigger_alarm(
+            alarm=alarm,
+            sensor=sensor,
+        )
+    def _process_motion(
+        self,
+        reading: SensorReading
+    ):
+        return reading.value == 1
 
+    def _process_ldr(
+        self,
+        reading: SensorReading,
+    ):
+        return reading.value < reading.sensor.threshold
+    
+    def _process_dht11(
+        self,
+        reading: SensorReading,
+    ):
+        return reading.value < reading.sensor.threshold
     async def arm_alarm(
         self,
         alarm: Alarm,
@@ -171,45 +208,58 @@ class AlarmControlService:
             alarm=alarm,
         )
     
-    async def _trigger_alarm(
+    def _trigger_alarm(
         self,
-        title: str,
-        event_type: AlarmEventType,
-        message: str,
-        user_id: int | None,
-        device_id: int | None,
-        location: str | None,
-        alarm: Alarm
-
+        sensor: Sensor,
+        alarm: Alarm,
     ) -> None:
 
-        if alarm.status == AlarmStatus.TRIGGERED:
+        if alarm.status in (
+            AlarmStatus.ACTIVATED,
+        ):
             return
         
-        self.settings_service.set_alarm_status(alarm, AlarmStatus.TRIGGERED)
 
-        await self.websocket_service.send_message(
+        self.alarm_service.set_alarm_status(alarm, AlarmStatus.TRIGGERED)
+
+        self.websocket_service.send_message_sync(
             alarm_id=alarm.id,
             event_type=MessageEventType.ALARM_STATUS_CHANGED,
             data={
                 "status": alarm.status.value,
             }
         )
+        logger.info("before even created")
         event = self._create_event(
-            event_type=event_type,
-            message=message,
-            user_id=user_id,
-            device_id=device_id,
-            location=location,
-            alarm=alarm
+            event_type=AlarmEventType.ALARM_TRIGGERED,
+            message=f"alarm triggered by sensor {sensor.name} in location {sensor.location}",
+            location=sensor.location,
+            alarm=alarm,
+            user_id=None,
+            device_id=None,
         )
+        logger.info("after even created")
+
         self._notify_users(
-            title=title,
-            message=message,
+            title="Alarm triggered",
+            message=f"Alarm triggered by sensor {sensor.name} in location {sensor.location}",
             event_id=event.id,
             alarm=alarm,
         )
-    
+        logger.info("Triggered before asyncio")
+        loop = get_event_loop()
+        future = asyncio.run_coroutine_threadsafe(
+            self._activation_timer(alarm.id),
+            loop,
+        )
+        future.add_done_callback(
+            lambda f: logger.exception(
+                "Activation timer failed",
+                exc_info=f.exception(),
+            ) if f.exception() else None
+        )
+        logger.info("Triggered after asyncio")
+
     def _create_event(
         self,
         event_type: AlarmEventType,
@@ -284,3 +334,53 @@ class AlarmControlService:
         for camera in cameras:
             self.device_control_service.turn_off_camera(camera)
 
+    async def _activation_timer(
+        self,
+        alarm_id: int,
+    ):
+        logger.info("Start activation timer")
+        
+        delay = 10
+        await asyncio.sleep(delay)
+        logger.info("End activation timer")
+
+        alarm = self.alarm_service.get_by_id(alarm_id)
+
+        if alarm.status != AlarmStatus.TRIGGERED:
+            return
+
+        self._activate_alarm(alarm)
+        logger.info("Alarm activated")
+
+    def _activate_alarm(
+        self,
+        alarm: Alarm,
+    ):
+
+        self.alarm_service.set_alarm_status(
+            alarm = alarm,
+            alarm_status=AlarmStatus.ACTIVATED,
+        )
+        self._activate_alarm_devices(alarm=alarm)
+        self.websocket_service.send_message_sync(
+            alarm_id=alarm.id,
+            event_type=MessageEventType.ALARM_STATUS_CHANGED,
+            data={
+                "status": alarm.status.value,
+            }
+        )
+        event = self._create_event(
+            event_type=AlarmEventType.ALARM_ACTIVATED,
+            message=f"Alarm activated!",
+            alarm=alarm,
+            user_id=None,
+            device_id=None,
+            location=None
+        )
+        self._notify_users(
+            title="Alarm activated",
+            message="Alarm activated",
+            event_id=event.id,
+            alarm=alarm,
+        )
+        logger.info("End activation func")

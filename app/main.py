@@ -26,6 +26,7 @@ from fastapicap import Cap
 import asyncio
 from app.core.event_loop import set_event_loop 
 from contextlib import asynccontextmanager
+from app.mqtt.dispatcher import dispatcher
 import logging
 logger = logging.getLogger(__name__)
 @asynccontextmanager
@@ -33,7 +34,7 @@ async def lifespan(app: FastAPI):
     loop = asyncio.get_running_loop()
     logger.info(f"FastAPI loop id = {id(loop)}")
     set_event_loop(loop)
-
+    mqtt_client.set_dispatcher(dispatcher)
     mqtt_client.start()
 
     yield

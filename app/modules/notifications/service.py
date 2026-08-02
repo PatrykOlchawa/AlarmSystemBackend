@@ -73,7 +73,7 @@ class NotificationService:
         notification_id: int,
         request: NotificationUpdate,
     ):
-        notification = self.get_by_id(notification_id)
+        notification = self.get_by_id(alarm, notification_id)
         notification.is_read = request.is_read
         
         return self.repository.update(notification)
