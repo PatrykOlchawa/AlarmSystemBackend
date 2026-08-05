@@ -35,12 +35,7 @@ class Device(Base):
         nullable=False,
         index=True
     )
-
-    alarm_id: Mapped[int] = mapped_column(
-        ForeignKey("alarms.id"),
-        nullable=False
-    )
-
+    
     connection_type: Mapped[ConnectionType] = mapped_column(
         Enum(ConnectionType),
         nullable=False

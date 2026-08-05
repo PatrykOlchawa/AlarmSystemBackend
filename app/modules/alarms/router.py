@@ -12,7 +12,7 @@ from app.modules.alarms.schemas import(
     DeleteUser,
     AlarmRoleResponse,
     UpdateAlarmRole,
-
+    AlarmCreateResponse,
 ) 
 from app.common.enums import AlarmRole
 from app.modules.alarms.service import AlarmService
@@ -114,14 +114,14 @@ def get_alarm(
 
 @router.post(
     "/",
-    response_model=AlarmResponse,
+    response_model=AlarmCreateResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def create_alarm(
     request: AlarmCreate,
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
-) -> AlarmResponse:
+) -> AlarmCreateResponse:
     return service.create(request)
 
 

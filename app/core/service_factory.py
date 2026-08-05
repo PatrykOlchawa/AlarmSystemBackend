@@ -31,6 +31,8 @@ from app.modules.car_plates.service import CarPlateService
 from app.modules.alarms.service import AlarmService
 from app.modules.alarms.repository import AlarmRepository
 from app.mqtt.service import mqtt_service
+from app.modules.clients.repository import ClientRepository
+from app.modules.clients.service import ClientService
 
 class ServicesFactory:
     def create_session(self) -> Session:
@@ -112,6 +114,14 @@ class ServicesFactory:
             self.create_device_service(db)
         )
 
+    def create_client_service(
+        self,
+        db: Session,
+    ) -> ClientService:
+        repository = ClientRepository(db)
+        return ClientService(
+            repository
+        )
     def create_alarm_service(
         self,
         db: Session,
@@ -119,7 +129,8 @@ class ServicesFactory:
         repository = AlarmRepository(db)
         return AlarmService(
             repository,
-            self.create_user_alarm_repository(db)
+            self.create_user_alarm_repository(db),
+            self.create_client_service(db),
         )
     
     def create_sensor_service(

@@ -8,7 +8,7 @@ from app.modules.devices.model import Device
 from app.modules.car_plates.model import CarPlate
 from app.modules.alarms.model import Alarm
 from app.modules.user_alarm.model import UserAlarm
-
+from app.modules.clients.model import Client
 
 
 

@@ -11,6 +11,8 @@ from app.modules.alarms.schemas import (
     AlarmUpdate,
     AddUser,
     DeleteUser,
+    AlarmCreateResponse,
+    AlarmResponse
 ) 
 from app.modules.alarms.model import Alarm
 from app.core.exceptions import (
@@ -23,15 +25,18 @@ from app.core.exceptions import (
 from app.modules.user_alarm.repository import UserAlarmRepository
 from app.modules.user_alarm.model import UserAlarm
 from app.modules.users.service import UserService
+from app.modules.clients.service import ClientService
 
 class AlarmService:
     def __init__(
         self,
         repository: AlarmRepository,
         user_alarm_repository: UserAlarmRepository,
+        client_service: ClientService
     ):
         self.repository = repository
         self.user_alarm_repository = user_alarm_repository
+        self.client_service = client_service
 
     def get_all(self) -> list[Alarm]:
         return self.repository.get_all()
@@ -83,16 +88,23 @@ class AlarmService:
         user_alarm_role: AlarmRole,
     ):
         self.repository.update_alarm_role(alarm_id, user_id, user_alarm_role)
+
     def create(
         self,
         request: AlarmCreate,
-    ) -> Alarm:
+    ) -> AlarmCreateResponse:
         exist = self.get_by_name(request.name)
         if exist:
             raise AlarmAlreadyExistsException() 
         alarm = Alarm(**request.model_dump())
+        
         self.repository.create(alarm)
-        return alarm
+        credentials = self.client_service.create_default_client(alarm)
+
+        return AlarmCreateResponse(
+            alarm=AlarmResponse.model_validate(alarm),
+            raspberry=credentials,
+        )
     
     def update(
         self,

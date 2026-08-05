@@ -3,6 +3,9 @@ from fastapi import Depends
 from app.modules.users.dependencies import (
     get_user_repository,
 )
+from app.modules.clients.dependencies import (
+    get_client_service
+)
 from app.modules.users.repository import UserRepository
 
 from app.security.hashing import (
@@ -14,8 +17,8 @@ from app.security.jwt_handler import (
     JWTHandler,
 )
 
-from app.modules.auth.service import AuthService
-
+from app.modules.auth.service import AuthService, ClientAuthService
+from app.modules.clients.service import ClientService
 
 def get_password_hasher() -> PasswordHasher:
     return password_hasher
@@ -35,4 +38,13 @@ def get_auth_service(
         repository,
         password_hasher,
         jwt_handler,
+    )
+
+def get_client_auth_service(
+    service: ClientService = Depends(get_client_service),
+    jwt_handler: JWTHandler = Depends(get_jwt_handler),
+) -> ClientAuthService:
+    return ClientAuthService(
+        service=service,
+        jwt_handler=jwt_handler,
     )

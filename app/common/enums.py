@@ -104,3 +104,7 @@ class MQTTMessageType(str, Enum):
     STATE = "state"
     EVENT = "event"
     HEARTBEAT = "heartbeat"
+
+class ClientType(str, Enum):
+    RASPBERRY = "RASBPERRY"
+    ESP32 = "ESP32"

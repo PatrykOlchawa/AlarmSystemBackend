@@ -18,6 +18,7 @@ class MQTTClient:
         self.client.on_disconnect = self.on_disconnect
         self.client.on_message = self.on_message
         self.dispatcher = None
+        
     def start(self):
         self.client.connect(
             settings.mqtt_host,

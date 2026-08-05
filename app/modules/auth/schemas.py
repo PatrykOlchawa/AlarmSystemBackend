@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from app.common.enums import UserRole 
+from app.common.enums import UserRole, ClientType
 
 class LoginRequest(BaseModel):
     username: str = Field(
@@ -21,3 +21,9 @@ class TokenPayload(BaseModel):
     sub: str
     username: str
     role: UserRole
+
+class ClientTokenPayload(BaseModel):
+    sub: str
+    alarm_id: int
+    client_id: str
+    client_type: ClientType

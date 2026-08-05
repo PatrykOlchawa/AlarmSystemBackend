@@ -4,7 +4,7 @@ from app.common.enums import (
 )
 from app.db.base import Base
 from pydantic import BaseModel, ConfigDict, Field
-
+from app.modules.clients.schemas import ClientCredentials
 class AlarmBase(BaseModel):
     name: str = Field(min_length=1, max_length=128)
 
@@ -35,3 +35,7 @@ class AlarmRoleResponse(BaseModel):
 
 class UpdateAlarmRole(BaseModel):
     user_alarm_role: AlarmRole
+
+class AlarmCreateResponse(BaseModel):
+    alarm: AlarmResponse
+    raspberry: ClientCredentials

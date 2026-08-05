@@ -4,6 +4,8 @@ from app.modules.settings.model import Setting
 from app.modules.notifications.model import Notification
 from app.modules.car_plates.model import CarPlate
 from app.modules.sensors.model import Sensor
+
+
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import Enum
@@ -21,7 +23,7 @@ if TYPE_CHECKING:
     from app.modules.user_alarm.model import UserAlarm
     from app.modules.devices.model import Device
     from app.modules.events.model import AlarmEvent
-
+    from app.modules.clients.model import Client
 class Alarm(Base):
     __tablename__ = "alarms"
 
@@ -79,4 +81,7 @@ class Alarm(Base):
     settings: Mapped[list["Setting"]] = relationship(
         back_populates="alarm",
     )
-    
+
+    clients: Mapped[list["Client"]] = relationship(
+        back_populates="alarm"
+    )

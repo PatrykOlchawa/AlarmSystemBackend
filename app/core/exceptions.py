@@ -94,3 +94,11 @@ class UserNotAddedToAlarm(AppException):
 class InvalidTokenException(AppException):
     status_code = 1008
     detail = "Invalid token"
+
+class ClientNotFoundException(AppException):
+    status_code = 403
+    detail = "Client not found"
+
+class ClientAlreadyExistsException(AppException):
+    status_code = 403
+    detail = "Client already exists"
