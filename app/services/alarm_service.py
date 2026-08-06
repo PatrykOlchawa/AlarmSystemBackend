@@ -3,7 +3,7 @@ from app.services.tollgate_service import TollgateService
 from app.services import tollgate_service
 from app.modules.devices.service import DeviceService
 from app.services.device_control_service import DeviceControlService
-from app.core.exceptions import InvalidPinException
+from app.core.exceptions import InvalidPinException, AlarmAccessDeniedException
 from app.modules.auth.service import AuthService
 from app.core.exceptions import AlarmAlreadyDisarmedException
 from app.core.exceptions import InvalidAlarmStateException
@@ -134,9 +134,16 @@ class AlarmControlService:
         user_id:int,
         pin:str,
     ) -> None:
-        user = self.user_service.get_user_by_id(user_id)
-        if not password_hasher.verify_pin(pin,user.pin_hash):
+        membership = self.user_alarm_repository.get(
+                    alarm_id=alarm.id,
+                    user_id=user_id
+                )
+        if membership is None:
+            raise AlarmAccessDeniedException
+        
+        if not password_hasher.verify_pin(pin, membership.pin_hash):
             raise InvalidPinException()
+        
         alarm_status = alarm.status
         if alarm_status != AlarmStatus.DISARMED:
             raise InvalidAlarmStateException(alarm_status)
@@ -176,8 +183,14 @@ class AlarmControlService:
         user_id:int,
         pin:str,
     ) -> None:
-        user = self.user_service.get_user_by_id(user_id)
-        if not password_hasher.verify_pin(pin,user.pin_hash):
+        membership = self.user_alarm_repository.get(
+            alarm_id=alarm.id,
+            user_id=user_id
+        )
+        if membership is None:
+            raise AlarmAccessDeniedException
+        
+        if not password_hasher.verify_pin(pin, membership.pin_hash):
             raise InvalidPinException()
             
         if alarm.status == AlarmStatus.DISARMED:

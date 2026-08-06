@@ -72,7 +72,7 @@ def add_user_to_alarm(
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
 ) -> MessageResponse:
-    service.add_user_to_alarm(alarm_id, user_id, request.alarm_role)
+    service.add_user_to_alarm(alarm_id, user_id, request)
     return MessageResponse(message="User added to alarm")
 
 @router.delete(

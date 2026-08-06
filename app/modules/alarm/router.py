@@ -1,4 +1,5 @@
 from app.security.authorization_dependencies import require_alarm_admin
+from app.security.authorization_dependencies import require_alarm_member
 from app.modules.alarms.model import Alarm
 from app.modules.alarm.schemas import AlarmPinRequest
 from app.modules.alarm.schemas import AlarmMessageResponse
@@ -21,7 +22,7 @@ router = APIRouter(
 )
 def get_alarm_status(
     service: AlarmService = Depends(get_alarm_service),
-    alarm : Alarm = Depends(require_alarm_admin),   
+    alarm : Alarm = Depends(require_alarm_member),   
 ):
     return AlarmStatusResponse(
         status=service.get_alarm_status(alarm)
@@ -34,7 +35,7 @@ def get_alarm_status(
 async def arm_alarm(
     request: AlarmPinRequest,
     current_user: User = Depends(get_current_user),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
     service: AlarmService = Depends(get_alarm_service),
 ):
     await service.arm_alarm(
@@ -54,7 +55,7 @@ async def disarm_alarm(
     request: AlarmPinRequest,
     current_user: User = Depends(get_current_user),
     service: AlarmService = Depends(get_alarm_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     await service.disarm_alarm(
         alarm,

@@ -1,21 +1,26 @@
-from fastapi import requests
-from app.modules.users.schema import UserUpdate, AlarmMemberResponse
-from app.core.exceptions import UserNotFoundException
+from app.modules.users.schema import (
+    UserUpdate,
+    AlarmMemberResponse,
+    UserCreate,
+    ChangePassword,
+)
+from app.core.exceptions import (
+    UserNotFoundException,
+    UserAlreadyExistsException,
+    InvalidCredentialsException,
+) 
 from app.security.hashing import PasswordHasher
-from app.core.exceptions import UserAlreadyExistsException
+from app.security.hashing import password_hasher
 from app.modules.users.repository import UserRepository
 from app.modules.users.model import User
-from app.common.enums import UserRole
-from app.security.hashing import password_hasher
-from app.modules.alarms.model import Alarm
-from app.modules.users.schema import UserCreate
+
 class UserService:
 
     def __init__(self, repository: UserRepository, password_hasher: PasswordHasher):
         self.repository = repository
         self.password_hasher = password_hasher
     
-    def create_user(
+    def create(
         self,
         request: UserCreate,
     ) -> User:
@@ -25,19 +30,17 @@ class UserService:
         if existing:
             raise UserAlreadyExistsException
         hashed_password = password_hasher.hash_password(request.password)
-        hashed_pin = password_hasher.hash_pin(request.pin)
+
         user = User(
             username = request.username,
             role = request.role,
             password_hash = hashed_password,
-            pin_hash = hashed_pin,
         )
         return self.repository.create(user)
     
     def get_user_by_id(
         self,
         user_id: int,
-
     ) -> User | None:
 
         return self.repository.get_by_id(user_id)
@@ -48,7 +51,7 @@ class UserService:
         return self.repository.get_all()
     
 
-    def delete_user(
+    def delete(
         self,
         user_id: int
     ) -> None:
@@ -57,7 +60,7 @@ class UserService:
             raise UserNotFoundException
         self.repository.delete(user)
     
-    def update_user(
+    def update(
         self,
         user_id: int,
         request: UserUpdate
@@ -76,3 +79,17 @@ class UserService:
         alarm_id:int,
     ) -> list[AlarmMemberResponse] | None:
         return self.repository.get_users_by_alarm(alarm_id)
+
+    def change_password(
+        self,
+        user: User,
+        request: ChangePassword,
+    ) -> User:
+        if not self.password_hasher.verify_pin(request.old_password, user.password_hash):
+            raise InvalidCredentialsException
+        user.password_hash = self.password_hasher.hash_password(request.new_password)
+        self.repository.update(user)
+        return user
+
+
+        

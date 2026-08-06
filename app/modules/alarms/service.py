@@ -1,11 +1,8 @@
-from app.core.exceptions import AlarmAccessDeniedException
 from app.common.enums import (
     AlarmRole,
     AlarmStatus,
     UserRole
 )
-from app.modules.users.model import User
-from app.modules.alarms.repository import AlarmRepository
 from app.modules.alarms.schemas import (
     AlarmCreate,
     AlarmUpdate,
@@ -14,19 +11,22 @@ from app.modules.alarms.schemas import (
     AlarmCreateResponse,
     AlarmResponse
 ) 
-from app.modules.alarms.model import Alarm
 from app.core.exceptions import (
     AlarmAlreadyExistsException,
     AlarmNotFoundException,
     UserNotFoundException,
     UserAlreadyAddedToAlarm,
     UserNotAddedToAlarm,
+    AlarmAccessDeniedException,
 )
+from app.modules.alarms.model import Alarm
+from app.modules.users.model import User
+from app.modules.alarms.repository import AlarmRepository
 from app.modules.user_alarm.repository import UserAlarmRepository
 from app.modules.user_alarm.model import UserAlarm
 from app.modules.users.service import UserService
 from app.modules.clients.service import ClientService
-
+from app.security.hashing import password_hasher
 class AlarmService:
     def __init__(
         self,
@@ -136,7 +136,7 @@ class AlarmService:
         self,
         alarm_id: int,
         user_id: int,
-        alarm_role: AlarmRole,
+        request: AddUser,
     ) -> None:
         membership = self.user_alarm_repository.get(user_id, alarm_id)
         if membership:
@@ -145,7 +145,8 @@ class AlarmService:
         membership = UserAlarm(
             alarm_id=alarm_id,
             user_id=user_id,
-            role=alarm_role,
+            role=request.alarm_role,
+            pin_hash=password_hasher.hash_password(request.pin)
         )
         self.user_alarm_repository.create(membership)
 

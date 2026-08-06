@@ -14,7 +14,6 @@ class UserBase(BaseModel):
     
 class UserCreate(UserBase):
     password: str
-    pin: str
 
 class UserLogin(BaseModel):
     username: str
@@ -32,8 +31,6 @@ class UserResponse(UserBase):
     
 class UserUpdate(BaseModel):
     username: str | None = None
-    password: str | None = None
-    pin: str | None = None
     role: UserRole | None = None
     is_active: bool | None = None
 
@@ -42,3 +39,6 @@ class AlarmMemberResponse(UserBase):
     alarm_role: AlarmRole
     is_active: bool
 
+class ChangePassword(BaseModel):
+    old_password: str
+    new_password: str

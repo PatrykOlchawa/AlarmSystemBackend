@@ -1,17 +1,25 @@
-from app.modules.users.schema import UserUpdate
-from fastapi import status
+from fastapi import (
+    APIRouter,
+    Depends,
+    status,
+)
+from app.modules.users.schema import (
+    UserCreate,
+    UserResponse,
+    AlarmMemberResponse,
+    UserUpdate,
+    ChangePassword,
+)
+
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
-from fastapi import APIRouter
-from fastapi import Depends
-
-from app.modules.users.schema import UserCreate
-from app.modules.users.schema import UserResponse, AlarmMemberResponse
-
 from app.modules.users.service import UserService
 from app.modules.users.dependencies import get_user_service
-from app.modules.alarms.model import Alarm
 from app.security.authorization_dependencies import require_alarm_admin
+
+
+
+
 router = APIRouter(
     prefix="/users",
     tags=["Users"]
@@ -55,32 +63,45 @@ def get_user(
     "/",
     response_model=UserResponse
 )
-def create_user(
+def create (
     request: UserCreate,
     service: UserService = Depends(get_user_service),
     current_user: User = Depends(get_current_user),
 ):
-    return service.create_user(request)
+    return service.create(request)
 
 @router.delete(
     "/{user_id}",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-def delete_user(
+def delete(
     user_id: int,
     service: UserService = Depends(get_user_service),
     current_user: User = Depends(get_current_user),
 ):
-    service.delete_user(user_id)
+    service.delete(user_id)
+
+@router.patch(
+    "/change_password",
+    response_model=UserResponse,
+)
+def change_password(
+    request: ChangePassword,
+    service: UserService = Depends(get_user_service),
+    current_user: User = Depends(get_current_user),
+):
+    user = service.change_password(current_user, request)
+    return user
 
 @router.patch(
     "/{user_id}",
     response_model=UserResponse,
 )
-def update_user(
+def update(
     user_id: int,
     request: UserUpdate,
     service: UserService = Depends(get_user_service),
     current_user: User = Depends(get_current_user),
 ):
-    return service.update_user(user_id, request)
+    return service.update(user_id, request)
+

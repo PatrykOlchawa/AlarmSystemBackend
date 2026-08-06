@@ -1,20 +1,24 @@
-from typing import TYPE_CHECKING
-from sqlalchemy.orm import relationship
-from datetime import datetime
-
-from sqlalchemy import Boolean
-from sqlalchemy import DateTime
-from sqlalchemy import Enum
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-
 from app.db.base import Base
+from sqlalchemy import(
+    Boolean,
+    DateTime,
+    Enum,
+    String,
+) 
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship,
+)
+from datetime import datetime
 from app.common.enums import UserRole
 from app.modules.events.model import AlarmEvent
 from app.modules.notifications.model import Notification
+from typing import TYPE_CHECKING
+
 if TYPE_CHECKING:
     from app.modules.user_alarm.model import UserAlarm
+
 class User(Base):
 
     __tablename__ = "users"
@@ -29,11 +33,6 @@ class User(Base):
     )
 
     password_hash: Mapped[str] = mapped_column(
-        String(255),
-        nullable=False
-    )
-
-    pin_hash: Mapped[str] = mapped_column(
         String(255),
         nullable=False
     )

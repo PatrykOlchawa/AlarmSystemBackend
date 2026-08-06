@@ -24,6 +24,7 @@ class AlarmResponse(AlarmBase):
     
 class AddUser(BaseModel):
     alarm_role: AlarmRole
+    pin: str
 
 class DeleteUser(BaseModel):
     user_id: int
