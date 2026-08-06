@@ -40,3 +40,7 @@ class UpdateAlarmRole(BaseModel):
 class AlarmCreateResponse(BaseModel):
     alarm: AlarmResponse
     raspberry: ClientCredentials
+
+class ChangePin(BaseModel):
+    old_pin: str
+    new_pin: str

@@ -57,7 +57,15 @@ class UserAlarmRepository:
         self.session.commit()
         self.session.refresh(membership)
         return membership
-
+        
+    def update(
+        self,
+        membership: UserAlarm
+    ) -> UserAlarm:        
+        self.session.commit()
+        self.session.refresh(membership)
+        return membership
+    
     def delete(
         self,
         membership: UserAlarm,

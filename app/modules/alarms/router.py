@@ -13,6 +13,7 @@ from app.modules.alarms.schemas import(
     AlarmRoleResponse,
     UpdateAlarmRole,
     AlarmCreateResponse,
+    ChangePin,
 ) 
 from app.common.enums import AlarmRole
 from app.modules.alarms.service import AlarmService
@@ -137,6 +138,18 @@ def update_alarm(
 ) -> AlarmResponse:
     return service.update(alarm_id, request)
 
+@router.patch(
+    "/{alarm_id}/pin",
+    response_model=MessageResponse,
+)
+def change_pin(
+    alarm_id: int,
+    request: ChangePin,
+    service: AlarmService = Depends(get_alarm_service),
+    current_user: User = Depends(get_current_user),
+) -> MessageResponse:
+    membership = service.change_pin(alarm_id, current_user.id, request)
+    return MessageResponse(message="PIN has been changed")
 @router.delete(
     "/{alarm_id}",
     response_model=MessageResponse,

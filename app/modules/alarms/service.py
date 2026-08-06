@@ -9,7 +9,8 @@ from app.modules.alarms.schemas import (
     AddUser,
     DeleteUser,
     AlarmCreateResponse,
-    AlarmResponse
+    AlarmResponse,
+    ChangePin,
 ) 
 from app.core.exceptions import (
     AlarmAlreadyExistsException,
@@ -18,6 +19,7 @@ from app.core.exceptions import (
     UserAlreadyAddedToAlarm,
     UserNotAddedToAlarm,
     AlarmAccessDeniedException,
+    InvalidPinException,
 )
 from app.modules.alarms.model import Alarm
 from app.modules.users.model import User
@@ -150,6 +152,21 @@ class AlarmService:
         )
         self.user_alarm_repository.create(membership)
 
+    def change_pin(
+        self,
+        alarm_id: int,
+        user_id: int,
+        request: ChangePin,
+    ) -> UserAlarm:
+        membership = self.user_alarm_repository.get(user_id, alarm_id)
+        if not membership:
+            raise UserNotAddedToAlarm()
+        if not password_hasher.verify_password(request.old_pin, membership.pin_hash):
+            raise InvalidPinException()
+        membership.pin_hash = password_hasher.hash_password(request.new_pin)
+        self.user_alarm_repository.update(membership)
+        return membership
+    
     def delete_user_from_alarm(
         self,
         alarm_id: int,
