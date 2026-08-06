@@ -4,12 +4,13 @@ from app.modules.clients.model import Client
 from app.core.exceptions import(
     ClientNotFoundException,
     ClientAlreadyExistsException,
-    InvalidCredentialsException
+    InvalidCredentialsException,
 )
 from app.modules.clients.schemas import (
     ClientUpdate,
     ClientCreate,
     ClientCredentials,
+
 )
 from app.security.hashing import password_hasher
 import secrets

@@ -16,6 +16,7 @@ from app.modules.devices.dependencies import get_device_service
 from app.modules.alarms.dependencies import get_alarm_service
 from app.services.websocket_service import WebSocketMessageService
 from app.modules.user_alarm.dependencies import get_user_alarm_repository
+from app.services.config_service import ConfigService
 from app.mqtt.service import MQTTService
 #if TYPE_CHECKING:
  #   from app.modules.readings.dependencies import get_sensor_reading_service
@@ -55,6 +56,19 @@ def get_tollgate_service(
         settings_service,
         device_service)
 
+def get_config_service(
+    alarm_service = Depends(get_alarm_service),
+    setting_service = Depends(get_settings_service),
+    device_service = Depends(get_device_service),
+    sensor_service = Depends(get_sensor_service),
+) -> ConfigService:
+    return ConfigService(
+        alarm_service=alarm_service,
+        sensor_service=sensor_service,
+        device_service=device_service,
+        setting_service=setting_service,
+    )
+    
 def get_alarm_service(
     settings_service = Depends(get_settings_service),
     sensor_service = Depends(get_sensor_service),

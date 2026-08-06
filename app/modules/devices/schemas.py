@@ -38,4 +38,11 @@ class DeviceResponse(BaseModel):
     status: dict[str, Any] | None = None
     model_config = ConfigDict(from_attributes=True)
 
-
+class DeviceConfig(BaseModel):
+    id: int
+    name: str
+    type: DeviceType
+    connection_identifier: str
+    enabled: bool
+    status: dict | None 
+    model_config = ConfigDict(from_attributes=True)

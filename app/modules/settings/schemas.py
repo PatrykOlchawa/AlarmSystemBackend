@@ -30,3 +30,9 @@ class SettingUpdate(BaseModel):
         min_length=1,
         max_length=255,
     )
+
+class SettingConfig(BaseModel):
+    id: int
+    key: str
+    value: str
+    model_config = ConfigDict(from_attributes=True)

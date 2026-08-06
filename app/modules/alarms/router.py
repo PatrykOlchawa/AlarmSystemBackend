@@ -12,9 +12,10 @@ from app.modules.alarms.schemas import(
     DeleteUser,
     AlarmRoleResponse,
     UpdateAlarmRole,
-    AlarmCreateResponse,
+    
     ChangePin,
 ) 
+from app.modules.clients.schemas import AlarmCreateResponse
 from app.common.enums import AlarmRole
 from app.modules.alarms.service import AlarmService
 from app.modules.alarms.dependencies import get_alarm_service

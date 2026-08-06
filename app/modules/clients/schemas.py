@@ -5,6 +5,13 @@ from pydantic import (
 )
 from datetime import datetime
 from app.common.enums import ClientType
+from app.modules.settings.schemas import SettingConfig
+from app.modules.sensors.schemas import SensorConfig
+from app.modules.devices.schemas import DeviceConfig
+from app.modules.alarms.schemas import AlarmResponse 
+
+
+
 class ClientBase(BaseModel):
     client_id: str = Field(
         min_length=1,
@@ -54,3 +61,13 @@ class ClientLoginResponse(BaseModel):
 class ClientCredentials(BaseModel):
     client_id: str
     secret: str
+
+class ConfigResponse(BaseModel):
+    alarm: AlarmResponse
+    settings: list[SettingConfig]
+    devices: list[DeviceConfig]
+    sensors: list[SensorConfig]
+
+class AlarmCreateResponse(BaseModel):
+    alarm: AlarmResponse
+    raspberry: ClientCredentials

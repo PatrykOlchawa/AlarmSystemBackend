@@ -60,3 +60,11 @@ class SensorRead(SensorBase):
 
 class SensorCreate(SensorBase):
     pass
+
+class SensorConfig(BaseModel):
+    id: int
+    name: str
+    type: SensorType
+    gpio_pin: int
+    enabled: bool
+    model_config = ConfigDict(from_attributes=True)

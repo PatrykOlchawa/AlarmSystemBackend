@@ -8,7 +8,6 @@ from app.modules.alarms.schemas import (
     AlarmUpdate,
     AddUser,
     DeleteUser,
-    AlarmCreateResponse,
     AlarmResponse,
     ChangePin,
 ) 
@@ -21,6 +20,7 @@ from app.core.exceptions import (
     AlarmAccessDeniedException,
     InvalidPinException,
 )
+from app.modules.clients.schemas import AlarmCreateResponse
 from app.modules.alarms.model import Alarm
 from app.modules.users.model import User
 from app.modules.alarms.repository import AlarmRepository

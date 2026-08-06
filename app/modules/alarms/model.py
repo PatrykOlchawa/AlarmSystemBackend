@@ -60,28 +60,35 @@ class Alarm(Base):
 
     devices: Mapped[list["Device"]] = relationship(
         back_populates="alarm",
+        cascade="all, delete-orphan",
     )
 
     sensors: Mapped[list["Sensor"]] = relationship(
         back_populates="alarm",
+        cascade="all, delete-orphan",
     )
 
     car_plates: Mapped[list["CarPlate"]] = relationship(
         back_populates="alarm",
+        cascade="all, delete-orphan",
     )
 
     notifications: Mapped[list["Notification"]] = relationship(
         back_populates="alarm",
+        cascade="all, delete-orphan",
     )
 
     events: Mapped[list["AlarmEvent"]] = relationship(
         back_populates="alarm",
+        cascade="all, delete-orphan",
     )
 
     settings: Mapped[list["Setting"]] = relationship(
         back_populates="alarm",
+        cascade="all, delete-orphan",
     )
 
     clients: Mapped[list["Client"]] = relationship(
-        back_populates="alarm"
+        back_populates="alarm",
+        cascade="all, delete-orphan",
     )
