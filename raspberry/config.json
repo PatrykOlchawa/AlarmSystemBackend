@@ -1,0 +1,34 @@
+{
+    "alarm": {
+        "id": 3,
+        "name": "WSB",
+        "status": "DISARMED",
+        "is_active": true
+    },
+    "settings": [
+        {
+            "id": 1,
+            "key": "dark_mode",
+            "value": "yes"
+        }
+    ],
+    "devices": [
+        {
+            "id": 1,
+            "name": "led1",
+            "type": "LED",
+            "connection_identifier": "14",
+            "enabled": true,
+            "status": null
+        }
+    ],
+    "sensors": [
+        {
+            "id": 1,
+            "name": "pir1",
+            "type": "PIR",
+            "gpio_pin": 10,
+            "enabled": true
+        }
+    ]
+}

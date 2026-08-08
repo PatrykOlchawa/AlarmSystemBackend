@@ -5,22 +5,34 @@ class Topics:
     HEARTBEAT = "alarm/+/heartbeat"
 
     @staticmethod
-    def command(
+    def command_alarm(
         alarm_id: int,
-        device: str,
     ) -> str:
-        return f"alarm/{alarm_id}/command/{device}"
+        return f"alarm/{alarm_id}/command/alarm"
+    
+    @staticmethod
+    def command_device(
+        alarm_id: int,
+        device_id: str,
+    ) -> str:
+        return f"alarm/{alarm_id}/command/device/{device_id}"
 
     @staticmethod
     def sensor(
         alarm_id:int,
-        sensor:str,
+        sensor_id:int,
     ) -> str:
-        return f"alarm/{alarm_id}/sensor/{sensor}"
+        return f"alarm/{alarm_id}/sensor/reading/{sensor_id}"
 
     @staticmethod
-    def state(
+    def state_alarm(
         alarm_id:int,
-        state: str,
     ) -> str:
-        return f"alarm/{alarm_id}/state/{state}"
+        return f"alarm/{alarm_id}/state/alarm"
+
+    @staticmethod
+    def state_device(
+        alarm_id:int,
+        device_id: int,
+    ) -> str:
+        return f"alarm/{alarm_id}/state/device/{device_id}"

@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 
-from raspberry.config import settings
+from raspberry.mqtt.mqtt_settings import settings
 from raspberry.mqtt.topics import Topics
 
 import logging

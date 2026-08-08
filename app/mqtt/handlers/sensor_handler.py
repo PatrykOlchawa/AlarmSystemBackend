@@ -32,12 +32,17 @@ class SensorHandler(BaseHandler):
         message: MQTTMessage,        
         
     ) -> None:
+        logger.info(
+            "SensorHandler resource_type=%s resource_id=%s",
+            message.resource_type,
+            message.resource_id,
+        )
         try:
             payload = SensorPayload.model_validate_json(message.payload)
-
-            sensor = self.sensor_service.get_by_alarm_and_name(
+            logger.info(f"resource {message.resource_id}")
+            sensor = self.sensor_service.get_alarm_and_id(
                 alarm_id=message.alarm_id,
-                sensor_name=message.resource,
+                sensor_id=message.resource_id,
             )
             reading = self.reading_service.create_for_sensor(
                 sensor=sensor,

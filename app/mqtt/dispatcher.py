@@ -9,6 +9,29 @@ class MQTTDispatcher:
     def __init__(self):
         self.factory = ServicesFactory()
 
+    def _get_handler(
+        self,
+        db,
+        message: MQTTMessage,
+    ):
+        match message.message_type:
+            case MQTTMessageType.SENSOR:
+                return self.factory.create_sensor_handler(db)
+            case MQTTMessageType.STATE:
+                match message.resource_type:
+                    case "device":
+                        return self.factory.create_device_state_handler(db)
+                    case "alarm":
+                        return self.factory.create_alarm_state_handler(db)
+            case MQTTMessageType.COMMAND:
+                logger.warning(
+                    "Backend should not receive command messages"
+                )
+        logger.warning(
+            "No handler for topic"
+        )
+        return None
+
     def dispatch(
         self,
         topic: str,
@@ -18,10 +41,13 @@ class MQTTDispatcher:
         db = self.factory.create_session()
         try: 
             parts = topic.split("/")
-            if len(parts) < 3:
+            if len(parts) < 4 :
                 logger.warning(f"Invalid topic: {topic}")
                 return
 
+            if parts[0] != "alarm":
+                logger.warning("Invalid topic: %s", topic)
+                return
             try:
                 alarm_id = int(parts[1])
             except ValueError:
@@ -34,30 +60,43 @@ class MQTTDispatcher:
                 logger.warning(f"Unknown MQTT message type: {parts[2]}")
                 return
             
-            resource = parts[3] if len(parts) > 3 else None
-
+            resource_type = parts[3]
+            resource_id = None
+            if len(parts) > 4:
+                    try:
+                        resource_id = int(parts[4])
+                    except ValueError:
+                        logger.warning(
+                            "Invalid resource id in topic %s",
+                            topic,
+                        )
+                        return       
+            logger.info(
+                "parts=%s resource_type=%s resource_id=%s",
+                parts,
+                resource_type,
+                resource_id,
+            )          
             message = MQTTMessage(
                 alarm_id=alarm_id,
                 message_type=message_type,
-                resource=resource,
+                resource_type=resource_type,
+                resource_id=resource_id,
                 payload=payload,
             )
-            logger.info(f"Received MQTT message {message.model_dump()}")
-            match message.message_type:
 
-                case MQTTMessageType.SENSOR:
-                    handler = self.factory.create_sensor_handler(db)
-                case MQTTMessageType.STATE:
-                    handler = self.factory.create_state_handler(db)
-                case _:
-                    logger.warning(
-                        "No handler for %s",
-                        message.message_type,
-                    )
-                    return
-            logger.info("Sending sensor websocket notification")
+            handler = self._get_handler(
+                db=db,
+                message=message,
+            )
+            if handler is None:
+                return
+
             handler.handle(message)
-            logger.info("Sensor websocket notification scheduled")
+
         finally:
             db.close()
+
+
 dispatcher = MQTTDispatcher()
+

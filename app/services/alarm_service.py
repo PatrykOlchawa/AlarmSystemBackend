@@ -74,7 +74,12 @@ class AlarmControlService:
         alarm_id: int,
         reading: SensorReading,
     ) -> None:
-        
+        logger.info(
+            "process_sensor_reading alarm=%s sensor=%s value=%s",
+            alarm_id,
+            reading.sensor_id,
+            reading.value,
+        )
         alarm = self.alarm_service.get_by_id(alarm_id)
         sensor = self.sensor_service.get_sensor_by_id(alarm, reading.sensor_id)
         if sensor is None:
@@ -219,6 +224,10 @@ class AlarmControlService:
             message="The alarm system has been disarmed",
             event_id=event.id,
             alarm=alarm,
+        )
+        self.mqtt_service.publish_alarm_command(
+            alarm_id=alarm.id,
+            armed=False,
         )
     
     def _trigger_alarm(

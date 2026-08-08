@@ -102,6 +102,7 @@ class MessageEventType(str, Enum):
 class MQTTMessageType(str, Enum):
     SENSOR = "sensor"
     STATE = "state"
+    COMMAND = "command"
     EVENT = "event"
     HEARTBEAT = "heartbeat"
 

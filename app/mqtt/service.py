@@ -25,9 +25,8 @@ class MQTTService:
         armed: bool,
     ) -> None: 
         self.publish(
-            topic=Topics.command(
+            topic=Topics.command_alarm(
                 alarm_id=alarm_id,
-                device="alarm",
             ),
             payload={
                 "armed" : armed,
@@ -36,13 +35,13 @@ class MQTTService:
     def publish_device_command(
         self,
         alarm_id: int,
-        device: str,
+        device_id: int,
         payload: dict,
     ) -> None:
         self.publish(
-            topic=Topics.command(
+            topic=Topics.command_device(
                 alarm_id=alarm_id,
-                device=device,
+                device_id=device_id,
             ),
             payload=payload
         )

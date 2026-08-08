@@ -37,7 +37,15 @@ class SensorService:
         if Sensor is None:
             raise SensorNotFoundException()
         return sensor
-    
+    def get_alarm_and_id(
+        self,
+        alarm_id: int,
+        sensor_id: int,
+    ) -> Sensor:
+        sensor = self.repository.get_alarm_and_id(alarm_id, sensor_id)
+        if Sensor is None:
+            raise SensorNotFoundException()
+        return sensor
     def create_sensor(
         self,
         alarm: Alarm,

@@ -196,13 +196,23 @@ class ServicesFactory:
             websocket_service=self.create_websocket_service(db),
         )
 
-    def create_state_handler(
+    def create_device_state_handler(
         self,
         db: Session,
     ):
-        from app.mqtt.handlers.state_handler import StateHandler
+        from app.mqtt.handlers.device_state_handler import StateHandler
         return StateHandler(
             device_service=self.create_device_service(db),
+            websocket_service=self.create_websocket_service(db),
+            alarm_service=self.create_alarm_service(db),
+        )
+  
+    def create_alarm_state_handler(
+        self,
+        db: Session,
+    ):
+        from app.mqtt.handlers.alarm_state_handler import AlarmStateHandler
+        return AlarmStateHandler(
             websocket_service=self.create_websocket_service(db),
             alarm_service=self.create_alarm_service(db),
         )

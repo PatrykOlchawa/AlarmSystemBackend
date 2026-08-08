@@ -18,7 +18,7 @@ class DeviceControlService:
         logger.info(f"Turning on LED for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "state": True,
             },
@@ -28,7 +28,7 @@ class DeviceControlService:
         logger.info(f"Turning off LED for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "state": False,
             },
@@ -38,7 +38,7 @@ class DeviceControlService:
         logger.info(f"Turning on BUZZER for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "state": True,
             },
@@ -47,7 +47,7 @@ class DeviceControlService:
         logger.info(f"Turning off BUZZER for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "state": False,
             },
@@ -56,7 +56,7 @@ class DeviceControlService:
         logger.info(f"Moving servodevice {device.name}, by {angle}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "angle": angle,
             },
@@ -65,7 +65,7 @@ class DeviceControlService:
         logger.info(f"Moving motor {device.name}, by {direction}, {steps}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "direction": direction,
                 "steps": steps
@@ -75,7 +75,7 @@ class DeviceControlService:
         logger.info(f"Turning on camera for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "state": True,
             },
@@ -84,7 +84,7 @@ class DeviceControlService:
         logger.info(f"Turning off camera for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
-            device=device.name,
+            device_id=device.id,
             payload={
                 "state": False,
             },

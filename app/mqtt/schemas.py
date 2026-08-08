@@ -1,9 +1,7 @@
 from pydantic import BaseModel, RootModel
 from typing import Any
 from app.common.enums import MQTTMessageType
-from datetime import datetime
-from typing import Any
-
+from app.common.enums import AlarmStatus 
 class SensorMessage(BaseModel):
     value: Any
 
@@ -13,7 +11,8 @@ class PIRMessage(BaseModel):
 class MQTTMessage(BaseModel):
     alarm_id: int
     message_type: MQTTMessageType
-    resource: str | None = None
+    resource_type: str | None = None
+    resource_id: int | None = None 
     payload: bytes
 
 class SensorPayload(BaseModel):
@@ -21,3 +20,6 @@ class SensorPayload(BaseModel):
 
 class StatePayload(RootModel[dict[str, Any]]):
     pass
+
+class AlarmStatePayload(BaseModel):
+    status: AlarmStatus

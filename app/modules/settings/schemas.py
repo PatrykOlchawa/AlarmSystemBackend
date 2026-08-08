@@ -34,5 +34,5 @@ class SettingUpdate(BaseModel):
 class SettingConfig(BaseModel):
     id: int
     key: str
-    value: str
+    value: bool | int | float | str | None
     model_config = ConfigDict(from_attributes=True)

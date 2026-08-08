@@ -1,8 +1,8 @@
-from raspberry.mqtt.publishers.state_publisher import StatePublisher
+from raspberry.mqtt.publishers.alarm_state_publisher import AlarmStatePublisher
 class DeviceControlService:
     def __init__(
         self,
-        state_publisher: StatePublisher
+        state_publisher: AlarmStatePublisher
     ):
 
         pass
