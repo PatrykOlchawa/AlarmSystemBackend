@@ -1,4 +1,5 @@
 class Topics:
+    COMMAND = "alarm/+/command/#"
     SENSOR = "alarm/+/sensor/#"
     STATE = "alarm/+/state/#"
 

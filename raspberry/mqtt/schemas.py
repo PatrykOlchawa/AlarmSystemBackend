@@ -1,6 +1,7 @@
 from pydantic import BaseModel, RootModel
 from typing import Any
-from app.common.enums import MQTTMessageType
+from common.enums import AlarmStatus
+from common.enums import MQTTMessageType
 class MQTTMessage(BaseModel):
     alarm_id: int
     message_type: MQTTMessageType
@@ -8,8 +9,14 @@ class MQTTMessage(BaseModel):
     resource_id: int | None = None 
     payload: bytes
 
-class CommandPayload(RootModel[dict[str, Any]]):
+class AlarmCommandPayload(BaseModel):
+    armed: bool
+
+class DeviceCommandPayload(RootModel[dict[str, Any]]):
     pass
 
-class StatePayload(RootModel[dict[str, Any]]):
+class AlarmStatePayload(BaseModel):
+    status: AlarmStatus
+
+class DeviceStatePayload(RootModel[dict[str, Any]]):
     pass

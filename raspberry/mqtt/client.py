@@ -1,13 +1,13 @@
 import paho.mqtt.client as mqtt
 
-from raspberry.mqtt.mqtt_settings import settings
-from raspberry.mqtt.topics import Topics
+from mqtt.mqtt_settings import mqtt_settings as settings
+from mqtt.topics import Topics
 
 import logging
 logger = logging.getLogger(__name__)
 
 class MQTTClient:
-    def __init(
+    def __init__(
         self,
         alarm_id: int,
     ):
@@ -68,7 +68,7 @@ class MQTTClient:
             logger.error(f"MQTT connection failed {reason_code}")
             return
         logger.info("MQTT connected")
-        self.__subscribe()
+        self.subscribe(topic=Topics.COMMAND)
 
     def on_disconnect(
         self,
@@ -103,12 +103,14 @@ class MQTTClient:
         self,
         topic: str,
     ):
-        self.client.subscribe(topic)
+        result, mid = self.client.subscribe(topic)
         logger.info(
-            f"Subscribed to: {topic}"
+            "Subscribed to topic=%s rc=%s mid=%s",
+            topic,
+            result,
+            mid,
         )
 
     def set_dispatcher(self, dispatcher):
         self.dispatcher = dispatcher
 
-mqtt_client = MQTTClient()

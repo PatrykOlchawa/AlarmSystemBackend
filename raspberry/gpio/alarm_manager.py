@@ -1,4 +1,4 @@
-from raspberry.common.enums import AlarmStatus
+from common.enums import AlarmStatus
 
 class AlarmManager:
     def __init__(self):

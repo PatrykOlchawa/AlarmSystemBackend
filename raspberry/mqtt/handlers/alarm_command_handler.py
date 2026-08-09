@@ -1,9 +1,9 @@
-from raspberry.mqtt.schemas import MQTTMessage, AlarmCommandPayload
-from raspberry.gpio.device_manager import DeviceManager
-from raspberry.mqtt.publishers.alarm_state_publisher import AlarmStatePublisher
-from raspberry.gpio.alarm_manager import AlarmManager
+from mqtt.schemas import MQTTMessage, AlarmCommandPayload
+from gpio.device_manager import DeviceManager
+from mqtt.publishers.alarm_state_publisher import AlarmStatePublisher
+from gpio.alarm_manager import AlarmManager
 from pydantic import ValidationError
-from raspberry.common.schemas import AlarmStatus
+from common.schemas import AlarmStatus
 import logging
 logger = logging.getLogger(__name__)
 class AlarmCommandHandler:
@@ -12,7 +12,7 @@ class AlarmCommandHandler:
         alarm_manager: AlarmManager,
         alarm_state_publisher: AlarmStatePublisher,
     ):
-        self.device_manager = alarm_manager
+        self.alarm_manager = alarm_manager
         self.alarm_state_publisher = alarm_state_publisher
         
     def handle(
@@ -26,7 +26,7 @@ class AlarmCommandHandler:
 
             logger.info(
                 "Command received fro device $s",
-                message.resource
+                message.resource_id
             )
 
             
@@ -39,9 +39,8 @@ class AlarmCommandHandler:
                     AlarmStatus.DISARMED
                 )
 
-            self.state_publisher(
-                device_id = message.resource_id,
-                status = payload.root,
+            self.alarm_state_publisher.publish(
+                status=self.alarm_manager.status,
             )
         except ValidationError as exc:
             logger.warning(

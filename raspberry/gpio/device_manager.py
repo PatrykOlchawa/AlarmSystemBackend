@@ -1,8 +1,9 @@
-from raspberry.common.schemas import (
+from common.schemas import (
     ConfigResponse,
     DeviceConfig,
 )
-
+import logging
+logger = logging.getLogger(__name__)
 class DeviceManager:
     def __init__(self):
         self.devices: dict[int, DeviceConfig] = {}
@@ -72,9 +73,15 @@ class DeviceManager:
         device_id: int,
         status: dict,
     ) -> None:
-        device = self.devices[device_id]
-
         print(
-            f"Set {device.name} -> {status}"
+            "Setting device id=%s, available devices=%s",
+            device_id,
+            list(self.devices.keys()),
         )
+
+        device = self.devices[device_id]
+        print(
+            f"Set {device.name} {device.id}-> {status}"
+        )
+        device.status = status
         #match device.type

@@ -1,4 +1,4 @@
-from raspberry.common.schemas import (
+from common.schemas import (
     ConfigResponse,
     SensorConfig,
     SensorType,
@@ -77,4 +77,12 @@ class SensorManager:
         print(
             f"Reading {sensor.name}"
         )
+        #if sensor.type == SensorType.PIR:
+        #    return 0
+
+        #if sensor.type == SensorType.LDR:
+        #    return 500
+
+        #if sensor.type == SensorType.TEMPERATURE:
+        #    return 50
         return None

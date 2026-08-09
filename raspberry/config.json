@@ -2,7 +2,7 @@
     "alarm": {
         "id": 3,
         "name": "WSB",
-        "status": "DISARMED",
+        "status": "ACTIVATED",
         "is_active": true
     },
     "settings": [
@@ -13,6 +13,14 @@
         }
     ],
     "devices": [
+        {
+            "id": 2,
+            "name": "gate",
+            "type": "SERVO",
+            "connection_identifier": "14",
+            "enabled": true,
+            "status": null
+        },
         {
             "id": 1,
             "name": "led1",
