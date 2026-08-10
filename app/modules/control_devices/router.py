@@ -1,5 +1,6 @@
 from app.modules.devices.service import DeviceService
 from app.security.authorization_dependencies import require_alarm_admin
+from app.security.authorization_dependencies import require_alarm_member
 from app.modules.alarms.model import Alarm
 from app.common.schemas import MessageResponse
 from app.modules.alarm.schemas import AlarmMessageResponse
@@ -20,7 +21,7 @@ def _get_device_or_raise(
     device_id: int,
     expected_type: DeviceType,
     service : DeviceService = Depends(get_device_service),
-    alarm : Alarm = Depends(require_alarm_admin),   
+    alarm : Alarm = Depends(require_alarm_member),   
 ) -> Device:
     device = service.get_by_id(alarm, device_id)
     if device is None:
@@ -41,7 +42,7 @@ def _get_device_or_raise(
     )
 def turn_on_led(
     device_id: int,
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> AlarmMessageResponse:
@@ -61,7 +62,7 @@ def turn_on_led(
     )
 def turn_off_led(
     device_id: int,
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -82,7 +83,7 @@ def turn_off_led(
     )
 def turn_on_buzzer(
     device_id: int,
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -103,7 +104,7 @@ def turn_on_buzzer(
     )
 def turn_off_buzzer(
     device_id: int,
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -124,7 +125,7 @@ def turn_off_buzzer(
     )
 def turn_on_camera(
     device_id: int,
-    alarm : Alarm = Depends(require_alarm_admin),   
+    alarm : Alarm = Depends(require_alarm_member),   
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -145,7 +146,7 @@ def turn_on_camera(
     )
 def turn_off_camera(
     device_id: int,
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -167,7 +168,7 @@ def turn_off_camera(
 def move_servo(
     device_id: int,
     angle: int,
-    alarm : Alarm = Depends(require_alarm_admin),   
+    alarm : Alarm = Depends(require_alarm_member),   
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:
@@ -190,7 +191,7 @@ def move_motor(
     device_id: int,
     direction: str,
     steps: int,
-    alarm : Alarm = Depends(require_alarm_admin),   
+    alarm : Alarm = Depends(require_alarm_member),   
     device_service = Depends(get_device_service),
     control_service = Depends(get_device_control_service),
 ) -> MessageResponse:

@@ -1,42 +1,20 @@
 {
     "alarm": {
-        "id": 3,
-        "name": "WSB",
-        "status": "ACTIVATED",
+        "id": 2,
+        "name": "house",
+        "status": "DISARMED",
         "is_active": true
     },
-    "settings": [
-        {
-            "id": 1,
-            "key": "dark_mode",
-            "value": "yes"
-        }
-    ],
+    "settings": [],
     "devices": [
         {
-            "id": 2,
-            "name": "gate",
-            "type": "SERVO",
-            "connection_identifier": "14",
-            "enabled": true,
-            "status": null
-        },
-        {
             "id": 1,
-            "name": "led1",
+            "name": "LED",
             "type": "LED",
-            "connection_identifier": "14",
+            "connection_identifier": "13",
             "enabled": true,
             "status": null
         }
     ],
-    "sensors": [
-        {
-            "id": 1,
-            "name": "pir1",
-            "type": "PIR",
-            "gpio_pin": 10,
-            "enabled": true
-        }
-    ]
+    "sensors": []
 }

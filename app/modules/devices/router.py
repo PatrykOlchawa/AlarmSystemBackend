@@ -12,6 +12,8 @@ from app.modules.devices.schemas import DeviceResponse
 from fastapi import APIRouter
 from app.modules.alarms.model import Alarm
 from app.security.authorization_dependencies import require_alarm_admin
+from app.security.authorization_dependencies import require_alarm_member
+
 
 router = APIRouter(
     prefix="/alarms/{alarm_id}/devices",
@@ -24,7 +26,7 @@ router = APIRouter(
 )
 def get_devices(
     service: DeviceService = Depends(get_device_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_all(alarm)
 
@@ -35,7 +37,7 @@ def get_devices(
 def get_device(
     device_id: int,
     service: DeviceService = Depends(get_device_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_by_id(alarm,device_id)
 

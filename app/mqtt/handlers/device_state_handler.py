@@ -24,7 +24,7 @@ class StateHandler:
         message: MQTTMessage
     ):
         logger.info("StateHandler started")
-        logger.info("Topic resource: %s", message.resource)
+        logger.info("Topic resource: %s", message.resource_id)
         logger.info("Payload: %s", message.payload)
         try:
 
@@ -32,9 +32,9 @@ class StateHandler:
                 message.payload
             ).root
             alarm = self.alarm_service.get_by_id(message.alarm_id)
-            device = self.device_service.get_by_name(
+            device = self.device_service.get_by_id(
                 alarm=alarm,
-                name=message.resource
+                device_id=message.resource_id
             )
             device.status = payload
             self.device_repository.update(device)

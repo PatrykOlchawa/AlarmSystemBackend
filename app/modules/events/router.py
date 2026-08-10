@@ -1,4 +1,5 @@
 from app.security.authorization_dependencies import require_alarm_admin
+from app.security.authorization_dependencies import require_alarm_member
 from app.modules.alarms.model import Alarm
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
@@ -30,7 +31,7 @@ router = APIRouter(
 )
 def get_all_events(
     service: AlarmEventService = Depends(get_alarm_event_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_all(alarm)
 
@@ -40,7 +41,7 @@ def get_all_events(
 )
 def get_last_event(
     service: AlarmEventService = Depends(get_alarm_event_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_latest(alarm)
 
@@ -51,7 +52,7 @@ def get_last_event(
 def get_event(
     event_id: int,
     service: AlarmEventService = Depends(get_alarm_event_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_by_id(alarm,event_id)
 
@@ -64,7 +65,7 @@ def get_event(
 def get_events_by_type(
     event_type: AlarmEventType,
     service: AlarmEventService = Depends(get_alarm_event_service),
-    alarm : Alarm = Depends(require_alarm_admin)
+    alarm : Alarm = Depends(require_alarm_member)
 ):
     return service.get_by_type(alarm,event_type)
 
@@ -77,7 +78,7 @@ def get_events_by_type(
 def create_event(
     request: AlarmEventCreate,
     service: AlarmEventService = Depends(get_alarm_event_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.create(alarm,request)
 

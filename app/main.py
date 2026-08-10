@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     loop = asyncio.get_running_loop()
-    logger.info(f"FastAPI loop id = {id(loop)}")
+    #logger.info(f"FastAPI loop id = {id(loop)}")
     set_event_loop(loop)
     mqtt_client.set_dispatcher(dispatcher)
     mqtt_client.start()

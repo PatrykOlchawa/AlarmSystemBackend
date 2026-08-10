@@ -1,4 +1,5 @@
 from app.security.authorization_dependencies import require_alarm_admin
+from app.security.authorization_dependencies import require_alarm_member
 from app.modules.alarms.model import Alarm
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User

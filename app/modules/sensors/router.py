@@ -1,4 +1,5 @@
 from app.security.authorization_dependencies import require_alarm_admin
+from app.security.authorization_dependencies import require_alarm_member
 from app.modules.alarms.model import Alarm
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
@@ -25,7 +26,7 @@ router = APIRouter(
 )
 def get_all_sensors(
     service: SensorService = Depends(get_sensor_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_all_sensors(alarm)
 
@@ -36,7 +37,7 @@ def get_all_sensors(
 def get_sensor(
     sensor_id: int,
     service: SensorService = Depends(get_sensor_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_sensor_by_id(alarm, sensor_id)
 

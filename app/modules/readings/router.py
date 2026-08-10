@@ -1,4 +1,5 @@
 from app.security.authorization_dependencies import require_alarm_admin
+from app.security.authorization_dependencies import require_alarm_member
 from app.modules.alarms.model import Alarm
 from app.security.auth_dependencies import get_current_user
 from app.modules.users.model import User
@@ -34,7 +35,7 @@ router = APIRouter(
 def get_sensor_history(
     sensor_id: int,
     service: SensorReadingService = Depends(get_sensor_reading_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_all(alarm, sensor_id)
 
@@ -45,7 +46,7 @@ def get_sensor_history(
 def get_last_reading(
     sensor_id: int,
     service: SensorReadingService = Depends(get_sensor_reading_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     return service.get_latest(alarm, sensor_id)
 
@@ -58,7 +59,7 @@ def create_reading(
     sensor_id: int,
     request: SensorReadingCreate,
     service: SensorReadingService = Depends(get_sensor_reading_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 
 ):
     return service.create(alarm, sensor_id, request)
@@ -71,6 +72,6 @@ def delete_reading(
     sensor_id: int,
     reading_id: int,
     service: SensorReadingService = Depends(get_sensor_reading_service),
-    alarm : Alarm = Depends(require_alarm_admin),
+    alarm : Alarm = Depends(require_alarm_member),
 ):
     service.delete(alarm, sensor_id, reading_id)
