@@ -122,7 +122,7 @@ class DeviceService:
         try:
             self.websocket_service.send_message_sync(
                 alarm_id=alarm_id,
-                event_type=MessageEventType.DEVICE_STATE_CHANGED,
+                event_type=MessageEventType.DEVICES_CHANGED,
                 data={},
             )
         except Exception:
