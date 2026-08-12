@@ -79,8 +79,9 @@ class SensorService:
         update_data = request.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(sensor, field, value)
-        return self.repository.update_sensor(sensor)
+        sensor = self.repository.update_sensor(sensor)
         self._notify_sensors_changed(alarm_id=alarm.id)
+        return sensor
     
     def delete_sensor(
         self,
