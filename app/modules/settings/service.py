@@ -117,7 +117,7 @@ class SettingService:
         
         setting = Setting(**request.model_dump(), alarm_id=alarm.id)
         setting = self.repository.create(setting)
-        self._notify_settings_changed()
+        self._notify_settings_changed(alarm_id=alarm.id))
         return setting
 
     def update(
@@ -130,7 +130,7 @@ class SettingService:
         setting.value = request.value
 
         setting = self.repository.update(setting)
-        self._notify_settings_changed()
+        self._notify_settings_changed(alarm_id=alarm.id)
         return setting
     def delete(
         self,
@@ -139,9 +139,7 @@ class SettingService:
     ):
         setting = self.get_by_key(alarm, key)
         self.repository.delete(setting)
-        self._notify_settings_changed()
-
-
+        self._notify_settings_changed(alarm_id=alarm.id)
 
     def _notify_settings_changed(
         self,
