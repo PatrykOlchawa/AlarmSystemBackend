@@ -117,7 +117,7 @@ class SettingService:
         
         setting = Setting(**request.model_dump(), alarm_id=alarm.id)
         setting = self.repository.create(setting)
-        self._notify_settings_changed(alarm_id=alarm.id))
+        self._notify_settings_changed(alarm_id=alarm.id)
         return setting
 
     def update(
