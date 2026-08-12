@@ -49,40 +49,6 @@ class SettingService:
     ):
         setting = self.repository.get_by_key(alarm, key)        
         return setting
-
-    def create(
-        self,
-        alarm: Alarm,
-        request: SettingCreate,
-    ):
-        exist = self.get_by_key(alarm, request.key)
-
-        if exist is not None:
-            raise SettingAlreadyExistsException()
-        
-        setting = Setting(**request.model_dump(), alarm_id=alarm.id)
-
-        return self.repository.create(setting)
-
-    def update(
-        self,
-        alarm: Alarm,
-        key: str,
-        request: SettingUpdate,
-    ):
-        setting = self.get_by_key(alarm, key)
-        setting.value = request.value
-
-        return self.repository.update(setting)
-    
-    def delete(
-        self,
-        alarm: Alarm,
-        key: str,
-    ):
-        setting = self.get_by_key(alarm, key)
-        self.repository.delete(setting)
-
     def get_string(
         self,
         key: str,
@@ -138,6 +104,44 @@ class SettingService:
         setting = self.get_by_key(alarm, "alarm_status")
         setting.value = status.value
         return self.repository.update(setting)
+    
+    def create(
+        self,
+        alarm: Alarm,
+        request: SettingCreate,
+    ):
+        exist = self.get_by_key(alarm, request.key)
+
+        if exist is not None:
+            raise SettingAlreadyExistsException()
+        
+        setting = Setting(**request.model_dump(), alarm_id=alarm.id)
+        setting = self.repository.create(setting)
+        self._notify_settings_changed()
+        return setting
+
+    def update(
+        self,
+        alarm: Alarm,
+        key: str,
+        request: SettingUpdate,
+    ):
+        setting = self.get_by_key(alarm, key)
+        setting.value = request.value
+
+        setting = self.repository.update(setting)
+        self._notify_settings_changed()
+        return setting
+    def delete(
+        self,
+        alarm: Alarm,
+        key: str,
+    ):
+        setting = self.get_by_key(alarm, key)
+        self.repository.delete(setting)
+        self._notify_settings_changed()
+
+
 
     def _notify_settings_changed(
         self,
