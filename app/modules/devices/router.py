@@ -53,7 +53,7 @@ def create_device(
 ):
     return service.create(alarm,request)
 
-@router.put(
+@router.patch(
     "/{device_id}",
     response_model=DeviceResponse,
 )
