@@ -80,23 +80,20 @@ class MotorDirection(str, Enum):
 class MessageEventType(str, Enum):
     
     CONNECTED = "CONNECTED"
-
     DISCONNECTED = "DISCONNECTED"
-
     ALARM_STATUS_CHANGED = "ALARM_STATUS_CHANGED"
-
     SENSOR_UPDATED = "SENSOR_UPDATED"
-
     DEVICE_STATE_CHANGED = "DEVICE_STATE_CHANGED"
-
     USER_ADDED_TO_ALARM = "USER_ADDED_TO_ALARM"
-
     USER_REMOVED_FROM_ALARM = "USER_REMOVED_FROM_ALARM"
-
     SETTINGS_UPDATED = "SETTINGS_UPDATED"
-
     NOTIFICATION_CREATED = "NOTIFICATION_CREATED"
-
+    DEVICES_CHANGED = "devices_changed"
+    SENSORS_CHANGED = "sensors_changed"
+    USERS_CHANGED = "users_changed"
+    ALARMS_CHANGED = "alarms_changed"
+    CAR_PLATES_CHANGED = "car_plates_changed"
+    NOTIFICATIONS_CHANGED = "notifications_changed"
     ERROR = "ERROR"
 
 class MQTTMessageType(str, Enum):

@@ -5,3 +5,7 @@ class WebSocketMessage(BaseModel):
     event: MessageEventType 
     alarm_id: int
     data: dict[str, Any]
+
+class GlobalWebsocketMessage(BaseModel):
+    event: MessageEventType 
+    data: dict[str, Any] 

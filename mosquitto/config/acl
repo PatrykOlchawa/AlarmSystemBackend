@@ -2,8 +2,8 @@ user backend
 topic readwrite alarm/+/#
 
 user raspberry
-topic read alarm/3/command/#
-topic write alarm/3/state/#
-topic write alarm/3/sensor/#
-topic write alarm/3/event
-topic write alarm/3/heartbeat
+topic read alarm/2/command/#
+topic write alarm/2/state/#
+topic write alarm/2/sensor/#
+topic write alarm/2/event
+topic write alarm/2/heartbeat

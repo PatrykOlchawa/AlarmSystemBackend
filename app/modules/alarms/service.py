@@ -1,7 +1,8 @@
 from app.common.enums import (
     AlarmRole,
     AlarmStatus,
-    UserRole
+    UserRole,
+    MessageEventType
 )
 from app.modules.alarms.schemas import (
     AlarmCreate,
@@ -19,6 +20,7 @@ from app.core.exceptions import (
     UserNotAddedToAlarm,
     AlarmAccessDeniedException,
     InvalidPinException,
+    WebsocketException
 )
 from app.modules.clients.schemas import AlarmCreateResponse
 from app.modules.alarms.model import Alarm
@@ -29,16 +31,23 @@ from app.modules.user_alarm.model import UserAlarm
 from app.modules.users.service import UserService
 from app.modules.clients.service import ClientService
 from app.security.hashing import password_hasher
+from app.modules.users.repository import UserRepository
+from app.services.websocket_service import WebSocketMessageService 
+
 class AlarmService:
     def __init__(
         self,
         repository: AlarmRepository,
         user_alarm_repository: UserAlarmRepository,
-        client_service: ClientService
+        client_service: ClientService,
+        user_repository: UserRepository,
+        websocket_service: WebSocketMessageService
     ):
         self.repository = repository
         self.user_alarm_repository = user_alarm_repository
         self.client_service = client_service
+        self.user_repository = user_repository
+        self.websocket_service = websocket_service
 
     def get_all(self) -> list[Alarm]:
         return self.repository.get_all()
@@ -102,7 +111,7 @@ class AlarmService:
         
         self.repository.create(alarm)
         credentials = self.client_service.create_default_client(alarm)
-
+        self._notify_alarms_changed()
         return AlarmCreateResponse(
             alarm=AlarmResponse.model_validate(alarm),
             raspberry=credentials,
@@ -125,6 +134,7 @@ class AlarmService:
         update_data = request.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(alarm, field, value)
+        self._notify_alarms_changed()
         return self.repository.update(alarm)
     
     def delete(
@@ -133,6 +143,7 @@ class AlarmService:
     ) -> None:
         alarm = self.get_by_id(alarm_id)
         self.repository.delete(alarm)
+        self._notify_alarms_changed()
 
     def add_user_to_alarm(
         self,
@@ -176,7 +187,8 @@ class AlarmService:
         if not membership:
             raise UserNotAddedToAlarm()
         self.user_alarm_repository.delete(membership)
-
+        self._notify_alarms_changed()
+        
     def verify_alarm_access(
         self,
         alarm_id: int,
@@ -198,3 +210,17 @@ class AlarmService:
             raise AlarmAccessDeniedException()
         
         return alarm
+
+    def _notify_alarms_changed(
+        self,
+    ) -> None:
+        try:
+            admin_ids = self.user_repository.get_global_admins()
+
+            self.websocket_service.send_message_to_admins_sync(
+                admin_ids=admin_ids,
+                event_type=MessageEventType.ALARMS_CHANGED,
+                data={},
+            )
+        except Exception:
+            raise WebsocketException    

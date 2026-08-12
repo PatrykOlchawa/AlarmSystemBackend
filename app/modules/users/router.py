@@ -17,9 +17,6 @@ from app.modules.users.service import UserService
 from app.modules.users.dependencies import get_user_service
 from app.security.authorization_dependencies import require_alarm_admin
 
-
-
-
 router = APIRouter(
     prefix="/users",
     tags=["Users"]

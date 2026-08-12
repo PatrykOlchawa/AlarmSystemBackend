@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.modules.users.schema import AlarmMemberResponse
 from app.modules.users.model import User
 from app.modules.user_alarm.model import UserAlarm
+from app.common.enums import UserRole
 class UserRepository:
 
     def __init__(self, db: Session):
@@ -66,6 +67,16 @@ class UserRepository:
             )
             for user in rows
         ]
+    
+    def get_global_admins(
+        self,
+    ) -> list[int]:
+        stmt = (
+            select(User.id)
+            .where(User.role == UserRole.ADMIN)
+        )
+        return self.db.scalars(stmt).all()
+
     def create(
         self,
         user: User

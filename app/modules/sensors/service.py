@@ -1,15 +1,25 @@
-from app.modules.sensors.schemas import SensorUpdate
-from app.core.exceptions import SensorNotFoundException
+from app.modules.sensors.schemas import (
+    SensorCreate,
+    SensorUpdate
+)
+from app.core.exceptions import (
+    SensorNotFoundException,
+    WebsocketException,
+)
 from app.modules.sensors.model import Sensor
 from app.modules.sensors.repository import SensorRepository
-from app.modules.sensors.schemas import SensorCreate
 from app.modules.alarms.model import Alarm
+from app.services.websocket_service import WebSocketMessageService
+from app.common.enums import MessageEventType
+
 class SensorService:
     def __init__(
         self,
-        repository: SensorRepository
+        repository: SensorRepository,
+        websocket_service: WebSocketMessageService
     ):
         self.repository = repository
+        self.websocket_service = websocket_service
     
     def get_all_sensors(
         self,
@@ -46,13 +56,16 @@ class SensorService:
         if Sensor is None:
             raise SensorNotFoundException()
         return sensor
+    
     def create_sensor(
         self,
         alarm: Alarm,
         request: SensorCreate,
     ):
         sensor = Sensor(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
-        return self.repository.create_sensor(sensor)
+        sensor = self.repository.create_sensor(sensor)
+        self._notify_sensors_changed(alarm_id=alarm.id)
+        return sensor
     
     def update_sensor(
         self,
@@ -67,6 +80,7 @@ class SensorService:
         for field, value in update_data.items():
             setattr(sensor, field, value)
         return self.repository.update_sensor(sensor)
+        self._notify_sensors_changed(alarm_id=alarm.id)
     
     def delete_sensor(
         self,
@@ -77,3 +91,17 @@ class SensorService:
         if sensor is None:
             raise SensorNotFoundException
         self.repository.delete_sensor(sensor)
+        self._notify_sensors_changed(alarm_id=alarm.id)
+
+    def _notify_sensors_changed(
+        self,
+        alarm_id: int,
+    ) -> None:
+        try:
+            self.websocket_service.send_message_sync(
+                alarm_id=alarm_id,
+                event_type=MessageEventType.DEVICES_CHANGED,
+                data={},
+            )
+        except Exception:
+            raise WebsocketException

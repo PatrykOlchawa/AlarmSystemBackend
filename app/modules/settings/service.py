@@ -1,22 +1,29 @@
-from app.modules.alarms.model import Alarm
-from app.common.enums import AlarmStatus
-from app.modules.settings.schemas import SettingUpdate
-from app.modules.settings.repository import SettingRepository
+from app.common.enums import (
+    MessageEventType,
+    AlarmStatus
+)
 from app.core.exceptions import (
     SettingNotFoundException,
     SettingAlreadyExistsException,
     AlarmNotFoundException,
+    WebsocketException
 )
+from app.modules.settings.schemas import(
+    SettingUpdate,
+    SettingCreate
+) 
+from app.modules.alarms.model import Alarm
+from app.modules.settings.repository import SettingRepository
 from app.modules.settings.model import Setting
-from app.modules.settings.schemas import SettingCreate
-
+from app.services.websocket_service import WebSocketMessageService
 class SettingService:
     def __init__(
         self,
         repository:SettingRepository,
-        
+        websocket_service: WebSocketMessageService,
     ):
         self.repository = repository
+        self.websocket_service = websocket_service
 
     def get_all(
         self,
@@ -131,3 +138,16 @@ class SettingService:
         setting = self.get_by_key(alarm, "alarm_status")
         setting.value = status.value
         return self.repository.update(setting)
+
+    def _notify_settings_changed(
+        self,
+        alarm_id: int,
+    ) -> None:
+        try:
+            self.websocket_service.send_message_sync(
+                alarm_id=alarm_id,
+                event_type=MessageEventType.SETTINGS_UPDATED,
+                data={},
+            )
+        except Exception:
+            raise WebsocketException

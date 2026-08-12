@@ -14,7 +14,7 @@ from app.services.device_control_service import DeviceControlService
 from app.modules.devices.service import DeviceService
 from app.modules.devices.dependencies import get_device_service
 from app.modules.alarms.dependencies import get_alarm_service
-from app.services.websocket_service import WebSocketMessageService
+from app.core.websocket.dependencies import get_websocket_service
 from app.modules.user_alarm.dependencies import get_user_alarm_repository
 from app.services.config_service import ConfigService
 from app.mqtt.service import MQTTService
@@ -36,11 +36,6 @@ def get_ocr_service(
     
 ) -> OCRService:
     return OCRService()
-
-def get_websocket_service(
-    user_alarm_repository = Depends(get_user_alarm_repository)
-) -> WebSocketMessageService:
-    return WebSocketMessageService(user_alarm_repository)
 
 def get_tollgate_service(
     device_control_service = Depends(get_device_control_service),

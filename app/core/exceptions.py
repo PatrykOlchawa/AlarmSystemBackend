@@ -102,3 +102,7 @@ class ClientNotFoundException(AppException):
 class ClientAlreadyExistsException(AppException):
     status_code = 403
     detail = "Client already exists"
+
+class WebsocketException(AppException):
+    status_code = 403
+    detail = "Websocket not send"

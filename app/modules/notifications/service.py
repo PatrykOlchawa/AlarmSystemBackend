@@ -2,17 +2,20 @@ from app.modules.alarms.model import Alarm
 from app.modules.notifications.repository import NotificationRepository
 from app.core.exceptions import (
     NotificationNotFoundException,
+    WebsocketException
 )
 from app.modules.notifications.model import Notification
 from app.modules.notifications.schemas import NotificationCreate, NotificationUpdate
-
+from app.services.websocket_service import WebSocketMessageService
+from app.common.enums import MessageEventType
 class NotificationService:
     def __init__(
         self,
-        repository: NotificationRepository
+        repository: NotificationRepository,
+        websocket_service: WebSocketMessageService,
     ):
         self.repository = repository
-    
+        self.websocket_service = websocket_service
     def get_all(
         self,
         alarm: Alarm,
@@ -76,8 +79,9 @@ class NotificationService:
         notification = self.get_by_id(alarm, notification_id)
         notification.is_read = request.is_read
         
-        return self.repository.update(notification)
-    
+        notification =  self.repository.update(notification)
+        self._notify_notifications_changed(alarm_id=alarm.id)
+        return notification
     def delete(
         self,
         alarm: Alarm,
@@ -86,3 +90,17 @@ class NotificationService:
         notification = self.get_by_id(alarm, notification_id)
         
         self.repository.delete(notification)
+
+    
+    def _notify_notifications_changed(
+        self,
+        alarm_id: int,
+    ) -> None:
+        try:
+            self.websocket_service.send_message_sync(
+                alarm_id=alarm_id,
+                event_type=MessageEventType.SENSORS_CHANGED,
+                data={},
+            )
+        except Exception:
+            raise WebsocketException
