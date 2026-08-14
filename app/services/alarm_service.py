@@ -100,6 +100,7 @@ class AlarmControlService:
                 "reading_id": reading.id,
                 "value": reading.value,
                 "timestamp": reading.timestamp,
+                "sensor_id":sensor.id,
                 "gpio_pin": sensor.gpio_pin,
                 "location": sensor.location,
             }
