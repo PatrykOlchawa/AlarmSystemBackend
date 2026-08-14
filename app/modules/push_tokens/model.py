@@ -14,9 +14,7 @@ from sqlalchemy.orm import (
 
 )
 from datetime import datetime
-from app.common.enums import UserRole
-from app.modules.events.model import AlarmEvent
-from app.modules.notifications.model import Notification
+from app.common.enums import PushPlatform, PushLocale
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from app.modules.users.model import User
@@ -36,11 +34,20 @@ class PushToken(Base):
         nullable=False
     )
 
-    platform: Mapped[str] = mapped_column(
-        String(128),
+    platform: Mapped[PushPlatform] = mapped_column(
+        Enum(PushPlatform),
         nullable=False
     )
 
+    locale: Mapped[PushLocale] = mapped_column(
+        Enum(PushLocale),
+        nullable=False
+    )
+
+    device_id: Mapped[str] = mapped_column(
+        String(255),
+        nullable=False
+    )
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
         default=datetime.utcnow,

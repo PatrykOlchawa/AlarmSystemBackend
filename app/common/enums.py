@@ -108,3 +108,11 @@ class MQTTMessageType(str, Enum):
 class ClientType(str, Enum):
     RASPBERRY = "RASBPERRY"
     ESP32 = "ESP32"
+
+class PushLocale(str, Enum):
+    PL = "pl"
+    EN = "en"
+
+class PushPlatform(str, Enum):
+    ANDROID = "ANDROID"
+    IOS = "IOS"
