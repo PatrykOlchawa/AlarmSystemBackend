@@ -44,28 +44,42 @@ class ServicesFactory:
     ) -> UserService:
         repository = UserRepository(db)
         password_hasher = PasswordHasher()
-        return UserService(repository, password_hasher)
+        return UserService(
+            repository=repository,
+            password_hasher=password_hasher,
+            websocket_service=self.create_websocket_service(db)
+        )
+
     
     def create_alarm_event_service(
         self,
         db: Session,
     ) -> AlarmEventService:
         repository = AlarmEventRepository(db) 
-        return AlarmEventService(repository)
+        return AlarmEventService(
+            repository=repository,
+            websocket_service=self.create_websocket_service(db)
+        )
 
     def create_notification_service(
         self,
         db: Session,
     ) -> NotificationService:
         repository = NotificationRepository(db)
-        return NotificationService(repository)
+        return NotificationService(
+            repository=repository,
+            websocket_service=self.create_websocket_service(db)
+        )
 
     def create_setting_service(
         self,
         db: Session,
     ) -> SettingService:
         repository = SettingRepository(db)
-        return SettingService(repository)
+        return SettingService(
+            repository=repository,
+            websocket_service=self.create_websocket_service(db)
+        )
 
     def create_auth_service(
         self,
@@ -81,7 +95,10 @@ class ServicesFactory:
         db: Session,
     ) -> DeviceService:
         repository = DeviceRepository(db)
-        return DeviceService(repository)
+        return DeviceService(
+            repository=repository,
+            websocket_service=self.create_websocket_service(db)
+        )
 
     def create_device_control_service(
         self,
@@ -100,7 +117,10 @@ class ServicesFactory:
         db:Session,
     ) -> CarPlateService:
         repository = CarPlateRepository(db)
-        return CarPlateService(repository)
+        return CarPlateService(
+            repository=repository,
+            websocket_service=self.create_websocket_service(db)
+        )
     
     def create_tollgate_service(
         self,
@@ -128,9 +148,11 @@ class ServicesFactory:
     ) -> AlarmService:
         repository = AlarmRepository(db)
         return AlarmService(
-            repository,
-            self.create_user_alarm_repository(db),
-            self.create_client_service(db),
+            repository=repository,
+            user_alarm_repository=self.create_user_alarm_repository(db),
+            client_service=self.create_client_service(db),
+            user_repository=self.create_user_service(db),
+            websocket_service=self.create_websocket_service(db),
         )
     
     def create_sensor_service(
@@ -138,7 +160,10 @@ class ServicesFactory:
         db: Session,
     ) -> SensorService:
         repository = SensorRepository(db)
-        return SensorService(repository)
+        return SensorService(
+            repository=repository,
+            websocket_service=self.create_websocket_service(db)
+        )
 
     def create_sensor_reading_service(
         self,

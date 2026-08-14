@@ -18,6 +18,7 @@ from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from app.modules.user_alarm.model import UserAlarm
+    from app.modules.push_tokens.model import PushToken
 
 class User(Base):
 
@@ -67,4 +68,9 @@ class User(Base):
     user_alarms: Mapped[list["UserAlarm"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan"
+    )
+    push_tokens: Mapped[list["PushToken"]] = relationship(
+        "PushToken",
+        back_populates="user",
+        cascade="all, delete-orphan",
     )

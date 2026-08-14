@@ -5,6 +5,7 @@ class AlarmRole(str, Enum):
     ADMIN = "ADMIN"
     USER = "USER"
     SERVICE = "SERVICE"
+    
 class UserRole(str, Enum):
     ADMIN = "ADMIN"
     USER = "USER"
@@ -78,7 +79,6 @@ class MotorDirection(str, Enum):
     BACKWARD = "BACKWARD"
 
 class MessageEventType(str, Enum):
-    
     CONNECTED = "CONNECTED"
     DISCONNECTED = "DISCONNECTED"
     ALARM_STATUS_CHANGED = "ALARM_STATUS_CHANGED"
@@ -88,12 +88,14 @@ class MessageEventType(str, Enum):
     USER_REMOVED_FROM_ALARM = "USER_REMOVED_FROM_ALARM"
     SETTINGS_UPDATED = "SETTINGS_UPDATED"
     NOTIFICATION_CREATED = "NOTIFICATION_CREATED"
-    DEVICES_CHANGED = "devices_changed"
-    SENSORS_CHANGED = "sensors_changed"
-    USERS_CHANGED = "users_changed"
-    ALARMS_CHANGED = "alarms_changed"
-    CAR_PLATES_CHANGED = "car_plates_changed"
-    NOTIFICATIONS_CHANGED = "notifications_changed"
+    NOTIFICATIONS_CHANGED = "NOTIFICATIONS_CHANGED"
+    DEVICES_CHANGED = "DEVICES_CHANGED"
+    SENSORS_CHANGED = "SENSORS_CHANGED"
+    USERS_CHANGED = "USERS_CHANGED"
+    ALARMS_CHANGED = "ALARMS_CHANGED"
+    CAR_PLATES_CHANGED = "CAR_PLATES_CHANGED"
+    EVENTS_CHANGED = "EVENTS_CHANGED"
+    NEW_READING = "NEW_READING"
     ERROR = "ERROR"
 
 class MQTTMessageType(str, Enum):

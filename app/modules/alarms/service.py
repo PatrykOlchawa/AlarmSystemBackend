@@ -97,8 +97,9 @@ class AlarmService:
         alarm_id: int,
         user_id: int,
         user_alarm_role: AlarmRole,
-    ):
+    )-> None:
         self.repository.update_alarm_role(alarm_id, user_id, user_alarm_role)
+        self._notify_alarms_changed()
 
     def create(
         self,
@@ -162,6 +163,7 @@ class AlarmService:
             pin_hash=password_hasher.hash_password(request.pin)
         )
         self.user_alarm_repository.create(membership)
+        self._notify_alarms_changed()
 
     def change_pin(
         self,

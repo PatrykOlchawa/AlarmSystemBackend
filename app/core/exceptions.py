@@ -106,3 +106,7 @@ class ClientAlreadyExistsException(AppException):
 class WebsocketException(AppException):
     status_code = 403
     detail = "Websocket not send"
+
+class InvalidPushTokenException(AppException):
+    status_code = 403
+    detail = "Invalid push token exception"

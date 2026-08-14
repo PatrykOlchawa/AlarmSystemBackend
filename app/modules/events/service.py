@@ -1,15 +1,26 @@
+from app.core.exceptions import(
+    AlarmEventNotFoundException,
+    WebsocketException,
+) 
+from app.common.enums import(
+    AlarmEventType,
+    MessageEventType,
+) 
 from app.modules.events.model import AlarmEvent
 from app.modules.events.schemas import AlarmEventCreate
 from app.modules.events.repository import AlarmEventRepository
-from app.core.exceptions import AlarmEventNotFoundException
-from app.common.enums import AlarmEventType
 from app.modules.alarms.model import Alarm
+from app.services.websocket_service import WebSocketMessageService
+
+
 class AlarmEventService:
     def __init__(
         self,
         repository: AlarmEventRepository,
+        websocket_service: WebSocketMessageService,
     ):
         self.repository = repository
+        self.websocket_service = websocket_service
     def get_all(
         self,
         alarm:Alarm
@@ -43,8 +54,9 @@ class AlarmEventService:
         request: AlarmEventCreate,
     ):
         event = AlarmEvent(**request.model_dump(exclude={"alarm_id"}), alarm_id = alarm.id)
-        return self.repository.create(event)
-        
+        event = self.repository.create(event)
+        self._notify_events_changed(alarm.id)
+        return event
     def delete(
         self,
         alarm:Alarm,
@@ -52,3 +64,17 @@ class AlarmEventService:
     ):
         event = self.get_by_id(alarm,event_id)
         self.repository.delete(event)
+        self._notify_events_changed(alarm.id)
+    
+    def _notify_events_changed(
+        self,
+        alarm_id: int,
+    ) -> None:
+        try:
+            self.websocket_service.send_message_sync(
+                alarm_id=alarm_id,
+                event_type=MessageEventType.EVENTS_CHANGED,
+                data={},
+            )
+        except Exception:
+            raise WebsocketException

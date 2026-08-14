@@ -33,6 +33,7 @@ from app.modules.alarms.service import AlarmService
 from app.modules.user_alarm.repository import UserAlarmRepository
 from app.core.websocket.manager import connection_manager
 from app.services.websocket_service import WebSocketMessageService
+from app.services.push_tokens_service import PushNotificationService
 from app.mqtt.service import MQTTService
 from app.core.event_loop import get_event_loop
 import asyncio
@@ -54,6 +55,7 @@ class AlarmControlService:
         websocket_service: WebSocketMessageService,
         user_alarm_repository: UserAlarmRepository,
         mqtt_service: MQTTService,
+        push_notification_service: PushNotificationService,
     ):
         self.settings_service = settings_service
         self.sensor_service = sensor_service
@@ -68,7 +70,7 @@ class AlarmControlService:
         self.user_alarm_repository = user_alarm_repository
         self.websocket_service = websocket_service
         self.mqtt_service = mqtt_service
-    
+        self.push_notification_service = push_notification_service
     def process_sensor_reading(
         self,
         alarm_id: int,
@@ -89,6 +91,20 @@ class AlarmControlService:
             alarm.status,
             AlarmStatus.ARMED,
         )
+
+        self.websocket_service.send_message_sync(
+            alarm_id=alarm.id,
+            event_type=MessageEventType.NEW_READING,
+            data={
+                "alarm_id": alarm.id,
+                "reading_id": reading.id,
+                "value": reading.value,
+                "timestamp": reading.timestamp,
+                "gpio_pin": sensor.gpio_pin,
+                "location": sensor.location,
+            }
+        )
+
         if alarm.status != AlarmStatus.ARMED:
             return
         
@@ -268,6 +284,7 @@ class AlarmControlService:
             event_id=event.id,
             alarm=alarm,
         )
+        self._push_to_users(alarm=alarm)
         logger.info("Triggered before asyncio")
         loop = get_event_loop()
         future = asyncio.run_coroutine_threadsafe(
@@ -300,7 +317,7 @@ class AlarmControlService:
         )
         event = self.alarm_event_service.create(alarm, request)
         return event
-    
+
     def _notify_users(
         self,
         title: str,
@@ -318,7 +335,23 @@ class AlarmControlService:
                 notification_type=NotificationType.INFO,
             )
             self.notification_service.create(alarm, request)
-    
+
+    def _push_to_users(
+            self,
+            alarm:Alarm,
+        ) -> None:
+            users = self.user_service.get_users_by_alarm(alarm.id)
+            for user in users:
+                self.push_notification_service.send_to_user(
+                    user_id=user.id,
+                    title="🚨 Alarm",
+                    message="alarm triggered",
+                    data={
+                        "alarm_id": alarm.id,
+                        "event": "ALARM_TRIGGERED",
+                    },
+                )
+
     def get_alarm_status(self, alarm) -> AlarmStatus:
         return alarm.status
     

@@ -68,7 +68,9 @@ class NotificationService:
         request: NotificationCreate,
     ):
         notification = Notification(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
-        return self.repository.create(notification)
+        notification = self.repository.create(notification)
+        self._notify_notifications_changed(alarm_id=alarm.id)
+        return notification
     
     def update(
         self,
@@ -82,14 +84,15 @@ class NotificationService:
         notification =  self.repository.update(notification)
         self._notify_notifications_changed(alarm_id=alarm.id)
         return notification
+    
     def delete(
         self,
         alarm: Alarm,
         notification_id: int,
     ):
         notification = self.get_by_id(alarm, notification_id)
-        
         self.repository.delete(notification)
+        self._notify_notifications_changed(alarm_id=alarm.id)
 
     
     def _notify_notifications_changed(
@@ -99,7 +102,7 @@ class NotificationService:
         try:
             self.websocket_service.send_message_sync(
                 alarm_id=alarm_id,
-                event_type=MessageEventType.SENSORS_CHANGED,
+                event_type=MessageEventType.NOTIFICATIONS_CHANGED,
                 data={},
             )
         except Exception:

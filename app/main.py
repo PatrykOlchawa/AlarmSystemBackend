@@ -18,6 +18,7 @@ from app.modules.car_plates.router import router as car_plate_router
 from app.modules.alarms.router import router as alarms_router
 from app.core.websocket.router import router as websocket_router
 from app.modules.clients.router import router as clients_router
+from app.modules.push_tokens.router import router as push_token_router
 from app.core.exception_handlers import register_exception_handlers
 from fastapi.middleware.cors import CORSMiddleware
 from app.mqtt.client import mqtt_client
@@ -78,7 +79,7 @@ app.include_router(car_plate_router)
 app.include_router(alarms_router)
 app.include_router(websocket_router)
 app.include_router(clients_router)
-
+app.include_router(push_token_router)
 
 @app.get("/")
 def root():

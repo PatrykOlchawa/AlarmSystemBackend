@@ -19,9 +19,7 @@ def get_notification_repository(
     return NotificationRepository(db)
 
 def get_notification_service(
-    repository: NotificationRepository = Depends(
-        get_notification_repository
-    ),
+    repository: NotificationRepository = Depends(get_notification_repository),
     websocket_service: WebSocketMessageService= Depends(get_websocket_service),
 ) -> NotificationService:
 
