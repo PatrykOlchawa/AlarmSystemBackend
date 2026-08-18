@@ -344,7 +344,7 @@ class AlarmControlService:
             users = self.user_service.get_users_by_alarm(alarm.id)
             for user in users:
                 self.push_notification_service.send_to_user(
-                    user_id=user.id,
+                    user_id=user.user_id,
                     title="🚨 Alarm",
                     message="alarm triggered",
                     data={

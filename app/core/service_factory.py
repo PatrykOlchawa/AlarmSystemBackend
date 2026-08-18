@@ -33,7 +33,7 @@ from app.modules.alarms.repository import AlarmRepository
 from app.mqtt.service import mqtt_service
 from app.modules.clients.repository import ClientRepository
 from app.modules.clients.service import ClientService
-from app.modules.push_tokens.service import PushTokenService
+from app.services.push_tokens_service import PushNotificationService
 from app.modules.push_tokens.repository import PushTokenRepository
 
 
@@ -195,10 +195,10 @@ class ServicesFactory:
     def create_push_notification(
         self,
         db: Session,
-    ) -> PushTokenService:
+    ) -> PushNotificationService:
         repository = PushTokenRepository(db)
-        return PushTokenService(
-            repository=repository,
+        return PushNotificationService(
+            push_token_repository=repository,
         )
     
     def create_alarm_control_service(
