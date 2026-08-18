@@ -16,8 +16,8 @@ from app.modules.devices.dependencies import get_device_service
 from app.modules.alarms.dependencies import get_alarm_service
 from app.core.websocket.dependencies import get_websocket_service
 from app.modules.user_alarm.dependencies import get_user_alarm_repository
-from app.modules.push_tokens.dependencies import get_push_token_service 
-
+from app.modules.push_tokens.dependencies import get_push_token_repository 
+from services.push_tokens_service import PushNotificationService
 from app.services.config_service import ConfigService
 from app.mqtt.service import MQTTService
 #if TYPE_CHECKING:
@@ -65,7 +65,11 @@ def get_config_service(
         device_service=device_service,
         setting_service=setting_service,
     )
-    
+def get_push_notification_service() -> PushNotificationService:
+    return PushNotificationService(
+        push_token_repository=Depends(get_push_token_repository),
+    )
+
 def get_alarm_service(
     settings_service = Depends(get_settings_service),
     sensor_service = Depends(get_sensor_service),
@@ -80,7 +84,7 @@ def get_alarm_service(
     websocket_service = Depends(get_websocket_service),
     user_alarm_repository = Depends(get_user_alarm_repository),
     mqtt_service = Depends(get_mqtt_service),
-    push_notification_service = Depends(get_push_token_service),
+    push_notification_service = Depends(get_push_notification_service),
 ) -> AlarmControlService:
 
     return AlarmControlService(
