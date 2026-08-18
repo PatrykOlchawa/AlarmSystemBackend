@@ -33,6 +33,9 @@ from app.modules.alarms.repository import AlarmRepository
 from app.mqtt.service import mqtt_service
 from app.modules.clients.repository import ClientRepository
 from app.modules.clients.service import ClientService
+from app.modules.push_tokens.service import PushTokenService
+from app.modules.push_tokens.repository import PushTokenRepository
+
 
 class ServicesFactory:
     def create_session(self) -> Session:
@@ -188,7 +191,16 @@ class ServicesFactory:
         return WebSocketMessageService(
             user_alarm_repository=self.create_user_alarm_repository(db),
         )
-
+    
+    def create_push_notification(
+        self,
+        db: Session,
+    ) -> PushTokenService:
+        repository = PushTokenRepository(db)
+        return PushTokenService(
+            repository=repository,
+        )
+    
     def create_alarm_control_service(
         self,
         db: Session
@@ -207,6 +219,7 @@ class ServicesFactory:
             websocket_service=self.create_websocket_service(db),
             user_alarm_repository=self.create_user_alarm_repository(db),
             mqtt_service=mqtt_service,
+            push_notification_service=self.create_push_notification(db),
         )
 
     def create_sensor_handler(
