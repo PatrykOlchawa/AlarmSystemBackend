@@ -16,50 +16,50 @@ class PushNotificationService:
     ):
         self.push_token_repository = push_token_repository
 
-def send_to_user(
-    self,
-    user_id: int,
-    title: str,
-    message: str,
-    data: dict | None = None,
-) -> None:
+    def send_to_user(
+        self,
+        user_id: int,
+        title: str,
+        message: str,
+        data: dict | None = None,
+    ) -> None:
 
-    tokens = self.push_token_repository.get_by_user_id(
-        user_id
-    )
-
-    if not tokens:
-        return
-
-    messages = [
-        {
-            "to": token.token,
-            "title": title,
-            "body": message,
-            "data": data or {},
-            "sound": "default",
-        }
-        for token in tokens
-    ]
-
-    try:
-        response = httpx.post(
-            EXPO_PUSH_URL,
-            json=messages,
-            timeout=10,
+        tokens = self.push_token_repository.get_by_user_id(
+            user_id
         )
 
-        response.raise_for_status()
+        if not tokens:
+            return
 
-        logger.info(
-            "Push notifications sent to user=%s",
-            user_id,
-        )
+        messages = [
+            {
+                "to": token.token,
+                "title": title,
+                "body": message,
+                "data": data or {},
+                "sound": "default",
+            }
+            for token in tokens
+        ]
 
-    except Exception:
-        logger.exception(
-            "Failed to send push notifications"
-        )
+        try:
+            response = httpx.post(
+                EXPO_PUSH_URL,
+                json=messages,
+                timeout=10,
+            )
+
+            response.raise_for_status()
+
+            logger.info(
+                "Push notifications sent to user=%s",
+                user_id,
+            )
+
+        except Exception:
+            logger.exception(
+                "Failed to send push notifications"
+            )
 
     def _send(
         self,
