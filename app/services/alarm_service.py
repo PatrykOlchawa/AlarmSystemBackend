@@ -346,7 +346,7 @@ class AlarmControlService:
                 self.push_notification_service.send_to_user(
                     user_id=user.user_id,
                     title="🚨 Alarm",
-                    message="alarm triggered",
+                    message=f"alarm {alarm.name} triggered",
                     data={
                         "alarm_id": alarm.id,
                         "event": "ALARM_TRIGGERED",
