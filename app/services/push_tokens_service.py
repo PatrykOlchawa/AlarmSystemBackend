@@ -60,38 +60,3 @@ class PushNotificationService:
             logger.exception(
                 "Failed to send push notifications"
             )
-
-    def _send(
-        self,
-        token: str,
-        title: str,
-        message: str,
-        data: dict,
-    ) -> None:
-
-        payload = {
-            "to": token,
-            "title": title,
-            "body": message,
-            "data": data,
-            "sound": "default",
-        }
-
-        try:
-            response = httpx.post(
-                EXPO_PUSH_URL,
-                json=payload,
-                timeout=10,
-            )
-
-            response.raise_for_status()
-
-            logger.info(
-                "Push notification sent to %s",
-                token,
-            )
-
-        except Exception:
-            logger.exception(
-                "Failed to send push notification"
-            )

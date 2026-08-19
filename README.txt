@@ -10,13 +10,6 @@
 - Nginx
 - Redis
 
-#To run:
-#sudo docker compose up --build
-#sudo docker compose down
-
-#To generate docs:
-http://localhost:8000/docs
-http://localhost:8000/redoc
 
 #Postgresql
 sudo docker compose exec postgres psql -U alarm -d alarm_db

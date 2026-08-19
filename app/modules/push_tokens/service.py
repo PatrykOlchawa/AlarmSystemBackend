@@ -47,7 +47,13 @@ class PushTokenService:
         existing = self.repository.get_by_token(request.token)
 
         if existing:
-            raise InvalidPushTokenException
+            existing.user_id = user_id
+            existing.platform = request.platform
+            existing.locale = request.locale
+            existing.device_id = request.device_id
+            existing.is_active = True
+
+            return self.repository.update(existing)
       
         push_token = PushToken(
             user_id=user_id,
