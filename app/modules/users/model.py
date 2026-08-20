@@ -10,7 +10,7 @@ from sqlalchemy.orm import (
     mapped_column,
     relationship,
 )
-from datetime import datetime
+from datetime import datetime, timezone
 from app.common.enums import UserRole
 from app.modules.events.model import AlarmEvent
 from app.modules.notifications.model import Notification
@@ -51,8 +51,8 @@ class User(Base):
     )
 
     creation_date: Mapped[DateTime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow(),
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
         nullable=True
     )
 

@@ -12,7 +12,7 @@ from sqlalchemy.orm import(
     relationship,
 )
 
-from datetime import datetime
+from datetime import datetime, timezone
 
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -43,8 +43,8 @@ class UserAlarm(Base):
     )
 
     joined_at: Mapped[DateTime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 

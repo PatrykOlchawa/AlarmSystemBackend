@@ -12,7 +12,7 @@ from sqlalchemy.orm import (
     Mapped,
 )
 from app.modules.alarms.model import Alarm
-from datetime import datetime
+from datetime import datetime, timezone
 from app.common.enums import ClientType
 class Client(Base):
     __tablename__ = "clients"
@@ -48,8 +48,8 @@ class Client(Base):
     )
 
     creation_date: Mapped[DateTime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
         nullable=True,
     )
 

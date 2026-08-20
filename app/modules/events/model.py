@@ -1,6 +1,6 @@
 from app.modules.alarms.model import Alarm
 from sqlalchemy.orm import relationship
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime
 from sqlalchemy import Enum
@@ -56,8 +56,8 @@ class AlarmEvent(Base):
     )
 
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+        DateTime(timezone=True),
+        default= lambda: datetime.now(timezone.utc),
         nullable=False,
         index=True
     )

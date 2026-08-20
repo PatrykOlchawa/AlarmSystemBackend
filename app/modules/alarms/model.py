@@ -1,21 +1,21 @@
+from app.db.base import Base
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Enum,
+    String,
 
+)
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship
+)
+from datetime import datetime, timezone
 from app.modules.settings.model import Setting
-
 from app.modules.notifications.model import Notification
 from app.modules.car_plates.model import CarPlate
 from app.modules.sensors.model import Sensor
-
-
-from sqlalchemy import Boolean
-from sqlalchemy import DateTime
-from sqlalchemy import Enum
-from datetime import datetime
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
-from app.db.base import Base
 from app.common.enums import AlarmStatus
 from typing import TYPE_CHECKING
 
@@ -42,8 +42,8 @@ class Alarm(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 

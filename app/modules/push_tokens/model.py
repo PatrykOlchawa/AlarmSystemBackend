@@ -13,7 +13,7 @@ from sqlalchemy.orm import (
     relationship,
 
 )
-from datetime import datetime
+from datetime import datetime, timezone
 from app.common.enums import PushPlatform, PushLocale
 from typing import TYPE_CHECKING
 if TYPE_CHECKING:
@@ -49,15 +49,15 @@ class PushToken(Base):
         nullable=False
     )
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+        DateTime(timezone=True),
+        default= lambda: datetime.now(timezone.utc),
         nullable=False
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
-        onupdate=datetime.utcnow,
+        DateTime(timezone=True),
+        default= lambda: datetime.now(timezone.utc),
+        onupdate= lambda: datetime.now(timezone.utc),
         nullable=False
     )
 

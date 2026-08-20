@@ -1,7 +1,7 @@
 import typing
 from sqlalchemy.orm import relationship
 from sqlalchemy import DateTime
-from datetime import datetime
+from datetime import datetime, timezone
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
 from sqlalchemy import String
@@ -44,8 +44,8 @@ class CarPlate(Base):
     )
 
     created_at: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+        DateTime(timezone=True),
+        default=lambda: datetime.now(timezone.utc),
         nullable=False
     )
 

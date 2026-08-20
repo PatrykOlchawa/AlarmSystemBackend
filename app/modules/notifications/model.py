@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
 from sqlalchemy import Enum
-from datetime import datetime
+from datetime import datetime, timezone
 
 from sqlalchemy import Boolean
 from sqlalchemy import DateTime
@@ -57,8 +57,8 @@ class Notification(Base):
         nullable=False
     )
     timestamp: Mapped[datetime] = mapped_column(
-        DateTime,
-        default=datetime.utcnow,
+        DateTime(timezone=True),
+        default= lambda: datetime.now(timezone.utc),
         nullable=False,
         index=True
     )
