@@ -1,7 +1,9 @@
 from app.mqtt.client import mqtt_client
 from app.mqtt.topics import Topics
 import json
+from app.common.enums import AlarmStatus
 import logging
+
 logger = logging.getLogger(__name__)
 class MQTTService:
     def __init__(self):
@@ -22,14 +24,14 @@ class MQTTService:
     def publish_alarm_command(
         self,
         alarm_id: int,
-        armed: bool,
+        state: AlarmStatus,
     ) -> None: 
         self.publish(
             topic=Topics.command_alarm(
                 alarm_id=alarm_id,
             ),
             payload={
-                "armed" : armed,
+                "state" : state,
             }
         )
     def publish_device_command(

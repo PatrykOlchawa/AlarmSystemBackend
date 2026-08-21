@@ -195,7 +195,7 @@ class AlarmControlService:
         )
         self.mqtt_service.publish_alarm_command(
             alarm_id=alarm.id,
-            armed=True,
+            state=AlarmStatus.ARMED,
         )
         #self.tollgate_service.process_vehicle()
     
@@ -218,7 +218,6 @@ class AlarmControlService:
         if alarm.status == AlarmStatus.DISARMED:
             raise AlarmAlreadyDisarmedException()
         
-        self._deactivate_alarm_devices(alarm)
         self.alarm_service.set_alarm_status(alarm, AlarmStatus.DISARMED)
 
         await self.websocket_service.send_message(
@@ -244,7 +243,7 @@ class AlarmControlService:
         )
         self.mqtt_service.publish_alarm_command(
             alarm_id=alarm.id,
-            armed=False,
+            state=AlarmStatus.DISARMED,
         )
     
     def _trigger_alarm(
@@ -258,9 +257,13 @@ class AlarmControlService:
         ):
             return
         
-
         self.alarm_service.set_alarm_status(alarm, AlarmStatus.TRIGGERED)
 
+        self.mqtt_service.publish_alarm_command(
+                alarm_id=alarm.id,
+                state=AlarmStatus.TRIGGERED,
+        )
+        
         self.websocket_service.send_message_sync(
             alarm_id=alarm.id,
             event_type=MessageEventType.ALARM_STATUS_CHANGED,
@@ -278,7 +281,6 @@ class AlarmControlService:
             device_id=None,
         )
         logger.info("after even created")
-
         self._notify_users(
             title="Alarm triggered",
             message=f"Alarm triggered by sensor {sensor.name} in location {sensor.location}",
@@ -299,6 +301,44 @@ class AlarmControlService:
             ) if f.exception() else None
         )
         logger.info("Triggered after asyncio")
+
+    def _activate_alarm(
+        self,
+        alarm: Alarm,
+    ):
+
+        self.alarm_service.set_alarm_status(
+            alarm = alarm,
+            alarm_status=AlarmStatus.ACTIVATED,
+        )
+
+        self.mqtt_service.publish_alarm_command(
+                alarm_id=alarm.id,
+                state=AlarmStatus.ACTIVATED,
+        )
+
+        self.websocket_service.send_message_sync(
+            alarm_id=alarm.id,
+            event_type=MessageEventType.ALARM_STATUS_CHANGED,
+            data={
+                "status": alarm.status.value,
+            }
+        )
+        event = self._create_event(
+            event_type=AlarmEventType.ALARM_ACTIVATED,
+            message=f"Alarm activated!",
+            alarm=alarm,
+            user_id=None,
+            device_id=None,
+            location=None
+        )
+        self._notify_users(
+            title="Alarm activated",
+            message="Alarm activated",
+            event_id=event.id,
+            alarm=alarm,
+        )
+        logger.info("End activation func")
 
     def _create_event(
         self,
@@ -356,40 +396,6 @@ class AlarmControlService:
     def get_alarm_status(self, alarm) -> AlarmStatus:
         return alarm.status
     
-    def _activate_alarm_devices(self, alarm):
-        leds = self.device_service.get_by_type(alarm, DeviceType.LED)
-        for led in leds:
-            self.device_control_service.turn_on_led(led)
-        buzzer = self.device_service.get_by_type(alarm, DeviceType.BUZZER)
-        for buzzer in buzzer:
-            self.device_control_service.turn_on_buzzer(buzzer)
-        servos = self.device_service.get_by_type(alarm, DeviceType.SERVO)
-        for servo in servos:
-            self.device_control_service.move_servo(servo,180)
-        motors = self.device_service.get_by_type(alarm, DeviceType.MOTOR)
-        for motor in motors:
-            self.device_control_service.move_motor(motor,'LEFT',100)
-        cameras = self.device_service.get_by_type(alarm, DeviceType.CAMERA)
-        for camera in cameras:
-            self.device_control_service.turn_on_camera(camera)
-
-    def _deactivate_alarm_devices(self, alarm):
-        leds = self.device_service.get_by_type(alarm, DeviceType.LED)
-        for led in leds:
-            self.device_control_service.turn_off_led(led)
-        buzzer = self.device_service.get_by_type(alarm, DeviceType.BUZZER)
-        for buzzer in buzzer:
-            self.device_control_service.turn_off_buzzer(buzzer)
-        servos = self.device_service.get_by_type(alarm, DeviceType.SERVO)
-        for servo in servos:
-            self.device_control_service.move_servo(servo,0)
-        motors = self.device_service.get_by_type(alarm, DeviceType.MOTOR)
-        for motor in motors:
-            self.device_control_service.move_motor(motor,'RIGHT',100)
-        cameras = self.device_service.get_by_type(alarm, DeviceType.CAMERA)
-        for camera in cameras:
-            self.device_control_service.turn_off_camera(camera)
-
     async def _activation_timer(
         self,
         alarm_id: int,
@@ -407,36 +413,3 @@ class AlarmControlService:
 
         self._activate_alarm(alarm)
         logger.info("Alarm activated")
-
-    def _activate_alarm(
-        self,
-        alarm: Alarm,
-    ):
-
-        self.alarm_service.set_alarm_status(
-            alarm = alarm,
-            alarm_status=AlarmStatus.ACTIVATED,
-        )
-        self._activate_alarm_devices(alarm=alarm)
-        self.websocket_service.send_message_sync(
-            alarm_id=alarm.id,
-            event_type=MessageEventType.ALARM_STATUS_CHANGED,
-            data={
-                "status": alarm.status.value,
-            }
-        )
-        event = self._create_event(
-            event_type=AlarmEventType.ALARM_ACTIVATED,
-            message=f"Alarm activated!",
-            alarm=alarm,
-            user_id=None,
-            device_id=None,
-            location=None
-        )
-        self._notify_users(
-            title="Alarm activated",
-            message="Alarm activated",
-            event_id=event.id,
-            alarm=alarm,
-        )
-        logger.info("End activation func")

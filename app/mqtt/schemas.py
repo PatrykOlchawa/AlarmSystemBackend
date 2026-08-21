@@ -23,3 +23,6 @@ class StatePayload(RootModel[dict[str, Any]]):
 
 class AlarmStatePayload(BaseModel):
     status: AlarmStatus
+
+class AlarmCommandPayload(BaseModel):
+    status:AlarmStatus
