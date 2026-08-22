@@ -10,3 +10,96 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIzIiwiYWxhcm1faWQiOjMsImNsaWVudF9
 vps:
 1bcd392e-c7e9-4cef-bcad-536d7fe05091
 NjjEa3BKehIlmn_-Q24U55OCFBBhCtYwDUvNuz-8VQM
+
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: alarm-postgres
+
+    environment:
+      POSTGRES_USER: alarm
+      POSTGRES_PASSWORD: alarm_password
+      POSTGRES_DB: alarm_db
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    restart: unless-stopped
+
+  backend:
+    build: .
+    container_name: alarm-backend
+
+    env_file:
+      - .env
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - .:/app
+
+    depends_on:
+      - postgres
+      - redis
+
+    restart: unless-stopped
+
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+
+  redis:
+    image: redis:7-alpine
+    container_name: alarm-redis
+    ports:
+      - "6379:6379"
+  certbot:
+    image: certbot/certbot
+    container_name: alarm-certbot
+
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+
+    entrypoint: >
+      sh -c "trap exit TERM;
+            while :; do
+              certbot renew --webroot -w /var/www/certbot;
+              sleep 12h;
+            done"
+
+    restart: unless-stopped
+  nginx:
+    image: nginx:latest
+    container_name: alarm-nginx
+
+    ports:
+      - "80:80"
+      - "443:443"
+
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+      - ../dist:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
+
+    restart: unless-stopped
+  mosquitto:
+    image: eclipse-mosquitto:2
+    container_name: alarm-mosquitto
+    restart: unless-stopped
+
+    ports:
+      - "1883:1883"
+
+    volumes:
+      - ./mosquitto/config:/mosquitto/config
+      - ./mosquitto/data:/mosquitto/data
+      - ./mosquitto/log:/mosquitto/log
+
+volumes:
+  postgres_data:
+
+  eyJhbGciOiJFUzI1NiIsImtpZCI6ImFsYXJtLW1lZGlhbXR4LTEiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL2FwaS53c2ItYWxhcm0ucGwiLCJhdWQiOiJtZWRpYW10eCIsImlhdCI6MTc4NzQwOTE3MSwiZXhwIjoxNzg3NDA5NDcxLCJtZWRpYW10eF9wZXJtaXNzaW9ucyI6W3siYWN0aW9uIjoicmVhZCIsInBhdGgiOiJhbGFybS00LWNhbWVyYS0xIn1dfQ.g0QfjQqPM2KYirYbnlOopT9uhufQC6I5YJYyteanMMKlMhG1PsoZGTwsPcpMm1AZ1-_HeDckl5tUY3qkg7VbQg
