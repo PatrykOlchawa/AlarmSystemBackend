@@ -6,7 +6,7 @@ from cryptography.hazmat.primitives.asymmetric.ec import (
 from cryptography.hazmat.primitives.serialization import (
     load_pem_private_key,
 )
-
+from app.core.config import settings
 class MediaAuthService:
     def __init__(
         self,
@@ -62,3 +62,7 @@ class MediaAuthService:
         }
 
 
+media_auth_service = MediaAuthService(
+    private_key_path=settings.mediamtx_private_key_path,
+    key_id=settings.mediamtx_key_id,
+)
