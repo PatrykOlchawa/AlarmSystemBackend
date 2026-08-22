@@ -1,15 +1,16 @@
+from sqlalchemy import (
+    Boolean,
+    Enum,
+    String,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import (
+    Mapped,
+    mapped_column,
+    relationship
+)
 from sqlalchemy import ForeignKey
 from app.modules.alarms.model import Alarm
-from sqlalchemy.orm import relationship
-from datetime import datetime
-
-from sqlalchemy import Boolean
-from sqlalchemy import DateTime
-from sqlalchemy import Enum
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
 from sqlalchemy.dialects.postgresql import JSONB
 from app.common.enums import DeviceType
 from app.common.enums import ConnectionType
@@ -71,4 +72,10 @@ class Device(Base):
     alarm: Mapped["Alarm"] = relationship(
         back_populates="devices"
     )
-    
+    __table_args__ = (
+        UniqueConstraint(
+            "alarm_id",
+            "connection_identifier",
+            name="uq_device_alarm_connection_identifier",
+        ),
+    )
