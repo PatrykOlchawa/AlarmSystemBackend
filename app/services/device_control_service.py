@@ -81,11 +81,11 @@ class DeviceControlService:
             )
         )
     def select_camera(self, device): 
-        logger.info(f"Turning on camera for device {device.name}")
+        logger.info(f"Select camera for stream {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-               payload=DeviceCommandPayload(
+            payload=DeviceCommandPayload(
                 command=DeviceCommand.SELECT_CAMERA,
             )
         )

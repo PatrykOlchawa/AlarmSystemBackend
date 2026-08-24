@@ -123,7 +123,7 @@ def turn_off_buzzer(
     "/camera/{device_id}/on",
     response_model=MessageResponse,
     )
-def turn_on_camera(
+def select_camera(
     device_id: int,
     alarm : Alarm = Depends(require_alarm_member),   
     device_service = Depends(get_device_service),
@@ -135,31 +135,11 @@ def turn_on_camera(
         device_service,
         alarm,
     )
-    control_service.turn_on_camera(device)
+    control_service.select_camera(device)
     return MessageResponse(
         message="Camera turned on",
     )
 
-@router.post(
-    "/camera/{device_id}/off",
-    response_model=MessageResponse,
-    )
-def turn_off_camera(
-    device_id: int,
-    alarm : Alarm = Depends(require_alarm_member),
-    device_service = Depends(get_device_service),
-    control_service = Depends(get_device_control_service),
-) -> MessageResponse:
-    device = _get_device_or_raise(
-        device_id,
-        DeviceType.CAMERA,
-        device_service,
-        alarm,
-    )
-    control_service.turn_off_camera(device)
-    return MessageResponse(
-        message="Camera turned off",
-    )
 
 @router.post(
     "/servo/{device_id}/move",
