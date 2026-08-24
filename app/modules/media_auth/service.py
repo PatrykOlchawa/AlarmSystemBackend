@@ -36,14 +36,13 @@ class MediaAuthService:
     def _base64url(data: bytes) -> str:
         return base64.urlsafe_b64encode(data).rstrip(b"=").decode()
 
-    def get_camera_path(
+    def get_stream_path(
         self,
         alarm: Alarm,
-        camera: Device,
     ) -> str:
         return (
-            f"alarm-{alarm.id}-"
-            f"{camera.connection_identifier}"
+            f"alarm-{alarm.id}-cam"
+
         )
     
     def get_jwks(self) -> dict:
@@ -74,21 +73,18 @@ class MediaAuthService:
             ]
         }
 
-    def create_camera_permissions(
+    def create_stream_permissions(
         self,
         alarm: Alarm,
-        cameras: list[Device],
     ) -> list[dict]:
-
         return [
             {
                 "action": "read",
-                "path": self.get_camera_path(
+                "path": self.get_stream_path(
                     alarm=alarm,
-                    camera=camera,
                 ),
             }
-            for camera in cameras
+
         ]
     
     def create_camera_stream_token(

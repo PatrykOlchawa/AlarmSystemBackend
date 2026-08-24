@@ -1,10 +1,11 @@
 from app.modules.devices.model import Device
 from app.core.exceptions import InvalidDeviceTypeException
-from app.common.enums import DeviceType
+from app.common.enums import DeviceType, DeviceCommand
 from app.services.ocr_service import OCRService
 import logging
 from app.modules.devices.service import DeviceService
 from app.mqtt.service import MQTTService
+from app.mqtt.schemas import DeviceCommandPayload
 logger = logging.getLogger(__name__)
 class DeviceControlService:
     def __init__(
@@ -19,9 +20,9 @@ class DeviceControlService:
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-            payload={
-                "state": True,
-            },
+            payload=DeviceCommandPayload(
+                command=DeviceCommand.TURN_ON,
+            )
         )
 
     def turn_off_led(self, device):
@@ -29,9 +30,9 @@ class DeviceControlService:
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-            payload={
-                "state": False,
-            },
+            payload=DeviceCommandPayload(
+                command=DeviceCommand.TURN_OFF,
+            )
         )
         
     def turn_on_buzzer(self, device):
@@ -39,60 +40,59 @@ class DeviceControlService:
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-            payload={
-                "state": True,
-            },
+             payload=DeviceCommandPayload(
+                command=DeviceCommand.TURN_ON,
+            )
         )
     def turn_off_buzzer(self, device):
         logger.info(f"Turning off BUZZER for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-            payload={
-                "state": False,
-            },
+            payload=DeviceCommandPayload(
+                command=DeviceCommand.TURN_OFF,
+            )
         )
     def move_servo(self, device, angle):
         logger.info(f"Moving servodevice {device.name}, by {angle}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-            payload={
-                "angle": angle,
-            },
+            payload=DeviceCommandPayload(
+                command=DeviceCommand.MOVE,
+                params={
+                    "angle": angle,
+                },
+            )
+                
+            
         )    
     def move_motor(self, device, direction, steps):
         logger.info(f"Moving motor {device.name}, by {direction}, {steps}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-            payload={
-                "direction": direction,
-                "steps": steps
-            },
+            payload=DeviceCommandPayload(
+                command=DeviceCommand.MOVE,
+                params={
+                    "direction": direction,
+                    "steps": steps,
+                },
+            )
         )
-    def turn_on_camera(self, device): 
+    def select_camera(self, device): 
         logger.info(f"Turning on camera for device {device.name}")
         self.mqtt_service.publish_device_command(
             alarm_id=device.alarm_id,
             device_id=device.id,
-            payload={
-                "state": True,
-            },
+               payload=DeviceCommandPayload(
+                command=DeviceCommand.SELECT_CAMERA,
+            )
         )
-    def turn_off_camera(self, device): 
-        logger.info(f"Turning off camera for device {device.name}")
-        self.mqtt_service.publish_device_command(
-            alarm_id=device.alarm_id,
-            device_id=device.id,
-            payload={
-                "state": False,
-            },
-        )
-    def capture_image(self, device): 
-        if device.type != DeviceType.CAMERA:
-            raise InvalidDeviceTypeException()
-        logger.info(f"Capturing image from device {device.name}")
+    #def capture_image(self, device): 
+    #    if device.type != DeviceType.CAMERA:
+    #        raise InvalidDeviceTypeException()
+    #    logger.info(f"Capturing image from device {device.name}")
         
     def open_tollgate(self, devices: list[Device]): 
         for device in devices:    

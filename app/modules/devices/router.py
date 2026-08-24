@@ -10,8 +10,11 @@ from app.modules.devices.schemas import (
     CameraStreamTokenResponse,
     DeviceUpdate,
     DeviceCreate,
-    CameraStreamResponse,
 ) 
+from app.core.exceptions import (
+   DeviceNotFoundException, 
+   InvalidDeviceTypeException
+)
 from fastapi import APIRouter
 from app.modules.alarms.model import Alarm
 from app.security.authorization_dependencies import require_alarm_admin
@@ -47,22 +50,26 @@ def get_device(
     return service.get_by_id(alarm,device_id)
 
 @router.get(
-    "/cameras/stream-token",
+    "/cameras/{device_id}/stream-token",
     response_model=CameraStreamTokenResponse,
 )
 def get_camera_stream_token(
+    device_id: int,
     alarm : Alarm = Depends(require_alarm_member),
-    current_user: User = Depends(get_current_user),
     devices_service: DeviceService = Depends(get_device_service),
     media_auth_service: MediaAuthService = Depends(get_media_auth_service),
 ):
-    cameras = devices_service.get_by_type(
+    camera = devices_service.get_by_id(
         alarm=alarm,
-        device_type=DeviceType.CAMERA
+        device_id=device_id,
     )
-    permissions = media_auth_service.create_camera_permissions(
+    if camera is None:
+        raise DeviceNotFoundException
+    if camera.device_type != DeviceType.CAMERA:
+        raise InvalidDeviceTypeException
+    
+    permissions = media_auth_service.create_stream_permissions(
         alarm = alarm,
-        cameras = cameras,
     )
 
     token = media_auth_service.create_camera_stream_token(
@@ -72,17 +79,9 @@ def get_camera_stream_token(
     return CameraStreamTokenResponse(
         token=token,
         expires_in=settings.mediamtx_token_expire_minutes * 60,
-        cameras=[
-            CameraStreamResponse(
-                device_id=camera.id,
-                connection_identifier=camera.connection_identifier,
-                path=media_auth_service.get_camera_path(
-                    alarm=alarm,
-                    camera=camera,
-                ),
-            )
-            for camera in cameras
-        ],
+        path=media_auth_service.get_stream_path(
+            alarm=alarm,
+        ),        
     )
 
 @router.post(

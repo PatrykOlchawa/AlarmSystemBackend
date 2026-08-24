@@ -1,7 +1,8 @@
-from pydantic import BaseModel, RootModel
+from pydantic import BaseModel, RootModel, Field
 from typing import Any
 from app.common.enums import MQTTMessageType
-from app.common.enums import AlarmStatus 
+from app.common.enums import AlarmStatus, DeviceCommand
+
 class SensorMessage(BaseModel):
     value: Any
 
@@ -24,5 +25,6 @@ class StatePayload(RootModel[dict[str, Any]]):
 class AlarmStatePayload(BaseModel):
     status: AlarmStatus
 
-class AlarmCommandPayload(BaseModel):
-    status:AlarmStatus
+class DeviceCommandPayload(BaseModel):
+    command: DeviceCommand
+    params: dict[str, Any] = Field(default_factory=dict)

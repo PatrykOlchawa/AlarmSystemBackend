@@ -116,3 +116,14 @@ class PushLocale(str, Enum):
 class PushPlatform(str, Enum):
     ANDROID = "ANDROID"
     IOS = "IOS"
+
+class DeviceCommand(str, Enum):
+    TURN_ON = "TURN_ON"
+    TURN_OFF = "TURN_OFF"
+    OPEN = "OPEN"
+    CLOSE = "CLOSE"
+    GET_STATUS = "GET_STATUS"
+    SELECT_CAMERA = "SELECT_CAMERA"
+    CHANGE_COLOR = "CHANGE_COLOR"
+    RESET = "RESET"
+    MOVE = "MOVE"

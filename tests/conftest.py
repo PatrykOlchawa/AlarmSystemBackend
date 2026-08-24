@@ -29,7 +29,7 @@ def alarm_control_service(alarm_service_dependencies):
     )
 
 @pytest.fixture
-def armed_alarm():
+def alarm():
     return SimpleNamespace(
         id=1,
         name="Test Alarm",
@@ -51,8 +51,22 @@ def pir_sensor():
 def sensor_reading():
     return SimpleNamespace(
         id=1,
-        sensor_reading=1,
+        sensor_id=1,
         value=1,
         timestamp=None,
-        sensor=None
+    )
+
+@pytest.fixture
+def pir_no_motion_reading():
+    return SimpleNamespace(
+        id=2,
+        sensor_id=1,
+        value=0,
+        timestamp=None,
+    )
+
+@pytest.fixture
+def event():
+    return SimpleNamespace(
+        id=1,
     )

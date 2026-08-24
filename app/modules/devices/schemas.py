@@ -47,13 +47,7 @@ class DeviceConfig(BaseModel):
     status: dict | None 
     model_config = ConfigDict(from_attributes=True)
 
-class CameraStreamResponse(BaseModel):
-    device_id: int
-    connection_identifier: str
-    path: str
-
-
 class CameraStreamTokenResponse(BaseModel):
     token: str
     expires_in: int
-    cameras: list[CameraStreamResponse]
+    stream_path: str

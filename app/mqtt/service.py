@@ -1,7 +1,8 @@
 from app.mqtt.client import mqtt_client
 from app.mqtt.topics import Topics
 import json
-from app.common.enums import AlarmStatus
+from app.common.enums import AlarmStatus, DeviceCommand
+from app.mqtt.schemas import DeviceCommandPayload
 import logging
 
 logger = logging.getLogger(__name__)
@@ -38,13 +39,13 @@ class MQTTService:
         self,
         alarm_id: int,
         device_id: int,
-        payload: dict,
+        payload: DeviceCommandPayload,
     ) -> None:
         self.publish(
             topic=Topics.command_device(
                 alarm_id=alarm_id,
                 device_id=device_id,
             ),
-            payload=payload
+            payload=payload.model_dump(mode="json")
         )
 mqtt_service = MQTTService()

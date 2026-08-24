@@ -71,6 +71,7 @@ class AlarmControlService:
         self.websocket_service = websocket_service
         self.mqtt_service = mqtt_service
         self.push_notification_service = push_notification_service
+        
     def process_sensor_reading(
         self,
         alarm_id: int,
@@ -83,6 +84,8 @@ class AlarmControlService:
             reading.value,
         )
         alarm = self.alarm_service.get_by_id(alarm_id)
+        if alarm is None:
+            return
         sensor = self.sensor_service.get_sensor_by_id(alarm, reading.sensor_id)
         if sensor is None:
             return
