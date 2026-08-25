@@ -1,0 +1,38 @@
+17. Kolejność implementacji
+
+Proponuję robić to dokładnie tak:
+
+Etap 1 — backend
+Zmienić connection_identifier generowane dla kamer.
+Ustalić CSI/USB.
+Zmienić get_camera_path().
+Zmienić create_camera_permissions().
+Sprawdzić CameraStreamTokenResponse.
+Etap 2 — MediaMTXClient
+Zostawić get_path_config().
+Zostawić patch_path().
+Dodać create_path().
+Dodać delete_path().
+Przetestować Control API ręcznie.
+Etap 3 — Raspberry
+Przebudować CameraController.
+Przebudować CameraManager.
+Usunąć active_camera_id.
+Usunąć select_camera() jako globalne przełączanie.
+Dodać konfigurację wielu kamer.
+Dla CSI generować:
+alarm-X-camera-Y → rpiCameraCamID
+Etap 4 — MQTT
+Usunąć SELECT_CAMERA z DeviceCommandHandler.
+Zostawić DeviceCommandHandler dla pozostałych komend.
+Nie publikować stanu dla operacji, które go nie zmieniają.
+Etap 5 — test
+Jedna kamera → alarm-4-camera-3.
+Druga kamera CSI → alarm-4-camera-4.
+Sprawdzić oba pathy równocześnie.
+Sprawdzić dwóch klientów oglądających różne kamery.
+Sprawdzić dwóch klientów oglądających tę samą kamerę.
+Etap 6 — USB
+Dodać obsługę usb-0.
+Dodać V4L2/FFmpeg jako źródło.
+Sprawdzić mieszane:

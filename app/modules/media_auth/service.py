@@ -39,9 +39,10 @@ class MediaAuthService:
     def get_stream_path(
         self,
         alarm: Alarm,
+        camera: Device,
     ) -> str:
         return (
-            f"alarm-{alarm.id}-cam"
+            f"alarm-{alarm.id}-camera-{camera.id}"
 
         )
     
@@ -76,15 +77,17 @@ class MediaAuthService:
     def create_stream_permissions(
         self,
         alarm: Alarm,
+        cameras: list[Device]
     ) -> list[dict]:
         return [
             {
                 "action": "read",
                 "path": self.get_stream_path(
                     alarm=alarm,
+                    camera=camera,
                 ),
             }
-
+            for camera in cameras
         ]
     
     def create_camera_stream_token(

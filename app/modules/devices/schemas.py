@@ -4,11 +4,16 @@ from pydantic import BaseModel, ConfigDict, Field
 # pyrefly: ignore [missing-import]
 from app.common.enums import ConnectionType
 from app.common.enums import DeviceType
+from app.modules.devices.model import Device
 from typing import Any
 class DeviceBase(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     connection_type: ConnectionType
-    connection_identifier: str = Field(min_length=1, max_length=50)
+    connection_identifier: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=50
+    )
     type: DeviceType
     location: str | None = Field(default=None, max_length=256)
     enabled: bool = True
@@ -42,12 +47,19 @@ class DeviceConfig(BaseModel):
     id: int
     name: str
     type: DeviceType
+    connection_type: ConnectionType
     connection_identifier: str
     enabled: bool
     status: dict | None 
     model_config = ConfigDict(from_attributes=True)
 
+class CameraStreamResponse(BaseModel):
+    device_id: int
+    connection_identifier: str
+    path: str
+
 class CameraStreamTokenResponse(BaseModel):
     token: str
     expires_in: int
-    stream_path: str
+    cameras: list[CameraStreamResponse]
+

@@ -89,8 +89,8 @@ class DeviceRepository:
     ) -> list[Device]:
         stmt = (
             select(Device)
-            .where(Device.connection_type == connection_type)
             .where(Device.alarm_id == alarm.id)
+            .where(Device.connection_type == connection_type)
         )
         return list(self.session.scalars(stmt))
 
@@ -105,4 +105,15 @@ class DeviceRepository:
         )
         return list(self.session.scalars(stmt))
         
-    
+    def get_cameras_by_connection_type(
+        self,
+        alarm:Alarm,
+        connection_type: ConnectionType
+    ) -> list[str]:
+        stmt = (
+            select(Device.connection_identifier)
+            .where(Device.alarm_id == alarm.id)
+            .where(Device.type == DeviceType.CAMERA)
+            .where(Device.connection_type == connection_type)
+        )
+        return list(self.session.scalars(stmt))

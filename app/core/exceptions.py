@@ -110,3 +110,7 @@ class WebsocketException(AppException):
 class InvalidPushTokenException(AppException):
     status_code = 403
     detail = "Invalid push token exception"
+
+class InvalidConnectionTypeException(AppException):
+    status_code = 403
+    detail = "Invalid connetion type exception"

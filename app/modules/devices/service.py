@@ -80,10 +80,31 @@ class DeviceService:
         if exist:
             raise DeviceAlreadyExistsException()
         
-        device = Device(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
-        device = self.repository.create(alarm,device)
+        data = request.model_dump(exclude={"alarm_id"})
+
+        if request.type == DeviceType.CAMERA:
+            if request.connection_type not in {
+                ConnectionType.CSI,
+                ConnectionType.USB,
+            }:
+                raise InvalidConnectionTypeException()
+            data["connection_identifier"] = (
+                self._generate_camera_connection_identifier(
+                    alarm=alarm,
+                    connection_type=request.connection_type,
+                )
+            )
+        device = Device(
+            **data,
+            alarm_id = alarm.id
+        )
+        device = self.repository.create(
+            alarm,
+            device
+        )
         self._notify_devices_changed(alarm_id=alarm.id)
         return device
+    
     def update(
         self,
         alarm:Alarm,
@@ -127,3 +148,33 @@ class DeviceService:
             )
         except Exception:
             raise WebsocketException
+
+    def _generate_camera_connection_identifier(
+        self,
+        alarm:Alarm,
+        connection_type: ConnectionType,
+    ) -> str:
+        prefix = connection_type.value.lower()
+        identifiers = self.repository.get_cameras_by_connection_type(
+            alarm=alarm,
+            connection_type=connection_type,
+        )
+        used_numbers: set[int] = set()
+
+        for identifier in identifiers:
+            expected_prefix = f"{prefix}"
+
+            if not identifier.startswith(expected_prefix):
+                continue
+            number_part = identifier.removeprefix(expected_prefix)
+
+            try:
+                number = int(number_part)
+            except ValueError:
+                continue
+            used_numbers.add(number)
+        number = 0
+        while number in used_numbers:
+            number += 1
+
+        return f"{prefix}-{number}"
