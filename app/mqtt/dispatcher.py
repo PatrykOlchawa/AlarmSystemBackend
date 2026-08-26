@@ -27,6 +27,10 @@ class MQTTDispatcher:
                 logger.warning(
                     "Backend should not receive command messages"
                 )
+            case MQTTMessageType.CONFIG:
+                match message.resource_type:
+                    case "cameras":
+                        return self.factory.create_cameras_config_handler()
         logger.warning(
             "No handler for topic"
         )

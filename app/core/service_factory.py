@@ -35,7 +35,9 @@ from app.modules.clients.repository import ClientRepository
 from app.modules.clients.service import ClientService
 from app.services.push_tokens_service import PushNotificationService
 from app.modules.push_tokens.repository import PushTokenRepository
-
+from mediaMTX.mediamtx_client import MediaMTXClient
+from mediaMTX.camera_controller import CameraController
+from mediaMTX.camera_manager import CameraManager
 
 class ServicesFactory:
     def create_session(self) -> Session:
@@ -244,7 +246,8 @@ class ServicesFactory:
             websocket_service=self.create_websocket_service(db),
             alarm_service=self.create_alarm_service(db),
         )
-  
+
+    
     def create_alarm_state_handler(
         self,
         db: Session,
@@ -253,4 +256,32 @@ class ServicesFactory:
         return AlarmStateHandler(
             websocket_service=self.create_websocket_service(db),
             alarm_service=self.create_alarm_service(db),
+        )
+
+    def create_media_mtx_client(
+        self,
+    ):
+        return MediaMTXClient()
+
+    def create_camera_controller(
+        self,
+    ):
+        return CameraController(
+            mediamtx_client= self.create_media_mtx_client()
+        )
+
+    def create_camera_manager(
+        self,
+    ):
+        return CameraManager(
+            camera_controller=self.create_camera_controller()
+        )
+    
+
+    def create_cameras_config_handler(
+        self,
+    ):
+        from app.mqtt.handlers.cameras_config_handler import CamerasConfigHandler
+        return CamerasConfigHandler(
+            camera_manager=self.create_camera_manager()
         )

@@ -11,7 +11,8 @@ from app.modules.devices.schemas import (
 from app.core.exceptions import (
     DeviceAlreadyExistsException,
     DeviceNotFoundException,
-    WebsocketException
+    WebsocketException,
+    InvalidConnectionTypeException
 )
 from app.modules.devices.model import Device
 from app.modules.devices.repository import DeviceRepository

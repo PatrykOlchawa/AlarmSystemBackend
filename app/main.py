@@ -30,6 +30,9 @@ import asyncio
 from app.core.event_loop import set_event_loop 
 from contextlib import asynccontextmanager
 from app.mqtt.dispatcher import dispatcher
+from mediaMTX.mediamtx_client import MediaMTXClient
+from mediaMTX.camera_controller import CameraController
+from mediaMTX.camera_manager import CameraManager
 import logging
 logger = logging.getLogger(__name__)
 @asynccontextmanager

@@ -104,6 +104,7 @@ class MQTTMessageType(str, Enum):
     COMMAND = "command"
     EVENT = "event"
     HEARTBEAT = "heartbeat"
+    CONFIG = "config"
 
 class ClientType(str, Enum):
     RASPBERRY = "RASBPERRY"
