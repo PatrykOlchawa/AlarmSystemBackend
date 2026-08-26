@@ -1,4 +1,4 @@
-from camera_controller import CameraController
+from mediaMTX.camera_controller import CameraController
 from app.common.enums import DeviceType
 from mediaMTX.schemas import CamerasConfigPayload
 

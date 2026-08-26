@@ -1,4 +1,4 @@
-from mediamtx_client import MediaMTXClient
+from mediaMTX.mediamtx_client import MediaMTXClient
 import logging
 logger = logging.getLogger(__name__)
 class CameraController:

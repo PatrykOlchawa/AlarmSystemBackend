@@ -30,6 +30,9 @@ class MQTTDispatcher:
             case MQTTMessageType.CONFIG:
                 match message.resource_type:
                     case "cameras":
+                        logger.info(
+                                "Cameras config revieced"
+                        )
                         return self.factory.create_cameras_config_handler()
         logger.warning(
             "No handler for topic"
