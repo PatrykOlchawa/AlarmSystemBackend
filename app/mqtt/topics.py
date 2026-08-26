@@ -3,6 +3,7 @@ class Topics:
     STATE = "alarm/+/state/#"
     EVENT = "alarm/+/event"
     HEARTBEAT = "alarm/+/heartbeat"
+    CONFIG = "alarm/+/config/#"
 
     @staticmethod
     def command_alarm(
