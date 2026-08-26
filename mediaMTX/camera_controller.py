@@ -16,7 +16,7 @@ class CameraController:
     ) -> None:
 
         config = {
-            "source": (f"rtsp://127.0.0.1:18554/{path}"),
+            "source": f"rtsp://host.docker.internal:18554/{path}",
             "rtspTransport": "tcp",
         }
 
