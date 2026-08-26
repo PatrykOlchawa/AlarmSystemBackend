@@ -3,7 +3,7 @@ class MediaMTXClient:
 
     def __init__(
         self,
-        base_url: str = "http://mediamtx:9997",
+        base_url: str = "http://host.docker.internal:9997",
     ):
         self.base_url = base_url.rstrip("/")
 
