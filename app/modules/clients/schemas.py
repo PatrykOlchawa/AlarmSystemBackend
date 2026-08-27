@@ -63,6 +63,7 @@ class ClientCredentials(BaseModel):
     secret: str
 
 class ConfigResponse(BaseModel):
+    revision: int
     alarm: AlarmResponse
     settings: list[SettingConfig]
     devices: list[DeviceConfig]

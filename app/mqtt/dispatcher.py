@@ -31,7 +31,7 @@ class MQTTDispatcher:
                 match message.resource_type:
                     case "cameras":
                         logger.info(
-                                "Cameras config revieced"
+                            "Cameras config revieced"
                         )
                         return self.factory.create_cameras_config_handler()
         logger.warning(

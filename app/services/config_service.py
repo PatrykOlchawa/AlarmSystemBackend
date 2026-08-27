@@ -40,6 +40,7 @@ class ConfigService:
         sensors = self.sensor_service.get_all_sensors(alarm=alarm)
 
         return ConfigResponse(
+            revision=alarm.config_revision,
             alarm=AlarmResponse.model_validate(alarm),
             settings=[
                 SettingConfig.model_validate(setting)

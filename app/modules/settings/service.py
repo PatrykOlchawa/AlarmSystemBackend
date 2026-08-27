@@ -16,14 +16,18 @@ from app.modules.alarms.model import Alarm
 from app.modules.settings.repository import SettingRepository
 from app.modules.settings.model import Setting
 from app.services.websocket_service import WebSocketMessageService
+from app.mqtt.service import MQTTService
+
 class SettingService:
     def __init__(
         self,
         repository:SettingRepository,
         websocket_service: WebSocketMessageService,
+        mqtt_service: MQTTService
     ):
         self.repository = repository
         self.websocket_service = websocket_service
+        self.mqtt_service = mqtt_service
 
     def get_all(
         self,
@@ -117,7 +121,8 @@ class SettingService:
         
         setting = Setting(**request.model_dump(), alarm_id=alarm.id)
         setting = self.repository.create(setting)
-        self._notify_settings_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_settings_changed(alarm=alarm)
         return setting
 
     def update(
@@ -130,7 +135,8 @@ class SettingService:
         setting.value = request.value
 
         setting = self.repository.update(setting)
-        self._notify_settings_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_settings_changed(alarm=alarm)
         return setting
     def delete(
         self,
@@ -139,15 +145,20 @@ class SettingService:
     ):
         setting = self.get_by_key(alarm, key)
         self.repository.delete(setting)
-        self._notify_settings_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_settings_changed(alarm=alarm)
 
     def _notify_settings_changed(
         self,
-        alarm_id: int,
+        alarm: Alarm,
     ) -> None:
+        self.mqtt_service.publish_config(
+            alarm_id=alarm.id,
+            revision=alarm.config_revision,
+        )
         try:
             self.websocket_service.send_message_sync(
-                alarm_id=alarm_id,
+                alarm_id=alarm.id,
                 event_type=MessageEventType.SETTINGS_UPDATED,
                 data={},
             )

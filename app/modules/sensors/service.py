@@ -11,15 +11,17 @@ from app.modules.sensors.repository import SensorRepository
 from app.modules.alarms.model import Alarm
 from app.services.websocket_service import WebSocketMessageService
 from app.common.enums import MessageEventType
-
+from app.mqtt.service import MQTTService
 class SensorService:
     def __init__(
         self,
         repository: SensorRepository,
-        websocket_service: WebSocketMessageService
+        websocket_service: WebSocketMessageService,
+        mqtt_service: MQTTService,
     ):
         self.repository = repository
         self.websocket_service = websocket_service
+        self.mqtt_service = mqtt_service
     
     def get_all_sensors(
         self,
@@ -44,7 +46,7 @@ class SensorService:
         sensor_name: str,
     ) -> Sensor:
         sensor = self.repository.get_by_alarm_and_name(alarm_id, sensor_name)
-        if Sensor is None:
+        if sensor is None:
             raise SensorNotFoundException()
         return sensor
     def get_alarm_and_id(
@@ -53,7 +55,7 @@ class SensorService:
         sensor_id: int,
     ) -> Sensor:
         sensor = self.repository.get_alarm_and_id(alarm_id, sensor_id)
-        if Sensor is None:
+        if sensor is None:
             raise SensorNotFoundException()
         return sensor
     
@@ -64,23 +66,25 @@ class SensorService:
     ):
         sensor = Sensor(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
         sensor = self.repository.create_sensor(sensor)
-        self._notify_sensors_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_sensors_changed(alarm=alarm)
         return sensor
     
     def update_sensor(
         self,
         alarm: Alarm,
-        sensor_int: int,
+        sensor_id: int,
         request: SensorUpdate
     ):
-        sensor = self.get_sensor_by_id(alarm, sensor_int)
+        sensor = self.get_sensor_by_id(alarm, sensor_id)
         if sensor is None:
             raise SensorNotFoundException
         update_data = request.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(sensor, field, value)
         sensor = self.repository.update_sensor(sensor)
-        self._notify_sensors_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_sensors_changed(alarm=alarm)
         return sensor
     
     def delete_sensor(
@@ -92,15 +96,20 @@ class SensorService:
         if sensor is None:
             raise SensorNotFoundException
         self.repository.delete_sensor(sensor)
-        self._notify_sensors_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_sensors_changed(alarm=alarm)
 
     def _notify_sensors_changed(
         self,
-        alarm_id: int,
+        alarm: Alarm,
     ) -> None:
+        self.mqtt_service.publish_config(
+            alarm_id=alarm.id,
+            revision=alarm.config_revision,
+        )
         try:
             self.websocket_service.send_message_sync(
-                alarm_id=alarm_id,
+                alarm_id=alarm.id,
                 event_type=MessageEventType.SENSORS_CHANGED,
                 data={},
             )

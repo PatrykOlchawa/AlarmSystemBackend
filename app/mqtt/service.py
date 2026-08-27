@@ -48,4 +48,18 @@ class MQTTService:
             ),
             payload=payload.model_dump(mode="json")
         )
+
+    def publish_config(
+        self,
+        alarm_id: int,
+        revision: int,
+    ) -> None:
+        self.publish(
+            topic=Topics.config(
+                alarm_id=alarm_id,
+            ),
+            payload={
+                "revision":revision,
+            },
+        )
 mqtt_service = MQTTService()

@@ -37,3 +37,9 @@ class Topics:
         device_id: int,
     ) -> str:
         return f"alarm/{alarm_id}/state/device/{device_id}"
+
+    @staticmethod
+    def config(
+        alarm_id:int,
+    ) -> str:
+        return f"alarm/{alarm_id}/config/alarm"

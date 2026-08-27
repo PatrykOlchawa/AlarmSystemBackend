@@ -6,7 +6,8 @@ from app.modules.devices.repository import DeviceRepository
 from app.modules.devices.service import DeviceService
 from app.core.websocket.dependencies import get_websocket_service
 from app.services.websocket_service import WebSocketMessageService
-
+from app.mqtt.service import MQTTService
+from app.mqtt.dependencies import get_mqtt_service
 def get_device_repository(
     db: Session = Depends(get_db),
 ) -> DeviceRepository:
@@ -15,6 +16,7 @@ def get_device_repository(
 
 def get_device_service(
     repository: DeviceRepository = Depends(get_device_repository),
-    websocket_service: WebSocketMessageService= Depends(get_websocket_service),    
+    websocket_service: WebSocketMessageService= Depends(get_websocket_service),
+    mqtt_service: MQTTService = Depends(get_mqtt_service),
 ) -> DeviceService:
-    return DeviceService(repository, websocket_service)
+    return DeviceService(repository, websocket_service, mqtt_service)

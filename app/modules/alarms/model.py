@@ -4,7 +4,7 @@ from sqlalchemy import (
     DateTime,
     Enum,
     String,
-
+    Integer
 )
 from sqlalchemy.orm import (
     Mapped,
@@ -52,7 +52,12 @@ class Alarm(Base):
         default=True,
         nullable=False
     )
-    
+    config_revision: Mapped[Integer] = mapped_column(
+        Integer,
+        default=0,
+        server_default="0",
+        nullable=False,
+    )
     user_alarms: Mapped[list["UserAlarm"]] = relationship(
         back_populates="alarm",
         cascade="all, delete-orphan"

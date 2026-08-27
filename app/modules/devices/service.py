@@ -18,14 +18,17 @@ from app.modules.devices.model import Device
 from app.modules.devices.repository import DeviceRepository
 from app.modules.alarms.model import Alarm
 from app.services.websocket_service import WebSocketMessageService
+from app.mqtt.service import MQTTService
 class DeviceService:
     def __init__(
         self,
         repository: DeviceRepository,
         websocket_service: WebSocketMessageService,
+        mqtt_service: MQTTService,
     ):
         self.repository = repository
         self.websocket_service = websocket_service
+        self.mqtt_service = mqtt_service
     def get_all(
         self,
         alarm:Alarm
@@ -103,7 +106,8 @@ class DeviceService:
             alarm,
             device
         )
-        self._notify_devices_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_devices_changed(alarm=alarm)
         return device
     
     def update(
@@ -125,7 +129,8 @@ class DeviceService:
             setattr(device, field, value)
             
         device = self.repository.update(device)
-        self._notify_devices_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_devices_changed(alarm=alarm)
         return device
     
     def delete(
@@ -135,15 +140,20 @@ class DeviceService:
     ) -> None:
         device = self.get_by_id(alarm,device_id)
         self.repository.delete(alarm,device)
-        self._notify_devices_changed(alarm_id=alarm.id)
+        alarm.config_revision += 1
+        self._notify_devices_changed(alarm=alarm)
 
     def _notify_devices_changed(
         self,
-        alarm_id: int,
+        alarm: Alarm,
     ) -> None:
+        self.mqtt_service.publish_config(
+            alarm_id=alarm.id,
+            revision=alarm.config_revision,
+        )
         try:
             self.websocket_service.send_message_sync(
-                alarm_id=alarm_id,
+                alarm_id=alarm.id,
                 event_type=MessageEventType.DEVICES_CHANGED,
                 data={},
             )

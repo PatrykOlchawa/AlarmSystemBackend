@@ -11,6 +11,8 @@ from app.modules.settings.service import (
 )
 from app.services.websocket_service import WebSocketMessageService
 from app.core.websocket.dependencies import get_websocket_service
+from app.mqtt.service import MQTTService
+from app.mqtt.dependencies import get_mqtt_service
 
 def get_setting_repository(
     db: Session = Depends(get_db),
@@ -21,6 +23,7 @@ def get_setting_repository(
 def get_settings_service(
     repository: SettingRepository = Depends(get_setting_repository),
     websocket_service: WebSocketMessageService= Depends(get_websocket_service),
+    mqtt_service: MQTTService = Depends(get_mqtt_service),
 ) -> SettingService:
 
-    return SettingService(repository, websocket_service)
+    return SettingService(repository, websocket_service, mqtt_service)
