@@ -1,7 +1,8 @@
 from app.common.enums import (
     ConnectionType,
     DeviceType,
-    MessageEventType
+    MessageEventType,
+    ConfigResourceType,
 ) 
 
 from app.modules.devices.schemas import (
@@ -107,7 +108,10 @@ class DeviceService:
             alarm,
             device
         )
-        self._notify_devices_changed(alarm=alarm)
+        self._notify_devices_changed(
+            alarm=alarm,
+            device=device
+        )
         return device
     
     def update(
@@ -130,7 +134,10 @@ class DeviceService:
             
         alarm.config_revision += 1
         device = self.repository.update(device)
-        self._notify_devices_changed(alarm=alarm)
+        self._notify_devices_changed(
+            alarm=alarm,
+            device=device
+        )
         return device
     
     def delete(
@@ -141,15 +148,25 @@ class DeviceService:
         device = self.get_by_id(alarm,device_id)
         alarm.config_revision += 1
         self.repository.delete(alarm,device)
-        self._notify_devices_changed(alarm=alarm)
+        self._notify_devices_changed(
+            alarm=alarm,
+            device=device
+        )
 
     def _notify_devices_changed(
         self,
         alarm: Alarm,
+        device: Device,
     ) -> None:
+        if device.type == DeviceType.CAMERA:
+            resource = ConfigResourceType.CAMERAS
+        else:
+            resource = ConfigResourceType.DEVICES
+
         self.mqtt_service.publish_config(
             alarm_id=alarm.id,
             revision=alarm.config_revision,
+            resource=resource,
         )
         try:
             self.websocket_service.send_message_sync(

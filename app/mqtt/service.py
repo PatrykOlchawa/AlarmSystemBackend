@@ -1,7 +1,7 @@
 from app.mqtt.client import mqtt_client
 from app.mqtt.topics import Topics
 import json
-from app.common.enums import AlarmStatus, DeviceCommand
+from app.common.enums import AlarmStatus, DeviceCommand, ConfigResourceType
 from app.mqtt.schemas import DeviceCommandPayload
 import logging
 
@@ -53,6 +53,7 @@ class MQTTService:
         self,
         alarm_id: int,
         revision: int,
+        resource: ConfigResourceType,
     ) -> None:
         self.publish(
             topic=Topics.config(
@@ -60,6 +61,7 @@ class MQTTService:
             ),
             payload={
                 "revision":revision,
+                "resource": ConfigResourceType,
             },
         )
 mqtt_service = MQTTService()

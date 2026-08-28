@@ -1,6 +1,7 @@
 from app.common.enums import (
     MessageEventType,
-    AlarmStatus
+    AlarmStatus,
+    ConfigResourceType
 )
 from app.core.exceptions import (
     SettingNotFoundException,
@@ -155,6 +156,7 @@ class SettingService:
         self.mqtt_service.publish_config(
             alarm_id=alarm.id,
             revision=alarm.config_revision,
+            resource=ConfigResourceType.SETTINGS,
         )
         try:
             self.websocket_service.send_message_sync(

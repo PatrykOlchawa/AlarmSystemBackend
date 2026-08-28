@@ -128,3 +128,9 @@ class DeviceCommand(str, Enum):
     CHANGE_COLOR = "CHANGE_COLOR"
     RESET = "RESET"
     MOVE = "MOVE"
+
+class ConfigResourceType(str, Enum):
+    DEVICES = "devices"
+    SENSORS = "sensors"
+    SETTINGS = "settings"
+    CAMERAS = "cameras"

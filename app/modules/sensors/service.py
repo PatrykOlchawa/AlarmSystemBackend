@@ -1,3 +1,7 @@
+from app.common.enums import (
+    MessageEventType,
+    ConfigResourceType
+)
 from app.modules.sensors.schemas import (
     SensorCreate,
     SensorUpdate
@@ -10,7 +14,6 @@ from app.modules.sensors.model import Sensor
 from app.modules.sensors.repository import SensorRepository
 from app.modules.alarms.model import Alarm
 from app.services.websocket_service import WebSocketMessageService
-from app.common.enums import MessageEventType
 from app.mqtt.service import MQTTService
 class SensorService:
     def __init__(
@@ -106,6 +109,7 @@ class SensorService:
         self.mqtt_service.publish_config(
             alarm_id=alarm.id,
             revision=alarm.config_revision,
+            resource=ConfigResourceType.SENSORS,
         )
         try:
             self.websocket_service.send_message_sync(
