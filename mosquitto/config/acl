@@ -3,8 +3,8 @@ topic readwrite alarm/+/#
 
 user raspberry
 topic read alarm/+/command/#
+topic read alarm/+/config/#
 topic write alarm/+/state/#
 topic write alarm/+/sensor/#
 topic write alarm/+/event
 topic write alarm/+/heartbeat
-topic write alarm/+/config/#

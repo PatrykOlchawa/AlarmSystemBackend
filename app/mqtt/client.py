@@ -102,7 +102,6 @@ class MQTTClient:
         self.client.subscribe(Topics.STATE)
         self.client.subscribe(Topics.EVENT)
         self.client.subscribe(Topics.HEARTBEAT)
-        self.client.subscribe(Topics.CONFIG)
 
 
     def set_dispatcher(self, dispatcher):
