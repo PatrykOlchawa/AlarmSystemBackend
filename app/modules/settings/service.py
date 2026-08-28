@@ -120,8 +120,8 @@ class SettingService:
             raise SettingAlreadyExistsException()
         
         setting = Setting(**request.model_dump(), alarm_id=alarm.id)
-        setting = self.repository.create(setting)
         alarm.config_revision += 1
+        setting = self.repository.create(setting)
         self._notify_settings_changed(alarm=alarm)
         return setting
 
@@ -134,8 +134,8 @@ class SettingService:
         setting = self.get_by_key(alarm, key)
         setting.value = request.value
 
-        setting = self.repository.update(setting)
         alarm.config_revision += 1
+        setting = self.repository.update(setting)
         self._notify_settings_changed(alarm=alarm)
         return setting
     def delete(
@@ -144,8 +144,8 @@ class SettingService:
         key: str,
     ):
         setting = self.get_by_key(alarm, key)
-        self.repository.delete(setting)
         alarm.config_revision += 1
+        self.repository.delete(setting)
         self._notify_settings_changed(alarm=alarm)
 
     def _notify_settings_changed(

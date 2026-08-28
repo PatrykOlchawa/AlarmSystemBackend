@@ -102,11 +102,11 @@ class DeviceService:
             **data,
             alarm_id = alarm.id
         )
+        alarm.config_revision += 1
         device = self.repository.create(
             alarm,
             device
         )
-        alarm.config_revision += 1
         self._notify_devices_changed(alarm=alarm)
         return device
     
@@ -128,8 +128,8 @@ class DeviceService:
         for field, value in update_data.items():
             setattr(device, field, value)
             
-        device = self.repository.update(device)
         alarm.config_revision += 1
+        device = self.repository.update(device)
         self._notify_devices_changed(alarm=alarm)
         return device
     
@@ -139,8 +139,8 @@ class DeviceService:
         device_id: int,
     ) -> None:
         device = self.get_by_id(alarm,device_id)
-        self.repository.delete(alarm,device)
         alarm.config_revision += 1
+        self.repository.delete(alarm,device)
         self._notify_devices_changed(alarm=alarm)
 
     def _notify_devices_changed(

@@ -65,8 +65,8 @@ class SensorService:
         request: SensorCreate,
     ):
         sensor = Sensor(**request.model_dump(exclude={"alarm_id"}), alarm_id=alarm.id)
-        sensor = self.repository.create_sensor(sensor)
         alarm.config_revision += 1
+        sensor = self.repository.create_sensor(sensor)
         self._notify_sensors_changed(alarm=alarm)
         return sensor
     
@@ -82,8 +82,8 @@ class SensorService:
         update_data = request.model_dump(exclude_unset=True)
         for field, value in update_data.items():
             setattr(sensor, field, value)
-        sensor = self.repository.update_sensor(sensor)
         alarm.config_revision += 1
+        sensor = self.repository.update_sensor(sensor)
         self._notify_sensors_changed(alarm=alarm)
         return sensor
     
@@ -95,8 +95,8 @@ class SensorService:
         sensor = self.get_sensor_by_id(alarm, sensor_id)
         if sensor is None:
             raise SensorNotFoundException
-        self.repository.delete_sensor(sensor)
         alarm.config_revision += 1
+        self.repository.delete_sensor(sensor)
         self._notify_sensors_changed(alarm=alarm)
 
     def _notify_sensors_changed(
