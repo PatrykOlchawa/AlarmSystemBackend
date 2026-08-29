@@ -33,6 +33,7 @@ from app.modules.clients.service import ClientService
 from app.security.hashing import password_hasher
 from app.modules.users.repository import UserRepository
 from app.services.websocket_service import WebSocketMessageService 
+from app.modules.clients.model import Client
 
 class AlarmService:
     def __init__(
@@ -190,7 +191,16 @@ class AlarmService:
             raise UserNotAddedToAlarm()
         self.user_alarm_repository.delete(membership)
         self._notify_alarms_changed()
-        
+
+    def get_clients(
+        self,
+        alarm_id: int,
+    ) -> list[Client]:
+        alarm = self.get_by_id(alarm_id)
+        return self.client_service.get_all(
+            alarm=alarm,
+        )  
+
     def verify_alarm_access(
         self,
         alarm_id: int,
@@ -226,3 +236,4 @@ class AlarmService:
             )
         except Exception:
             raise WebsocketException    
+

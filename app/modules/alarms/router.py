@@ -11,17 +11,17 @@ from app.modules.alarms.schemas import(
     AddUser,
     DeleteUser,
     AlarmRoleResponse,
-    UpdateAlarmRole,
-    
+    UpdateAlarmRole,    
     ChangePin,
 ) 
-from app.modules.clients.schemas import AlarmCreateResponse
+from app.modules.clients.schemas import AlarmCreateResponse, ClientResponse
 from app.common.enums import AlarmRole
 from app.modules.alarms.service import AlarmService
 from app.modules.alarms.dependencies import get_alarm_service
 from app.modules.user_alarm.model import UserAlarm
 from app.modules.user_alarm.repository import UserAlarmRepository 
-
+from app.modules.alarms.model import Alarm
+from app.security.authorization_dependencies import require_alarm_admin
 router = APIRouter(
     prefix="/alarms",
     tags=["Alarms"],
@@ -148,9 +148,11 @@ def change_pin(
     request: ChangePin,
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ) -> MessageResponse:
     membership = service.change_pin(alarm_id, current_user.id, request)
     return MessageResponse(message="PIN has been changed")
+
 @router.delete(
     "/{alarm_id}",
     response_model=MessageResponse,
@@ -159,8 +161,24 @@ def delete_alarm(
     alarm_id: int,
     service: AlarmService = Depends(get_alarm_service),
     current_user: User = Depends(get_current_user),
+    alarm : Alarm = Depends(require_alarm_admin),
 ) -> MessageResponse:
     service.delete(alarm_id)
     return MessageResponse(message="Alarm deleted successfully")
 
 
+@router.get(
+    "/{alarm_id}/clients",
+    response_model=list[ClientResponse],
+)
+def get_clients(
+    alarm_id: int,
+    alarm : Alarm = Depends(require_alarm_admin),
+    service: AlarmService = Depends(get_alarm_service),
+    current_user: User = Depends(get_current_user),
+) -> list[ClientResponse]:
+    clients = service.get_clients(alarm_id)
+    return [
+        ClientResponse.model_validate(client)
+        for client in clients
+    ]

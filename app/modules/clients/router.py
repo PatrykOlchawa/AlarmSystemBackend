@@ -8,15 +8,19 @@ from app.modules.clients.schemas import (
     ClientLoginResponse,
     ClientResponse,
     ConfigResponse,
+    ResetCredentials,
+    ClientCredentials,
 )
 from app.modules.auth.service import ClientAuthService
 from app.modules.auth.dependencies import get_client_auth_service
 from app.security.auth_dependencies import get_current_client
 from app.services.dependencies import get_config_service
+from app.modules.clients.dependencies import get_client_service
+from app.security.authorization_dependencies import require_alarm_admin
 from app.modules.clients.model import Client
 from app.modules.clients.service import ClientService
 from app.services.config_service import ConfigService
-
+from app.modules.alarms.model import Alarm
 router = APIRouter(
     prefix="/clients",
     tags=["Clients"]
@@ -54,3 +58,18 @@ def config(
     service: ConfigService = Depends(get_config_service),
 ):
     return service.get_config(client)
+
+
+@router.post(
+    "/{client_id}/reset_credentials",
+    response_model=ClientCredentials,
+)
+def reset_credentials(
+    client_id:str,
+    alarm: Alarm = Depends(require_alarm_admin),
+    service: ClientService = Depends(get_client_service),
+):
+    return service.reset_credentials(
+        client_id=client_id,
+        alarm=alarm,
+    )

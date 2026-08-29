@@ -61,7 +61,7 @@ class MQTTService:
             ),
             payload={
                 "revision":revision,
-                "resource": ConfigResourceType,
+                "resource": resource,
             },
         )
 mqtt_service = MQTTService()

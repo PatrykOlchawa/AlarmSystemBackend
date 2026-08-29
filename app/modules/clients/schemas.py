@@ -37,13 +37,9 @@ class ClientUpdate(BaseModel):
 
 class ClientResponse(BaseModel):
     id: int
-
     alarm_id: int
-
     client_id: str
-
     client_type: ClientType
-
     enabled: bool
 
     model_config = ConfigDict(
@@ -72,3 +68,6 @@ class ConfigResponse(BaseModel):
 class AlarmCreateResponse(BaseModel):
     alarm: AlarmResponse
     raspberry: ClientCredentials
+
+class ResetCredentials(BaseModel):
+    client_id: str

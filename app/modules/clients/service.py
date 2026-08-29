@@ -107,3 +107,33 @@ class ClientService:
             client_id=client_id,
             secret=secret,
         )
+
+    def reset_credentials(
+        self,
+        client_id: int,
+        alarm: Alarm,
+    ):
+        client = self.repository.get_by_client_id(
+            client_id=client_id,
+        )
+        self.repository.delete(
+            client=client,
+        )
+        client_id = str(uuid.uuid4())
+        secret = secrets.token_urlsafe(32)
+
+        client = Client(
+            client_id = client_id,
+            alarm_id = alarm.id,
+            secret_hash = self.password_hasher.hash_password(secret),
+            client_type = ClientType.RASPBERRY,
+            enabled = True,
+        )
+
+        self.repository.create(client)
+
+        return ClientCredentials(
+            client_id=client_id,
+            secret=secret,
+        )
+    
