@@ -1,5 +1,5 @@
 class Topics:
-    SENSOR = "alarm/+/sensor/#"
+    SENSOR = "alarm/+/reading/#"
     STATE = "alarm/+/state/#"
     EVENT = "alarm/+/event"
     HEARTBEAT = "alarm/+/heartbeat"
