@@ -15,7 +15,7 @@ class MQTTDispatcher:
         message: MQTTMessage,
     ):
         match message.message_type:
-            case MQTTMessageType.SENSOR:
+            case MQTTMessageType.READING:
                 return self.factory.create_sensor_handler(db)
             case MQTTMessageType.STATE:
                 match message.resource_type:
@@ -45,7 +45,7 @@ class MQTTDispatcher:
         payload: bytes,
     ) -> None:
         
-        db = self.factory.create_session()
+
         try: 
             parts = topic.split("/")
             if len(parts) < 4 :
@@ -67,23 +67,75 @@ class MQTTDispatcher:
                 logger.warning(f"Unknown MQTT message type: {parts[2]}")
                 return
             
-            resource_type = parts[3]
+            # resource_type = parts[3]
+            # resource_id = None
+            # if len(parts) > 4:
+            #         try:
+            #             resource_id = int(parts[4])
+            #         except ValueError:
+            #             logger.warning(
+            #                 "Invalid resource id in topic %s",
+            #                 topic,
+            #             )
+            #             return       
+            # logger.info(
+            #     "parts=%s resource_type=%s resource_id=%s",
+            #     parts,
+            #     resource_type,
+            #     resource_id,
+            # )       
+
+            resource_type = None
             resource_id = None
-            if len(parts) > 4:
+            match message_type:
+
+                case MQTTMessageType.READING:
+                    if len(parts) != 5 or parts[3] != "sensor":
+                        logger.warning("Invalid reading topic: %s", topic)
+                        return None
+
+                    resource_type = "sensor"
+
                     try:
                         resource_id = int(parts[4])
                     except ValueError:
-                        logger.warning(
-                            "Invalid resource id in topic %s",
-                            topic,
-                        )
-                        return       
-            logger.info(
-                "parts=%s resource_type=%s resource_id=%s",
-                parts,
-                resource_type,
-                resource_id,
-            )          
+                        logger.warning("Invalid sensor ID: %s", topic)
+                        return None
+
+                case MQTTMessageType.STATE:
+                    if len(parts) == 4:
+                        resource_type = parts[3]
+
+                        if resource_type != "alarm":
+                            logger.warning("Invalid state topic: %s", topic)
+                            return None
+
+                    elif len(parts) == 5 and parts[3] == "device":
+                        resource_type = "device"
+
+                        try:
+                            resource_id = int(parts[4])
+                        except ValueError:
+                            logger.warning("Invalid device ID: %s", topic)
+                            return None
+
+                    else:
+                        logger.warning("Invalid state topic: %s", topic)
+                        return None
+
+                case MQTTMessageType.CONFIG:
+                    if len(parts) != 4:
+                        logger.warning("Invalid config topic: %s", topic)
+                        return None
+
+                    resource_type = parts[3]
+
+                case MQTTMessageType.COMMAND:
+                    logger.warning("Backend should not receive command messages")
+                    return None  
+                case _:
+                    logger.warning("Unsupported MQTT message type: %s", message_type)
+                    return
             message = MQTTMessage(
                 alarm_id=alarm_id,
                 message_type=message_type,
@@ -91,7 +143,8 @@ class MQTTDispatcher:
                 resource_id=resource_id,
                 payload=payload,
             )
-
+            db = self.factory.create_session()
+            
             handler = self._get_handler(
                 db=db,
                 message=message,

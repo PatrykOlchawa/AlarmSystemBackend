@@ -15,9 +15,9 @@ class MQTTMessage(BaseModel):
     resource_type: str | None = None
     resource_id: int | None = None 
     payload: bytes
-
+    
 class SensorPayload(BaseModel):
-    value: bool | int | float | str
+    value: float = Field(gt=-1)
 
 class StatePayload(RootModel[dict[str, Any]]):
     pass

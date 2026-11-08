@@ -41,3 +41,4 @@ class UpdateAlarmRole(BaseModel):
 class ChangePin(BaseModel):
     old_pin: str
     new_pin: str
+

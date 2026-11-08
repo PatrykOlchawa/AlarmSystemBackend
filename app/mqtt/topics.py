@@ -23,7 +23,7 @@ class Topics:
         alarm_id:int,
         sensor_id:int,
     ) -> str:
-        return f"alarm/{alarm_id}/sensor/reading/{sensor_id}"
+        return f"alarm/{alarm_id}/reading/sensor/{sensor_id}"
 
     @staticmethod
     def state_alarm(

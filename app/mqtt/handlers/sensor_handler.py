@@ -8,6 +8,7 @@ from app.modules.readings.service import SensorReadingService
 from pydantic import ValidationError
 from app.services.websocket_service import WebSocketMessageService
 from app.common.enums import MessageEventType
+from app.modules.readings.schemas import SensorReadingCreate
 import logging
 from typing import TYPE_CHECKING
 
@@ -46,7 +47,7 @@ class SensorHandler(BaseHandler):
             )
             reading = self.reading_service.create_for_sensor(
                 sensor=sensor,
-                request=payload,
+                rrequest=SensorReadingCreate(value=payload.value),
             )
             try: 
                 self.websocket_service.send_message_sync(

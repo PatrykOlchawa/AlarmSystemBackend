@@ -99,12 +99,13 @@ class MessageEventType(str, Enum):
     ERROR = "ERROR"
 
 class MQTTMessageType(str, Enum):
-    SENSOR = "sensor"
+    READING = "reading"
     STATE = "state"
     COMMAND = "command"
     EVENT = "event"
     HEARTBEAT = "heartbeat"
     CONFIG = "config"
+
 
 class ClientType(str, Enum):
     RASPBERRY = "RASBPERRY"
